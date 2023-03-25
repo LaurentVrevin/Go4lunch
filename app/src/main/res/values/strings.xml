@@ -10,4 +10,13 @@
     <string name="menu_your_lunch">YOUR LUNCH</string>
     <string name="menu_settings">SETTINGS</string>
     <string name="menu_logout">LOGOUT</string>
+    <string name="menu_mapview">MAPVIEW</string>
+    <string name="menu_listview">LISTVIEW</string>
+    <string name="menu_workmates">WORKMATES</string>
+    <!-- BOTTOM MENU STRING-->
+    <string name="menu_bottom_mapview">Map View</string>
+    <string name="menu_bottom_listview">List View</string>
+    <string name="menu_bottom_workmates">Workmates</string>
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

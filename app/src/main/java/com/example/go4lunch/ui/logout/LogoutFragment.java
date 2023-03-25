@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.home;
+package com.example.go4lunch.ui.logout;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,22 +9,22 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.arch.lifecycle.ViewModelProvider;
 
-import com.example.go4lunch.databinding.FragmentHomeBinding;
+import com.example.go4lunch.databinding.FragmentLogoutBinding;
 
-public class HomeFragment extends Fragment {
+public class LogoutFragment extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentLogoutBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(HomeViewModel.class);
+        LogoutViewModel logoutViewModel =
+                new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(LogoutViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentLogoutBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textHome;
-        homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        final TextView textView = binding.textSlideshow;
+        logoutViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 
