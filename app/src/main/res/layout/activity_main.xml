@@ -6,11 +6,14 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:fitsSystemWindows="false"
+    tools:openDrawer="start"
+    >
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
     <include
         android:id="@+id/app_bar_main"
         layout="@layout/app_bar_main"
@@ -43,10 +46,22 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="@color/orange"
         android:fitsSystemWindows="true"
+        app:itemTextColor="@color/white"
+        app:itemIconTint="@color/white"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_nav_menu">
 
+        <ImageView
+            android:id="@+id/imageview_logo_bottom"
+            android:layout_width="@dimen/imagesize_iv_logo_width"
+            android:layout_height="@dimen/imagesize_iv_logo_height"
+            android:src="@drawable/meal_v2_half_size"
+            android:layout_gravity="bottom|center"
+            android:contentDescription="@string/nav_header_title"
+
+            />
 </com.google.android.material.navigation.NavigationView>
 
 </androidx.drawerlayout.widget.DrawerLayout>

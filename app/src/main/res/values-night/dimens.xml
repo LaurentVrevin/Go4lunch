@@ -1,4 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="header_title_margin">200dp</dimen>
     <dimen name="textsize_header_profilename">16sp</dimen>
 </resources>

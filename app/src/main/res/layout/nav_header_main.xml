@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
+    android:layout_height="wrap_content"
+    android:background="@drawable/lunch"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -11,25 +12,54 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    <TextView
+        android:id="@+id/tv_header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nav_header_title"
+        android:paddingBottom="@dimen/header_title_margin"
+        android:textSize="@dimen/textsize_header_title"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/iv_header_Avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        android:paddingEnd="@dimen/nav_header_vertical_spacing"
+        android:paddingStart="0dp"
+        app:srcCompat="@mipmap/ic_launcher_round"
+        app:layout_constraintTop_toBottomOf="@+id/tv_header_title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/nav_header_title"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-    <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_header_profilename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/nav_header_subtitle" />
-</LinearLayout>
+        android:paddingTop="@dimen/header_title_margin"
+        android:text="@string/nav_header_profilename"
+        android:textSize="@dimen/textsize_header_profilename"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/tv_header_title"
+        app:layout_constraintLeft_toRightOf="@id/iv_header_Avatar"
+        />
+
+    <TextView
+        android:id="@+id/tv_header_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nav_header_subtitle"
+        android:textSize="@dimen/textsize_header_email"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/tv_header_profilename"
+        app:layout_constraintLeft_toRightOf="@id/iv_header_Avatar"
+      />
+</androidx.constraintlayout.widget.ConstraintLayout>
