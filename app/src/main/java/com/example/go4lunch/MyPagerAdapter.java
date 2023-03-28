@@ -1,21 +1,19 @@
 package com.example.go4lunch;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.lifecycle.Lifecycle;
 
 import com.example.go4lunch.ui.listview.ListViewFragment;
 import com.example.go4lunch.ui.mapview.MapViewFragment;
 import com.example.go4lunch.ui.workmates.WorkmatesFragment;
 
-public class MyPagerAdapter extends FragmentPagerAdapter {
+public class MyPagerAdapter extends FragmentStatePagerAdapter {
     private static final int NUM_PAGES = 3;
 
 
-    public MyPagerAdapter(FragmentManager fm, int behavior) {
+    public MyPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -36,7 +34,5 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return NUM_PAGES;
     }
-
-
 
 }

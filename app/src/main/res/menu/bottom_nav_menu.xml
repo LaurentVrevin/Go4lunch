@@ -2,18 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_mapview"
+        android:id="@+id/nav_mapview"
         android:icon="@drawable/ic_baseline_map_24"
         android:title="@string/menu_bottom_mapview" />
 
     <item
-        android:id="@+id/navigation_listview"
+        android:id="@+id/nav_listview"
         android:icon="@drawable/ic_baseline_view_list_24"
         android:title="@string/menu_bottom_listview" />
 
     <item
-        android:id="@+id/navigation_workmates"
+        android:id="@+id/nav_workmates"
         android:icon="@drawable/ic_workmate"
         android:title="@string/menu_bottom_workmates" />
+
 
 </menu>

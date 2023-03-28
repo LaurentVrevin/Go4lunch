@@ -1,9 +1,9 @@
 package com.example.go4lunch.ui.listview;
 
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProvider;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +15,9 @@ import com.example.go4lunch.databinding.FragmentListviewBinding;
 public class ListViewFragment extends Fragment {
 
     private FragmentListviewBinding binding;
+    public static ListViewFragment newInstance(){
+        return new ListViewFragment();
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {

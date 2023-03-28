@@ -4,9 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/drawable/ic_baseline_power_settings_new_24.xml" value="0.3435" />
-        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/activity_main.xml" value="0.1842434347644852" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/app_bar_main.xml" value="0.23020833333333332" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/content_main.xml" value="0.25" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_blank.xml" value="0.23020833333333332" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_gallery.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_home.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_list_view.xml" value="0.389945652173913" />
@@ -18,8 +19,10 @@
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_workmates.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_yourlunch.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/nav_header_main.xml" value="0.23020833333333332" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/test.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/activity_main_drawer.xml" value="0.42916666666666664" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/bottom_nav_menu.xml" value="0.3109375" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/drawer_nav_menu.xml" value="0.42916666666666664" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/main.xml" value="0.33" />
       </map>
     </option>
