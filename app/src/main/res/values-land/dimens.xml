@@ -11,4 +11,6 @@
     <dimen name="textsize_header_email">12sp</dimen>
     <dimen name="imagesize_iv_logo_width">140dp</dimen>
     <dimen name="imagesize_iv_logo_height">140dp</dimen>
+    <dimen name="avatarsize_header_width">80dp</dimen>
+    <dimen name="avatarsize_header_height">80dp</dimen>
 </resources>

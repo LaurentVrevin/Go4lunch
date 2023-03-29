@@ -2,7 +2,7 @@
     <string name="app_name">Go4lunch</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Go4LUNCH</string>
+    <string name="nav_header_title">Go4Lunch</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
@@ -38,4 +38,7 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="text_setting">page de settings</string>
+    <string name="facebook_login_btn_txt">SIGN IN WITH FACEBOOK</string>
+    <string name="google_login_btn_txt">SIGN IN WITH GOOGLE</string>
+
 </resources>

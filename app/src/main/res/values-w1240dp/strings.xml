@@ -2,4 +2,8 @@
 <resources>
     <string name="nav_header_profilename">Prénom NOM</string>
     <string name="text_setting">page de settings</string>
+    <string name="avatarsize_header_width">100</string>
+    <string name="avatarsize_header_height">50</string>
+    <string name="facebook_login_btn_txt">SIGN IN WITH FACEBOOK</string>
+    <string name="google_login_btn_txt">SIGN IN WITH GOOGLE</string>
 </resources>

@@ -3,15 +3,13 @@ package com.example.go4lunch;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -56,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         //NavigationUI.setupWithNavController(navigationView, navController);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        //NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
-        // gérer le clique sur your lunch et sur settings pour ouvrir leur activités respectives
+        // gérer le clique sur yourlunch et sur settings pour ouvrir leurs activités respectives
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -79,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -105,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
                     this.mListViewFragment = ListViewFragment.newInstance();
                 }
                 if (!mListViewFragment.isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main, mListViewFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main, mListViewFragment).addToBackStack(null).commit();
+
                 }
                 return true;
             case R.id.nav_workmates:
@@ -113,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     this.mWorkmatesFragment = WorkmatesFragment.newInstance();
                 }
                 if (!mWorkmatesFragment.isVisible()) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main, mWorkmatesFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main, mWorkmatesFragment).disallowAddToBackStack().commit();
                 }
                 return true;
         }

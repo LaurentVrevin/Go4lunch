@@ -1,4 +1,4 @@
-package com.example.go4lunch;
+package com.example.go4lunch.adapter;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
