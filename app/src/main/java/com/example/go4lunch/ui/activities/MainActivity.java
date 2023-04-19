@@ -2,6 +2,7 @@ package com.example.go4lunch.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -26,17 +27,19 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
-    private NavController navController;
+
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
+    private BottomNavigationView bottomNavigationView;
+    private TextView tvUserName;
+    private TextView tvUserEmail;
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityMainBinding binding;
+    private NavController navController;
     private MapViewFragment mMapViewFragment;
     private ListViewFragment mListViewFragment;
     private WorkmatesFragment mWorkmatesFragment;
-    private UserManager userManager = UserManager.getInstance();
-    private TextView tvUserName, tvUserEmail;
-    private BottomNavigationView bottomNavigationView;
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
+    private ActivityMainBinding binding;
+    private UserManager userManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,37 +47,57 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        userManager = new UserManager();
+
+        setupToolbar();
+        setupNavigationDrawer();
+        setupBottomNavigation();
+        setupHeaderView();
+        setupNavController();
+        setupMapViewFragment();
+        setupNavigationListener();
+    }
+
+    private void setupToolbar() {
         setSupportActionBar(binding.appBarMain.toolbar);
+    }
+
+    private void setupNavigationDrawer() {
         drawer = binding.drawerLayout;
         navigationView = binding.navViewDrawer;
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    private void setupBottomNavigation() {
         bottomNavigationView = binding.bottomNavView;
-
         configureBottomNavItem();
-        tvUserName = binding.navViewDrawer.getHeaderView(0).findViewById(R.id.tv_header_profilename);
-        tvUserEmail = binding.navViewDrawer.getHeaderView(0).findViewById(R.id.tv_header_email);
+    }
 
-        String firstName = userManager.getFirstName();
-        String lastName = userManager.getLastName();
-        String email = userManager.getEmail();
+    private void setupHeaderView() {
+        View headerView = navigationView.getHeaderView(0);
+        tvUserName = headerView.findViewById(R.id.tv_header_profilename);
+        tvUserEmail = headerView.findViewById(R.id.tv_header_email);
+        displayUserInfo();
+    }
 
-        // Affichage des informations de l'utilisateur dans les vues de texte
-        if (tvUserName != null) {
-            tvUserName.setText(firstName + " " + lastName);
-        }
-        if (tvUserEmail != null) {
-            tvUserEmail.setText(email);
-        }
-
+    private void setupNavController() {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         mAppBarConfiguration = new AppBarConfiguration.Builder()
                 .setDrawerLayout(drawer)
                 .build();
+    }
 
-        // Affichage par défaut du fragment MapViewFragment
+    private void setupMapViewFragment() {
         mMapViewFragment = new MapViewFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main, mMapViewFragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment_content_main, mMapViewFragment)
+                .commit();
+    }
 
-        // Gestion du clic sur les éléments du menu de navigation supérieure
+    private void setupNavigationListener() {
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             Intent intent = null;
             switch (menuItem.getItemId()) {
@@ -85,18 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     intent = new Intent(MainActivity.this, SettingsActivity.class);
                     break;
                 case R.id.nav_logout:
-                    // Création de la boîte de dialogue de confirmation
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(R.string.logout_title)
-                            .setMessage(R.string.logout_message)
-                            .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
-                                // Si l'utilisateur confirme, déconnexion de l'utilisateur
-                                userManager.signOut(this).addOnSuccessListener(aVoid ->{
-                                    finish();
-                                });
-                            })
-                            .setNegativeButton(R.string.logout_negative_button, null)
-                            .show();
+                    showLogoutConfirmationDialog();
                     break;
             }
             if (intent != null) {
@@ -106,12 +118,38 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        // Configuration du bouton hamburger de la barre d'app
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
     }
+
+    private void displayUserInfo() {
+        String firstName = userManager.getFirstName();
+        String lastName = userManager.getLastName();
+        String email = userManager.getEmail();
+
+        if (tvUserName != null) {
+            tvUserName.setText(firstName + " " + lastName);
+        }
+        if (tvUserEmail != null) {
+            tvUserEmail.setText(email);
+        }
+    }
+
+    private void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.logout_title)
+                .setMessage(R.string.logout_message)
+                .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
+                    userManager.signOut(this).addOnSuccessListener(aVoid ->{
+
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    });
+                })
+                .setNegativeButton(R.string.logout_negative_button, null)
+                .show();
+    }
+
     // Configuration des éléments de la barre de navigation inférieure
     private void configureBottomNavItem() {
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {

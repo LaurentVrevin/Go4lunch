@@ -10,7 +10,7 @@ public class UserManager {
     private static volatile UserManager instance;
     private UserRepository userRepository;
 
-    private UserManager() {
+    public UserManager() {
         userRepository = UserRepository.getInstance();
     }
 
