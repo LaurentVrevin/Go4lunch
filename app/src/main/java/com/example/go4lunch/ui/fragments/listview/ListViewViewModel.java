@@ -1,16 +1,15 @@
-package com.example.go4lunch.ui.yourlunch;
+package com.example.go4lunch.ui.fragments.listview;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class YourLunchViewModel extends ViewModel {
-
+public class ListViewViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
-    public YourLunchViewModel() {
+    public ListViewViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is your lunch fragment");
+        mText.setValue("This is your ListView fragment");
     }
 
     public LiveData<String> getText() {

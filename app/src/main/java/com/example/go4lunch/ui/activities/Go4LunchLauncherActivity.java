@@ -1,11 +1,12 @@
-package com.example.go4lunch;
+package com.example.go4lunch.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.Window;
+
+import com.example.go4lunch.R;
 
 public class Go4LunchLauncherActivity extends AppCompatActivity {
 

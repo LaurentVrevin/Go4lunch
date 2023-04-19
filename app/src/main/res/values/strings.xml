@@ -40,5 +40,13 @@
     <string name="text_setting">page de settings</string>
     <string name="facebook_login_btn_txt">SIGN IN WITH FACEBOOK</string>
     <string name="google_login_btn_txt">SIGN IN WITH GOOGLE</string>
+    <string name="connection_succeed">Connection succeed !!!</string>
+    <string name="error_authentication_canceled">Error, connection canceled !</string>
+    <string name="error_no_internet">Error, no internet</string>
+    <string name="error_unknown_error">Error unkown</string>
+    <string name="logout_title">Sign out</string>
+    <string name="logout_message">Are you sure you want to logout ?</string>
+    <string name="logout_positive_button">Yes</string>
+    <string name="logout_negative_button">No</string>
 
 </resources>

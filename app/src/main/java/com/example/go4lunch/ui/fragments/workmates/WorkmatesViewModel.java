@@ -1,15 +1,15 @@
-package com.example.go4lunch.ui.listview;
+package com.example.go4lunch.ui.fragments.workmates;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class ListViewViewModel extends ViewModel {
+public class WorkmatesViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
 
-    public ListViewViewModel() {
+    public WorkmatesViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is your ListView fragment");
+        mText.setValue("This is Workmates fragment");
     }
 
     public LiveData<String> getText() {
