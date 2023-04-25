@@ -2,9 +2,11 @@ package com.example.go4lunch.ui.manager;
 
 import android.content.Context;
 
-import com.example.go4lunch.ui.repository.UserRepository;
+
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
+
+import repositories.UserRepository;
 
 public class UserManager {
     private static volatile UserManager instance;

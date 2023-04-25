@@ -6,48 +6,57 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.ui.manager.UserManager;
+import com.example.go4lunch.databinding.ActivityLoginBinding;
+
+import models.User;
+
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // Définition de la constante RC_SIGN_IN qui sera utilisée pour identifier la requête de connexion
     private static final int RC_SIGN_IN = 123;
-    private final UserManager userManager = UserManager.getInstance();
-    // Création d'une instance de la classe ActivityMainBinding pour lier la vue avec l'activité
-    ActivityMainBinding binding;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mFirestore;
+    private ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        // Récupération des instances Firebase Authentication et Firestore
+        mAuth = FirebaseAuth.getInstance();
+        mFirestore = FirebaseFirestore.getInstance();
 
-        // Définition de la vue de l'activité
-        //setContentView(R.layout.activity_login);
-        setupListener();
-    }
-
-    private void setupListener() {
-        if (userManager.isCurrentUserLogged()) {
-            startProfileActivity();
+        // Vérification si l'utilisateur est déjà connecté ou non
+        if (mAuth.getCurrentUser() != null) {
+            // Si oui, démarrage de l'activité principale
+            startMainActivity();
         } else {
-            startSignInActivity();
+            // Sinon, démarrage de l'activité de connexion
+            startLoginActivity();
         }
     }
 
-    private void startSignInActivity() {
-        // Définition de la liste des fournisseurs d'authentification disponibles
+    // Méthode pour démarrer l'activité de connexion
+    private void startLoginActivity() {
+        // Configuration des fournisseurs d'authentification
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
+                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                new AuthUI.IdpConfig.FacebookBuilder().build());
 
-        // Création d'une intention de connexion et lancement de l'activité correspondante
+
+        // Création de l'intent de connexion avec FirebaseUI
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
@@ -56,56 +65,36 @@ public class LoginActivity extends AppCompatActivity {
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.logo_go4lunch_launcher)
                         .build(),
-                RC_SIGN_IN);
+                RC_SIGN_IN); // Ajout du code de demande de connexion
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setupListener();
-    }
-
-    // Launching Profile Activity
-    private void startProfileActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+    // Méthode pour démarrer l'activité principale
+    private void startMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
+    // Méthode appelée après la fin de l'activité de connexion FirebaseUI
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Gestion de la réponse de l'activité de connexion
-        handleResponseAfterSignIn(requestCode, resultCode, data);
-    }
-
-    // Affiche un message dans une barre de notification en bas de l'écran
-    private void showSnackBar(String message) {
-        if (binding != null && binding.getRoot() != null) {
-            Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    // Gère la réponse de l'activité de connexion
-    private void handleResponseAfterSignIn(int requestCode, int resultCode, Intent data) {
-
-        // Récupération de la réponse de l'activité de connexion
-        IdpResponse response = IdpResponse.fromResultIntent(data);
-
-        // Vérification que la réponse concerne bien la requête de connexion
+        // Vérification si la demande de connexion provient de FirebaseUI
         if (requestCode == RC_SIGN_IN) {
-            // CONNEXION RÉUSSIE
+            // Récupération de la réponse de connexion
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+
+            // Vérification si la connexion a réussi ou non
             if (resultCode == RESULT_OK) {
-                //userManager.createUser();
-                // Affichage d'un message de connexion réussie
-                showSnackBar(getString(R.string.connection_succeed));
+                // Si oui, création de l'utilisateur dans Firestore et démarrage de l'activité principale
+                createUserInFirestore();
+                startMainActivity();
             } else {
-                // ERREURS
+                // Si non, affichage d'un message d'erreur dans un Snackbar
                 if (response == null) {
-                    // Affichage d'un message indiquant que l'utilisateur a annulé la connexion
                     showSnackBar(getString(R.string.error_authentication_canceled));
                 } else if (response.getError() != null) {
-                    // Affichage d'un message d'erreur en fonction du code d'erreur retourné
                     if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
                         showSnackBar(getString(R.string.error_no_internet));
                     } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
@@ -114,5 +103,24 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    // Méthode pour créer l'utilisateur dans Firestore
+    private void createUserInFirestore() {
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            // Récupération du nom de famille et de l'e-mail depuis le profil de l'utilisateur Firebase
+            String surname = firebaseUser.getDisplayName().split(" ")[1];
+            String email = firebaseUser.getEmail();
+            // Récupération de l'URL de la photo de profil
+            String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
+            // Création d'un objet User avec les informations de l'utilisateur actuellement connecté
+            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null);
+            mFirestore.collection("users").document(user.getUserId()).set(user);
+        }
+    }
+
+    private void showSnackBar(String message) {
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
     }
 }

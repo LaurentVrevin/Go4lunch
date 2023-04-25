@@ -49,4 +49,8 @@
     <string name="logout_positive_button">Yes</string>
     <string name="logout_negative_button">No</string>
 
+    <string name="facebook_application_id" translatable="false">927722528466481</string>
+    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb927722528466481</string>
+
 </resources>

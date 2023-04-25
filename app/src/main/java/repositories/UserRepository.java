@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.repository;
+package repositories;
 
 import android.content.Context;
 

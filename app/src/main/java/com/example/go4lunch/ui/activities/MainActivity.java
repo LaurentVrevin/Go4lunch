@@ -1,30 +1,38 @@
 package com.example.go4lunch.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.fragment.app.Fragment;
-
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.ui.fragments.listview.ListViewFragment;
 import com.example.go4lunch.ui.fragments.mapview.MapViewFragment;
 import com.example.go4lunch.ui.fragments.workmates.WorkmatesFragment;
-import com.example.go4lunch.ui.manager.UserManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
+
+import viewmodels.UserViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,7 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private ListViewFragment mListViewFragment;
     private WorkmatesFragment mWorkmatesFragment;
     private ActivityMainBinding binding;
-    private UserManager userManager;
+    private UserViewModel mUserViewModel;
+    private FirebaseAuth mAuth;
+    private ImageView imvProfilePhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        userManager = new UserManager();
+        mAuth = FirebaseAuth.getInstance();
+        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         setupToolbar();
         setupNavigationDrawer();
@@ -80,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         tvUserName = headerView.findViewById(R.id.tv_header_profilename);
         tvUserEmail = headerView.findViewById(R.id.tv_header_email);
+        imvProfilePhoto = findViewById(R.id.iv_header_Avatar);
         displayUserInfo();
     }
 
@@ -120,16 +132,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private void displayUserInfo() {
-        String firstName = userManager.getFirstName();
-        String lastName = userManager.getLastName();
-        String email = userManager.getEmail();
+        Log.d("MainActivity", "displayUserInfo called");
 
-        if (tvUserName != null) {
-            tvUserName.setText(firstName + " " + lastName);
+        // Récupère l'ID de l'utilisateur actuellement connecté
+        String userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+
+        // Vérifie que ViewModel a été initialisé
+        if (mUserViewModel != null) {
+            // Appelle la méthode getCurrentUserFromFirestore du ViewModel pour récupérer les données de l'utilisateur à partir de Firestore
+            mUserViewModel.getCurrentUserFromFirestore(userId);
+
+            // Crée un Observer pour recevoir les mises à jour de données d'utilisateur en direct
+            mUserViewModel.getUserLiveData().observe(this, user -> {
+                // Si les données de l'utilisateur ne sont pas nulles, les affiche dans les TextView correspondants
+                if (user != null) {
+                    tvUserName.setText(user.getName());
+                    tvUserEmail.setText(user.getEmail());
+                    if(user.getPictureUrl() !=null){
+                        setProfilePicture(user.getPictureUrl());
+                    }
+                }
+            });
         }
-        if (tvUserEmail != null) {
-            tvUserEmail.setText(email);
+    }
+    private void setProfilePicture(String profilePicture){
+
+        if(profilePicture!=null && imvProfilePhoto !=null){
+            Glide.with(this)
+                    .load(profilePicture)
+                    .circleCrop()
+                    .into(imvProfilePhoto);
         }
     }
 
@@ -138,13 +172,11 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle(R.string.logout_title)
                 .setMessage(R.string.logout_message)
                 .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
-                    userManager.signOut(this).addOnSuccessListener(aVoid ->{
-
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        finish();
-                    });
+                    mUserViewModel.logOut();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
                 })
                 .setNegativeButton(R.string.logout_negative_button, null)
                 .show();
