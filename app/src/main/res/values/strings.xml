@@ -50,7 +50,18 @@
     <string name="logout_negative_button">No</string>
 
     <string name="facebook_application_id" translatable="false">927722528466481</string>
+    <string name="facebook_client_token">10baba866d9c65dcc89fc173ef8e9636</string>
     <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
     <string name="facebook_login_protocol_scheme" translatable="false">fb927722528466481</string>
+    <string name="place_image">Place image</string>
+    <string name="call">call</string>
+    <string name="like">like</string>
+    <string name="website">website</string>
+    <string name="button_to_save_place_choice">Button to save place choice</string>
+    <string name="delete_title">Delete account</string>
+    <string name="delete_message">"Are you sure you want delete your account ? "</string>
+    <string name="notification_channel_id">myCanal</string>
+    <string name="notification_channel_title">myTitle</string>
+    <string name="notification_channel_description">This is the good channel</string>
 
 </resources>

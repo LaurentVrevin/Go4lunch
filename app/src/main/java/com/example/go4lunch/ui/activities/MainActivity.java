@@ -2,7 +2,6 @@ package com.example.go4lunch.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         View headerView = navigationView.getHeaderView(0);
         tvUserName = headerView.findViewById(R.id.tv_header_profilename);
         tvUserEmail = headerView.findViewById(R.id.tv_header_email);
-        imvProfilePhoto = findViewById(R.id.iv_header_Avatar);
+        imvProfilePhoto = headerView.findViewById(R.id.iv_header_Avatar);
         displayUserInfo();
     }
 
@@ -150,8 +149,9 @@ public class MainActivity extends AppCompatActivity {
                 if (user != null) {
                     tvUserName.setText(user.getName());
                     tvUserEmail.setText(user.getEmail());
+                    String profilePictureUrl = user.getPictureUrl();
                     if(user.getPictureUrl() !=null){
-                        setProfilePicture(user.getPictureUrl());
+                        setProfilePicture(profilePictureUrl);
                     }
                 }
             });

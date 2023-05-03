@@ -1,7 +1,5 @@
 package models;
 
-import android.net.Uri;
-
 import java.util.List;
 
 import javax.annotation.Nullable;

@@ -1,10 +1,16 @@
 package repositories;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.ui.activities.LoginActivity;
+import com.example.go4lunch.ui.activities.MainActivity;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -121,22 +127,12 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
     @Override
     public void deleteAccount(Context context) {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null) {
-            firebaseUser.delete().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    // Suppression réussie
-                    // Supprimer les données utilisateur associées dans Firestore
-                    userCollection.document(firebaseUser.getUid()).delete().addOnCompleteListener(task1 -> {
-                        if (task1.isSuccessful()) {
-                            // Données utilisateur supprimées avec succès dans Firestore
-                        }
-                    });
-                } else {
-                    // Erreur lors de la suppression
-                }
-            });
-        }
+        AuthUI.getInstance().delete(context);
+        userCollection.document(firebaseUser.getUid()).delete();
+        //Je m'assure que celui-ci soit bien déconnecté :
+        firebaseAuth.signOut();
     }
+
 
     @Override
     public void updateUserInFirestore(String userId, User user) {

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+
 import com.example.go4lunch.R;
 
 public class YourLunchActivity extends AppCompatActivity {
@@ -13,8 +14,8 @@ public class YourLunchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_your_lunch);
-        ActionBar actionBar = getSupportActionBar();
 
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

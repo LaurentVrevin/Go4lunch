@@ -14,4 +14,13 @@
     <string name="logout_message">Are you sure you want to logout ?</string>
     <string name="logout_positive_button">Yes</string>
     <string name="logout_negative_button">No</string>
+    <string name="place_image">Place image</string>
+    <string name="call">call</string>
+    <string name="like">like</string>
+    <string name="button_to_save_place_choice">Button to save place choice</string>
+    <string name="delete_title">delete_title</string>
+    <string name="delete_message">"Are you sure to want delete your account ? "</string>
+    <string name="notification_channel_id">myCanal</string>
+    <string name="notification_channel_title">myTitle</string>
+    <string name="notification_channel_description">This is the good channel</string>
 </resources>

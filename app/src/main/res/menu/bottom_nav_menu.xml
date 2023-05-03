@@ -4,17 +4,20 @@
     <item
         android:id="@+id/nav_mapview"
         android:icon="@drawable/ic_baseline_map_24"
-        android:title="@string/menu_bottom_mapview" />
+        android:title="@string/menu_bottom_mapview"
+        />
 
     <item
         android:id="@+id/nav_listview"
         android:icon="@drawable/ic_baseline_view_list_24"
-        android:title="@string/menu_bottom_listview" />
+        android:title="@string/menu_bottom_listview"
+        />
 
     <item
         android:id="@+id/nav_workmates"
         android:icon="@drawable/ic_workmate"
-        android:title="@string/menu_bottom_workmates" />
+        android:title="@string/menu_bottom_workmates"
+        />
 
 
 </menu>
