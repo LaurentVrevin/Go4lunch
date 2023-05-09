@@ -8,19 +8,21 @@ public class User {
 
     private String userId;
     private String name;
-
     private String email;
     @Nullable
     private String pictureUrl;
     private List<String> likedPlaces;
+    @Nullable
+    private String selectedRestaurantId; // Nouvelle variable pour stocker l'ID du restaurant sélectionné
 
     //CONSTRUCTOR
-    public User(String userId, String name, String email, @Nullable String pictureUrl, List<String> likedPlaces) {
+    public User(String userId, String name, String email, @Nullable String pictureUrl, List<String> likedPlaces, @Nullable String selectedRestaurantId) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.pictureUrl = pictureUrl;
         this.likedPlaces = likedPlaces;
+        this.selectedRestaurantId = selectedRestaurantId;
     }
     public User() {
         // constructeur sans argument requis pour Firestore
@@ -42,7 +44,6 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getEmail() {
         return email;
@@ -67,5 +68,14 @@ public class User {
 
     public void setLikedPlaces(List<String> likedPlaces) {
         this.likedPlaces = likedPlaces;
+    }
+
+    @Nullable
+    public String getSelectedRestaurantId() {
+        return selectedRestaurantId;
+    }
+
+    public void setSelectedRestaurantId(@Nullable String selectedRestaurantId) {
+        this.selectedRestaurantId = selectedRestaurantId;
     }
 }

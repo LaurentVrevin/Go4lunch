@@ -6,17 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_workmates_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="12dp"
+        android:padding="12dp"
         android:backgroundTint="@color/white"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        android:layout_marginTop="?attr/actionBarSize"
         tools:context=".ui.fragments.WorkmatesFragment"
-        tools:listitem="@layout/item_detail_workmates_view" />
+        tools:listitem="@layout/item_workmates_listview"
+
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

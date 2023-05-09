@@ -1,4 +1,4 @@
-package com.example.go4lunch.ui.fragments.mapview;
+package ui.fragments;
 
 import androidx.fragment.app.Fragment;
 

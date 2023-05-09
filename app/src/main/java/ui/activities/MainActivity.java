@@ -1,4 +1,6 @@
-package com.example.go4lunch.ui.activities;
+package ui.activities;
+
+
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -22,9 +24,10 @@ import androidx.navigation.ui.NavigationUI;
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-import com.example.go4lunch.ui.fragments.listview.ListViewFragment;
-import com.example.go4lunch.ui.fragments.mapview.MapViewFragment;
-import com.example.go4lunch.ui.fragments.workmates.WorkmatesFragment;
+
+import ui.fragments.ListViewFragment;
+import ui.fragments.MapViewFragment;
+import ui.fragments.WorkmatesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private WorkmatesFragment mWorkmatesFragment;
     private ActivityMainBinding binding;
     private UserViewModel mUserViewModel;
+
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
 
@@ -58,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
-        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
+        configureViewModels();
         setupToolbar();
         setupNavigationDrawer();
         setupBottomNavigation();
@@ -67,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
         setupNavController();
         setupMapViewFragment();
         setupNavigationListener();
+    }
+
+    private void configureViewModels() {
+        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
     }
 
     private void setupToolbar() {

@@ -24,6 +24,7 @@ public interface UserInterfaceRepository {
     void getCurrentUserFromFirestore(String userId);
 
     LiveData<List<User>> getUserListLiveData();
+    void setUserList(List<User> userList);
 
     void getUserListFromFirestore();
 

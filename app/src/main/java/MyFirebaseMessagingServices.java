@@ -1,5 +1,3 @@
-package com.example.go4lunch;
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -9,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.go4lunch.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

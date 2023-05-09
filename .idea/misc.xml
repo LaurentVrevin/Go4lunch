@@ -30,6 +30,8 @@
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_workmates.xml" value="0.3118811881188119" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/fragment_yourlunch.xml" value="0.389945652173913" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/item_detail_workmates_view.xml" value="0.23385416666666667" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/item_workmates_list_view.xml" value="0.389945652173913" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/item_workmates_listview.xml" value="0.33" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/nav_header_main.xml" value="0.5" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/settings_activity.xml" value="0.25" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/layout/test.xml" value="0.389945652173913" />
@@ -37,6 +39,7 @@
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/bottom_nav_menu.xml" value="0.3109375" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/drawer_nav_menu.xml" value="0.42916666666666664" />
         <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/main.xml" value="0.33" />
+        <entry key="..\:/COURS OPENCLASSROOMS/PROJET 07/app/src/main/res/menu/toolbar_menu.xml" value="0.428125" />
       </map>
     </option>
   </component>

@@ -1,21 +1,21 @@
-package com.example.go4lunch.ui.activities;
+package ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityLoginBinding;
 
-import models.User;
+import viewmodels.UserViewModel;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
@@ -27,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFirestore;
     private ActivityLoginBinding binding;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
         // Récupération des instances Firebase Authentication et Firestore
         mAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         // Vérification si l'utilisateur est déjà connecté ou non
         if (mAuth.getCurrentUser() != null) {
@@ -88,7 +90,8 @@ public class LoginActivity extends AppCompatActivity {
             // Vérification si la connexion a réussi ou non
             if (resultCode == RESULT_OK) {
                 // Si oui, création de l'utilisateur dans Firestore et démarrage de l'activité principale
-                createUserInFirestore();
+                userViewModel.createUserInFirestore();
+                //createUserInFirestore();
                 startMainActivity();
             } else {
                 // Si non, affichage d'un message d'erreur dans un Snackbar
@@ -105,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // Méthode pour créer l'utilisateur dans Firestore
+    /* Méthode pour créer l'utilisateur dans Firestore
     private void createUserInFirestore() {
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         if (firebaseUser != null) {
@@ -115,10 +118,10 @@ public class LoginActivity extends AppCompatActivity {
             // Récupération de l'URL de la photo de profil
             String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
             // Création d'un objet User avec les informations de l'utilisateur actuellement connecté
-            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null);
+            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null, null);
             mFirestore.collection("users").document(user.getUserId()).set(user);
         }
-    }
+    }*/
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();

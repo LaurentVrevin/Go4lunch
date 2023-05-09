@@ -1,15 +1,11 @@
 package repositories;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.go4lunch.ui.activities.LoginActivity;
-import com.example.go4lunch.ui.activities.MainActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +23,7 @@ import models.User;
 
 public class UserRepositoryImpl implements UserInterfaceRepository {
 
-    private final FirebaseFirestore firebaseFirestoreDB;
+    private FirebaseFirestore firebaseFirestoreDB;
     private final FirebaseAuth firebaseAuth;
     private final CollectionReference userCollection;
     private final MutableLiveData<User> userLiveData;
@@ -43,7 +39,12 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
 
     @Override
     public void instanceFirestore() {
-        FirebaseFirestore.setLoggingEnabled(true); // Activation des logs Firestore
+        //FirebaseFirestore.setLoggingEnabled(true); // Activation des logs Firestore
+        firebaseFirestoreDB = FirebaseFirestore.getInstance();
+    }
+    @Override
+    public void setUserList(List<User> userList) {
+        userListLiveData.postValue(userList);
     }
 
     @Override
@@ -80,17 +81,21 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
 
     @Override
     public void getUserListFromFirestore() {
+        instanceFirestore();
         // Récupération de la liste des utilisateurs depuis Firestore
-        userCollection.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                // Si la récupération des données est réussie et que les données ne sont pas nulles, on créé une liste d'objets User avec les données récupérées et on la poste dans le LiveData userListLiveData
-                List<User> userList = new ArrayList<>();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User user = document.toObject(User.class);
-                    userList.add(user);
-                }
-                userListLiveData.postValue(userList);
-            }
+        Log.d("UserRepositoryImpl", "getUserListFromFirestore() called");
+                userCollection.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        List<User> userList = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            User user = document.toObject(User.class);
+                            userList.add(user);
+                        }
+                        userListLiveData.postValue(userList);
+                        Log.d("UserRepositoryImpl", "getUserListFromFirestore() success - userList size: " + userList.size());
+                    } else {
+                        Log.e("UserRepositoryImpl", "getUserListFromFirestore() error: " + task.getException());
+                    }
         });
     }
 
@@ -104,7 +109,7 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
             // Récupération de l'URL de la photo de profil
             String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
             // Création d'un objet User avec les informations de l'utilisateur actuellement connecté
-            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null);
+            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null, null);
             userCollection.document(user.getUserId()).set(user);
         }
     }
@@ -151,3 +156,4 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
         }
     }
 }
+
