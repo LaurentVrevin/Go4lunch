@@ -24,4 +24,6 @@
     <string name="notification_channel_title">myTitle</string>
     <string name="notification_channel_description">This is the good channel</string>
     <string name="user_avatar">User avatar</string>
+    <string name="Search_Description">Search</string>
+    <string name="search_title">Search</string>
 </resources>

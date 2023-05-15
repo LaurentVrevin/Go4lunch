@@ -78,13 +78,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
-        setSupportActionBar(binding.appBarMain.toolbar);
+        setSupportActionBar(binding.toolbar);
     }
 
     private void setupNavigationDrawer() {
         drawer = binding.drawerLayout;
         navigationView = binding.navViewDrawer;
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.appBarMain.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
     }

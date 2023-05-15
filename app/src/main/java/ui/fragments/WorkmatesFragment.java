@@ -54,6 +54,5 @@ public class WorkmatesFragment extends Fragment {
 
         return view;
     }
-
 }
 

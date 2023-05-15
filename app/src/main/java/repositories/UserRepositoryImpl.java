@@ -89,6 +89,11 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
                         List<User> userList = new ArrayList<>();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             User user = document.toObject(User.class);
+                            // Si l'utilisateur actuellement traité est l'utilisateur connecté,
+                            // on ignore cet utilisateur et on passe à l'itération suivante de la boucle
+                            if (user.getUserId().equals(getCurrentUserFromFirebase().getUid())){
+                                continue;
+                            }
                             userList.add(user);
                         }
                         userListLiveData.postValue(userList);
