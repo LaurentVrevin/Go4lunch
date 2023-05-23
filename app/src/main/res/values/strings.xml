@@ -66,5 +66,9 @@
     <string name="user_avatar">User avatar</string>
     <string name="Search_Description">Search</string>
     <string name="search_title">Search</string>
+    <string name="location_permission_denied">Permission denied !</string>
+    <string name="permission_required_toast">Permission required</string>
+    <string name="permission_rationale_location">Need permission location</string>
+
 
 </resources>

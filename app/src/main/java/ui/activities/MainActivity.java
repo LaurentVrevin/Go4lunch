@@ -4,12 +4,14 @@ package ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,12 +24,15 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 
 import ui.fragments.ListViewFragment;
 import ui.fragments.MapViewFragment;
 import ui.fragments.WorkmatesFragment;
+
+import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +42,9 @@ import java.util.Objects;
 import viewmodels.UserViewModel;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final int LOCATION_PERMISSION_REQUEST_CODE = 5004;
+
 
     private DrawerLayout drawer;
     private NavigationView navigationView;
@@ -62,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         mAuth = FirebaseAuth.getInstance();
+
+
 
         configureViewModels();
         setupToolbar();
