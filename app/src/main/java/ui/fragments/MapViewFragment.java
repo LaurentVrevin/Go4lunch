@@ -2,8 +2,8 @@ package ui.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,10 +13,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
 
 import com.example.go4lunch.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -28,12 +27,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import ui.activities.LoginActivity;
 import viewmodels.MapViewViewModel;
 import viewmodels.UserViewModel;
 
@@ -56,7 +55,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
     private void configureViewModels() {
         mUserViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         mMapViewViewModel = new ViewModelProvider(requireActivity()).get(MapViewViewModel.class);
-
     }
 
     @Override
@@ -70,8 +68,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        // Exemple : Déplacer la caméra vers une position spécifique
-        //LatLng position = new LatLng(49.1828, -0.3700); // Exemple : Caen
         if (currentMapPosition != null) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapPosition, 12));
             googleMap.addMarker(new MarkerOptions().position(currentMapPosition).title("My Position"));
@@ -80,12 +76,11 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
         } else {
             requestLocationPermission();
         }
-        // Activer les contrôles de zoom
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        // Définir les limites de zoom
         googleMap.setMinZoomPreference(MIN_ZOOM);
         googleMap.setMaxZoomPreference(MAX_ZOOM);
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -144,8 +139,39 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            Toast.makeText(requireContext(), "Malheureusement, l'application a besoin de votre localisation pour fonctionner", Toast.LENGTH_SHORT).show();
-        mUserViewModel.logOut();
+            showPermissionDeniedDialog();
         }
     }
+
+    private void logOutAndRedirect() {
+        mUserViewModel.logOut();
+        // Rediriger vers l'activité LoginActivity
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        requireActivity().finish();
+    }
+    private void showPermissionDeniedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Permission de localisation refusée");
+        builder.setMessage("Pour utiliser l'application, nous avons besoin de votre localisation. Voulez-vous activer la localisation maintenant ? Sinon vous serez déconnecté !!!");
+
+        builder.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                requestLocationPermission(); // Demander à nouveau la permission de localisation
+            }
+        });
+
+        builder.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logOutAndRedirect(); // Déconnecter l'utilisateur et le rediriger vers LoginActivity
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }

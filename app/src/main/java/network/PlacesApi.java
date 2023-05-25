@@ -1,5 +1,6 @@
 package network;
 
+import models.nearbysearch.NearbySearchResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -10,5 +11,12 @@ import retrofit2.http.Query;
 
 
 public interface PlacesApi {
+    @GET("nearbysearch/json")
+    Call<NearbySearchResponse> nearbySearch(
+            @Query("location") String location,
+            @Query("type") String type,
+            @Query("key") String apiKey
+    );
+
 
 }
