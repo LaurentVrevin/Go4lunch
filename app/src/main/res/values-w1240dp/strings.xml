@@ -29,4 +29,8 @@
     <string name="location_permission_denied">Permission denied !</string>
     <string name="permission_required_toast">Permission required</string>
     <string name="permission_rationale_location">Need permission location</string>
+    <string name="permission_denied_title">Permission denied</string>
+    <string name="permission_denied_message">To use the app, we need your location. Do you want to enable location now? Otherwise you will be disconnected.</string>
+    <string name="permission_denied_positive_button">yes</string>
+    <string name="permission_denied_negative_button">no</string>
 </resources>

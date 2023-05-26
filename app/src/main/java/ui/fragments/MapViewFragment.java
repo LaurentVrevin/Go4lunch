@@ -88,6 +88,48 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
             outState.putParcelable("map_position", googleMap.getCameraPosition().target);
         }
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!hasLocationPermission()) {
+            requestLocationPermission();
+        } else {
+            showUserLocation();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!hasLocationPermission()) {
+            requestLocationPermission();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (googleMap != null) {
+            googleMap.clear();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (googleMap != null) {
+            googleMap.clear();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (googleMap != null) {
+            googleMap.clear();
+        }
+    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
