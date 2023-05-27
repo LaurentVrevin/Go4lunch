@@ -69,8 +69,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         if (currentMapPosition != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapPosition, 12));
             googleMap.addMarker(new MarkerOptions().position(currentMapPosition).title("My Position"));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentMapPosition, 12));
+
+
         } else if (hasLocationPermission()) {
             showUserLocation();
         } else {
@@ -148,7 +150,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
             public void onSuccess(Location location) {
                 if (location != null) {
                     LatLng myPosition = new LatLng(location.getLatitude(), location.getLongitude());
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 12));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, MAX_ZOOM));
                     googleMap.addMarker(new MarkerOptions().position(myPosition).title("My Position"));
                 }
             }
