@@ -108,20 +108,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /* Méthode pour créer l'utilisateur dans Firestore
-    private void createUserInFirestore() {
-        FirebaseUser firebaseUser = mAuth.getCurrentUser();
-        if (firebaseUser != null) {
-            // Récupération du nom de famille et de l'e-mail depuis le profil de l'utilisateur Firebase
-            String surname = firebaseUser.getDisplayName().split(" ")[1];
-            String email = firebaseUser.getEmail();
-            // Récupération de l'URL de la photo de profil
-            String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
-            // Création d'un objet User avec les informations de l'utilisateur actuellement connecté
-            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null, null);
-            mFirestore.collection("users").document(user.getUserId()).set(user);
-        }
-    }*/
 
     private void showSnackBar(String message) {
         Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();

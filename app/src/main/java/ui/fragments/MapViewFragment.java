@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -28,16 +30,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.io.IOException;
 import java.util.List;
 
+import network.PlacesApi;
+import network.RetrofitBuilder;
+import okhttp3.ResponseBody;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ui.activities.LoginActivity;
 import viewmodels.MapViewViewModel;
 import viewmodels.UserViewModel;
 
 public class MapViewFragment extends Fragment implements OnMapReadyCallback, EasyPermissions.PermissionCallbacks {
     private SupportMapFragment supportMapFragment;
+    private static final String GOOGLE_PLACE_API_KEY = BuildConfig.MAPS_API_KEY;
     private GoogleMap googleMap;
     private LatLng currentMapPosition;
     private static final float MIN_ZOOM = 10.0f;
@@ -63,6 +73,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
         supportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapView);
         assert supportMapFragment != null;
         supportMapFragment.getMapAsync(this);
+        retrieveNearbyRestaurants();
     }
 
     @Override
@@ -75,12 +86,60 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
 
         } else if (hasLocationPermission()) {
             showUserLocation();
+            retrieveNearbyRestaurants();
         } else {
             requestLocationPermission();
         }
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.setMinZoomPreference(MIN_ZOOM);
         googleMap.setMaxZoomPreference(MAX_ZOOM);
+    }
+
+    private void retrieveNearbyRestaurants() {
+        // Obtenez l'instance de l'API Google Places
+        PlacesApi placesApi = RetrofitBuilder.buildPlacesApi();
+
+        // Récupérez les coordonnées de l'emplacement actuel
+        double latitude =  49.1828;
+        double longitude = -0.3700;
+
+        // Définissez le rayon de recherche en mètres
+        int radius = 200;
+
+        // Définissez le type de lieu à rechercher (restaurant dans cet exemple)
+        String type = "restaurant";
+
+        // Appelez l'API pour récupérer les données des restaurants à proximité
+        Call<ResponseBody> call = placesApi.getNearbyRestaurants(latitude + "," + longitude, radius, type, GOOGLE_PLACE_API_KEY);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        String json = response.body().string();
+                        Log.d("JSON", json);
+                        // Faites ce que vous voulez avec le contenu JSON
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // Gérer les erreurs de réponse
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Gérer les erreurs de requête
+            }
+        });
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (googleMap != null) {
+            googleMap.clear();
+        }
     }
 
     @Override

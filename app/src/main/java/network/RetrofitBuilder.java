@@ -16,6 +16,8 @@ public class RetrofitBuilder {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                //journal pour récupérer les requêtes json
+                .client(new OkHttpClient.Builder().addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build())
                 .build();
 
         return retrofit.create(PlacesApi.class);
