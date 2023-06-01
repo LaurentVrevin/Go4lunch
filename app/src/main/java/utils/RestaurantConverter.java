@@ -1,16 +1,18 @@
 package utils;
 
+
+
+//Cette classe me permet de convertir les données récupérées via NearbySearchResponse
+//en objet java que je stock dans une liste restaurantList selon mon model Restaurant
+
 import java.util.ArrayList;
 import java.util.List;
 
 import models.Restaurant;
 import models.nearbysearch.NearbySearchResponse;
+import models.nearbysearch.OpeningHours;
+import models.nearbysearch.Photo;
 import models.nearbysearch.Result;
-import models.nearbysearch.Result.OpeningHours;
-
-
-//Cette classe me permet de convertir les données récupérées via NearbySearchResponse
-//en objet java que je stock dans une liste restaurantList selon mon model Restaurant
 
 public class RestaurantConverter {
     public static List<Restaurant> convertToRestaurantList(NearbySearchResponse response) {
@@ -27,17 +29,19 @@ public class RestaurantConverter {
                 String name = result.getName();
                 String address = result.getVicinity();
                 String phone = result.getFormattedPhoneNumber();
-                String websiteUrl = result.getWebsiteUrl();
-                String photoUrl = result.getPhotoUrl();
+                String websiteUrl = result.getWebsite();
+                List<Photo> photoUrl = result.getPhotos();
                 double latitude = result.getGeometry().getLocation().getLat();
                 double longitude = result.getGeometry().getLocation().getLng();
                 String openingHours = getOpeningHours(result);
                 String closingHours = getClosingHours(result);
-                float rating = result.getRating();
+                Double rating = result.getRating();
+                
 
                 // Créer un objet Restaurant avec les informations récupérées
+                Double distance = null;
                 Restaurant restaurant = new Restaurant(id, name, address, phone, websiteUrl, photoUrl,
-                        latitude, longitude, openingHours, closingHours, rating);
+                        latitude, longitude, openingHours, closingHours, rating, distance);
 
                 // Ajouter le restaurant à la liste
                 restaurantList.add(restaurant);
@@ -48,7 +52,7 @@ public class RestaurantConverter {
         return restaurantList;
     }
 
-    private static String getOpeningHours(Result result) {
+   private static String getOpeningHours(Result result) {
         OpeningHours openingHours = result.getOpeningHours();
         if (openingHours != null && openingHours.isOpenNow()) {
             // Le lieu est ouvert actuellement

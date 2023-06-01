@@ -21,7 +21,7 @@ import java.util.List;
 
 import models.User;
 
-public class UserRepositoryImpl implements UserInterfaceRepository {
+public class UserRepositoryImpl implements UserInterface {
 
     private FirebaseFirestore firebaseFirestoreDB;
     private final FirebaseAuth firebaseAuth;
@@ -30,7 +30,7 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
     private final MutableLiveData<List<User>> userListLiveData;
 
     public UserRepositoryImpl() {
-        firebaseFirestoreDB = FirebaseFirestore.getInstance();
+        instanceFirestore();
         firebaseAuth = FirebaseAuth.getInstance();
         userCollection = firebaseFirestoreDB.collection("users");
         userLiveData = new MutableLiveData<>();
@@ -81,7 +81,7 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
 
     @Override
     public void getUserListFromFirestore() {
-        instanceFirestore();
+        //instanceFirestore();
         // Récupération de la liste des utilisateurs depuis Firestore
         Log.d("UserRepositoryImpl", "getUserListFromFirestore() called");
                 userCollection.get().addOnCompleteListener(task -> {
@@ -146,13 +146,9 @@ public class UserRepositoryImpl implements UserInterfaceRepository {
 
     @Override
     public void updateUserInFirestore(String userId, User user) {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null) {
-            // Mise à jour des données de l'utilisateur dans Firestore
-            userCollection.document(user.getUserId()).set(user).addOnCompleteListener(task -> {
+        if (userId != null && user != null) {
+            userCollection.document(userId).set(user).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    // Données utilisateur mises à jour avec succès dans Firestore
-                    // Mettre à jour les données utilisateur dans le LiveData userLiveData
                     userLiveData.postValue(user);
                 } else {
                     // Erreur lors de la mise à jour des données utilisateur dans Firestore

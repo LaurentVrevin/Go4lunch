@@ -12,7 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.List;
 
-public interface UserInterfaceRepository {
+public interface UserInterface {
     void instanceFirestore();
 
     FirebaseUser getCurrentUserFromFirebase();

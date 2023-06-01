@@ -10,12 +10,9 @@ import models.User;
 import repositories.UserRepositoryImpl;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 public class UserViewModel extends ViewModel {
 

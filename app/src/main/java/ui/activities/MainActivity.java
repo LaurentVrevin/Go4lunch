@@ -43,9 +43,6 @@ import viewmodels.UserViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int LOCATION_PERMISSION_REQUEST_CODE = 5004;
-
-
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;

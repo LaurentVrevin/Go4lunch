@@ -73,6 +73,10 @@
     <string name="permission_denied_message">To use the app, we need your location. Do you want to enable location now? Otherwise you will be disconnected.</string>
     <string name="permission_denied_positive_button">yes</string>
     <string name="permission_denied_negative_button">no</string>
+    <string name="first_parenthesis">(</string>
+    <string name="workmate_number">2</string>
+    <string name="last_parenthesis">)</string>
+    <string name="place_photo">place_photo</string>
 
 
 </resources>

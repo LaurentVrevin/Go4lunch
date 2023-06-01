@@ -1,20 +1,31 @@
 package models;
 
+import java.util.List;
+
+import models.nearbysearch.Photo;
+
 public class Restaurant {
     private String id;
     private String name;
     private String address;
     private String phone;
     private String websiteUrl;
-    private String photoUrl;
+    private List<Photo> photoUrl;
     private double latitude;
     private double longitude;
     private String openingHours;
     private String closingHours;
-    private float rating;
+    private Double rating;
+    private Double distance;
 
-    public Restaurant(String id, String name, String address, String phone, String websiteUrl, String photoUrl,
-                      double latitude, double longitude, String openingHours, String closingHours, float rating) {
+
+
+    public Restaurant() {
+        // constructeur sans argument requis pour Firestore
+    }
+
+    public Restaurant(String id, String name, String address, String phone, String websiteUrl,
+                      List<Photo> photoUrl, double latitude, double longitude, String openingHours, String closingHours, Double rating, Double distance) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -26,9 +37,7 @@ public class Restaurant {
         this.openingHours = openingHours;
         this.closingHours = closingHours;
         this.rating = rating;
-    }
-    public Restaurant() {
-        // constructeur sans argument requis pour Firestore
+        this.distance = distance;
     }
 
     public String getId() {
@@ -51,7 +60,7 @@ public class Restaurant {
         return websiteUrl;
     }
 
-    public String getPhotoUrl() {
+    public List<Photo> getPhotoUrl() {
         return photoUrl;
     }
 
@@ -71,7 +80,14 @@ public class Restaurant {
         return closingHours;
     }
 
-    public float getRating() {
+    public Double getRating() {
         return rating;
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+    public void setDistance(Double distance) {
+        this.distance = distance;
     }
 }
