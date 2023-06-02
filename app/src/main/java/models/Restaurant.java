@@ -2,7 +2,10 @@ package models;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import models.nearbysearch.Photo;
+import models.nearbysearch.Result;
 
 public class Restaurant {
     private String id;
@@ -16,6 +19,7 @@ public class Restaurant {
     private String openingHours;
     private String closingHours;
     private Double rating;
+    @Nullable
     private Double distance;
 
 
@@ -24,7 +28,7 @@ public class Restaurant {
         // constructeur sans argument requis pour Firestore
     }
 
-    public Restaurant(String id, String name, String address, String phone, String websiteUrl,
+    /*public Restaurant(String id, String name, String address, String phone, String websiteUrl,
                       List<Photo> photoUrl, double latitude, double longitude, String openingHours, String closingHours, Double rating, Double distance) {
         this.id = id;
         this.name = name;
@@ -38,7 +42,23 @@ public class Restaurant {
         this.closingHours = closingHours;
         this.rating = rating;
         this.distance = distance;
+    }*/
+
+    public Restaurant(Result result) {
+        this.id = result.getPlaceId();
+        this.name = result.getName();
+        this.address = result.getFormattedAddress();
+        this.phone = result.getFormattedPhoneNumber();
+        this.websiteUrl = result.getWebsite();
+        this.photoUrl = result.getPhotos();
+        this.latitude = result.getGeometry().getLocation().getLat();
+        this.longitude = result.getGeometry().getLocation().getLng();
+        this.openingHours = result.getOpeningHours().getOpeningHours(result);
+        this.closingHours = result.getOpeningHours().getClosingHours(result);
+        this.rating = result.getRating();
+        this.distance=null;
     }
+
 
     public String getId() {
         return id;

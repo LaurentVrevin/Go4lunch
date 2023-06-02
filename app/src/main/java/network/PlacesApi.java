@@ -16,23 +16,14 @@ import retrofit2.http.Query;
 
 
 public interface PlacesApi {
-    @GET("nearbysearch/json" + BuildConfig.MAPS_API_KEY)
+    @GET("nearbysearch/json?type=restaurant&key=" + BuildConfig.MAPS_API_KEY)
     Call<NearbySearchResponse> nearbySearch(
             @Query("location") String location,
-            @Query("radius") int radius,
-            @Query("type") String type);
+            @Query("radius") int radius);
 
-    @GET("details/json?" + BuildConfig.MAPS_API_KEY)
+    @GET("details/json?key=" + BuildConfig.MAPS_API_KEY)
     Call<PlaceDetailsResponse> getPlaceDetailsResponse(
             @Query("fields") String fields,
-            @Query("place_id") String placeId,
-            @Query("key") String key);
-
-    @GET("nearbysearch/json")
-    Call<ResponseBody> getNearbyRestaurants(
-            @Query("location") String location,
-            @Query("radius") int radius,
-            @Query("type") String type,
-            @Query("key") String apiKey);
+            @Query("place_id") String placeId);
 
 }

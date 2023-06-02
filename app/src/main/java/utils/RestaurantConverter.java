@@ -15,7 +15,7 @@ import models.nearbysearch.Photo;
 import models.nearbysearch.Result;
 
 public class RestaurantConverter {
-    public static List<Restaurant> convertToRestaurantList(NearbySearchResponse response) {
+   /* public static List<Restaurant> convertToRestaurantList(NearbySearchResponse response) {
         // Liste des restaurants convertis
         List<Restaurant> restaurantList = new ArrayList<>();
 
@@ -75,5 +75,5 @@ public class RestaurantConverter {
             // Les informations sur les heures de fermeture ne sont pas disponibles
             return "Inconnu";
         }
-    }
+    }*/
 }

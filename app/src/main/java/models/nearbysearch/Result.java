@@ -236,7 +236,7 @@ public class Result {
         return userRatingsTotal;
     }
 
-    public void setUserRatingsTotal(Integer userRatingsTotal) {
+    public void setUserRatingsTotal(int userRatingsTotal) {
         this.userRatingsTotal = userRatingsTotal;
     }
 

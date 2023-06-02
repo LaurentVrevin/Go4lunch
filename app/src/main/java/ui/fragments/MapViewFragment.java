@@ -59,7 +59,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private UserViewModel mUserViewModel;
     private LocationViewModel mLocationViewModel;
-    private List<Result> restaurantList;
     private List<Restaurant> restaurantListData;
 
 
@@ -92,7 +91,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
                 }
             }
         });
-
     }
 
     @Override
@@ -105,8 +103,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
 
         } else if (hasLocationPermission()) {
             showUserLocation();
-            //retrieveNearbyRestaurants();
-            NearbySearchRestaurantJson();
             updateMapWithMarkers(restaurantListData);
         } else {
             requestLocationPermission();
@@ -116,96 +112,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
         googleMap.setMaxZoomPreference(MAX_ZOOM);
     }
 
-    /*private void retrieveNearbyRestaurants() {
 
-        // Vérifier si currentMapPosition est null avant d'appeler l'API
-        if (currentMapPosition != null) {
-            PlacesApi placesApi = RetrofitBuilder.buildPlacesApi();
-
-            // Récupérer les coordonnées de l'emplacement actuel
-            double latitude = currentMapPosition.latitude;
-            double longitude = currentMapPosition.longitude;
-
-            // Définir le rayon de recherche en mètres
-            int radius = 200;
-
-            // Définir le type de lieu à rechercher (restaurant dans cet exemple)
-            String type = "restaurant";
-
-            // Appeler l'API pour récupérer les données des restaurants à proximité
-            Call<ResponseBody> call = placesApi.getNearbyRestaurants(latitude + "," + longitude, radius, type, GOOGLE_PLACE_API_KEY);
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        try {
-                            String json = response.body().string();
-                            Log.d("JSON", json);
-                            // Utiliser un parser JSON pour extraire les résultats et les stocker dans la liste
-                            restaurantList = parseRestaurantData(json);
-                            // Mettre à jour la liste dans ListViewFragment
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        // Gérer les erreurs de réponse
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    // Gérer les erreurs de requête
-                }
-            });
-        }
-    }*/
-    private void NearbySearchRestaurantJson() {
-        // Vérifier si currentMapPosition est null avant d'appeler l'API
-        if (currentMapPosition != null) {
-            PlacesApi placesApi = RetrofitBuilder.buildPlacesApi();
-
-            // Récupérer les coordonnées de l'emplacement actuel
-            double latitude = currentMapPosition.latitude;
-            double longitude = currentMapPosition.longitude;
-            String location = latitude + "," + longitude;
-
-            // Définir le rayon de recherche en mètres
-            int radius = 200;
-
-            // Définir le type de lieu à rechercher (restaurant dans cet exemple)
-            String type = "restaurant";
-
-            Call<NearbySearchResponse> nearbySearchResponseCall = placesApi.nearbySearch(location, radius, type);
-            nearbySearchResponseCall.enqueue(new Callback<NearbySearchResponse>() {
-                @Override
-                public void onResponse(Call<NearbySearchResponse> call, Response<NearbySearchResponse> response) {
-                    if (response.isSuccessful()){
-                        NearbySearchResponse nearbySearchResponse= response.body();
-                        if (nearbySearchResponse!=null){
-                            List<Result> resultList = nearbySearchResponse.getResults();
-
-                            // Utiliser RestaurantConverter pour convertir les résultats en objets Restaurant
-                            restaurantListData = RestaurantConverter.convertToRestaurantList(nearbySearchResponse);
-
-                            // Afficher les données des restaurants dans le log
-                            for (Restaurant restaurant : restaurantListData) {
-                                Log.e("GETRESTOLIST", "onResponse: " + restaurant.toString());
-                            }
-
-                            // Mettre à jour la carte avec les marqueurs
-                            updateMapWithMarkers(restaurantListData);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<NearbySearchResponse> call, Throwable t) {
-
-                }
-            });
-        }
-    }
     private void updateMapWithMarkers(List<Restaurant> restaurantList) {
         // Effacer les marqueurs existants de la carte
         googleMap.clear();
@@ -224,17 +131,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
                     .title(name));
         }
     }
-
-
-    /*private List<Result> parseRestaurantData(String json) {
-        // Utiliser un parser JSON pour extraire les résultats des restaurants à partir du JSON
-        // et les stocker dans une liste de type Result (ou tout autre modèle que vous utilisez)
-        // et retourner cette liste
-        List<Result> resultList = new ArrayList<>();
-        // Code pour extraire les résultats du JSON et les ajouter à resultList
-        return resultList;
-    }*/
-
 
     @Override
     public void onLowMemory() {
@@ -322,7 +218,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
                         // Une fois que la localisation de l'utilisateur est disponible,
                         // récupérer les restaurants à proximité
                         //retrieveNearbyRestaurants();
-                        NearbySearchRestaurantJson();
+
                     }
                 }
             });
@@ -375,14 +271,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
         }
     }
 
-    private void logOutAndRedirect() {
-        mUserViewModel.logOut();
-        // Rediriger vers l'activité LoginActivity
-        Intent intent = new Intent(requireContext(), LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        requireActivity().finish();
-    }
     private void showPermissionDeniedDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Permission de localisation refusée");
@@ -404,6 +292,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback, Eas
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    private void logOutAndRedirect() {
+        mUserViewModel.logOut();
+        // Rediriger vers l'activité LoginActivity
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 
 
