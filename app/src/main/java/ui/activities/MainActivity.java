@@ -1,17 +1,20 @@
 package ui.activities;
 
 
-
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,25 +27,37 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
-import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
-
-import ui.fragments.ListViewFragment;
-import ui.fragments.MapViewFragment;
-import ui.fragments.WorkmatesFragment;
-
-import com.google.android.libraries.places.api.Places;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.List;
 import java.util.Objects;
 
+import models.User;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
+import repositories.LocationRepository;
+import ui.fragments.ListViewFragment;
+import ui.fragments.MapViewFragment;
+import ui.fragments.WorkmatesFragment;
+import utils.LocationPermission;
+import viewmodels.LocationViewModel;
 import viewmodels.UserViewModel;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    private final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
@@ -55,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
     private WorkmatesFragment mWorkmatesFragment;
     private ActivityMainBinding binding;
     private UserViewModel mUserViewModel;
+    private LocationViewModel mLocationViewModel;
+    private LocationRepository mLocationRepository;
+    private LatLng location;
 
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
@@ -66,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
         mAuth = FirebaseAuth.getInstance();
 
         configureViewModels();
@@ -76,11 +95,17 @@ public class MainActivity extends AppCompatActivity {
         setupNavController();
         setupMapViewFragment();
         setupNavigationListener();
+        checkLocationPermissions();
     }
 
     private void configureViewModels() {
-        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        LocationRepository locationRepository = new LocationRepository();
+        mLocationViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(LocationViewModel.class);
+        mLocationViewModel.setLocationRepository(locationRepository);
+        mUserViewModel=new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(UserViewModel.class);
+
     }
+
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
@@ -119,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment_content_main, mMapViewFragment)
                 .commit();
+
     }
 
     private void setupNavigationListener() {
@@ -163,16 +189,16 @@ public class MainActivity extends AppCompatActivity {
                     tvUserName.setText(user.getName());
                     tvUserEmail.setText(user.getEmail());
                     String profilePictureUrl = user.getPictureUrl();
-                    if(user.getPictureUrl() !=null){
+                    if (user.getPictureUrl() != null) {
                         setProfilePicture(profilePictureUrl);
                     }
                 }
             });
         }
     }
-    private void setProfilePicture(String profilePicture){
 
-        if(profilePicture!=null && imvProfilePhoto !=null){
+    private void setProfilePicture(String profilePicture) {
+        if (profilePicture != null && imvProfilePhoto != null) {
             Glide.with(this)
                     .load(profilePicture)
                     .circleCrop()
@@ -201,10 +227,6 @@ public class MainActivity extends AppCompatActivity {
             Fragment fragment = null;
             switch (menuItem.getItemId()) {
                 case R.id.nav_mapview:
-                    // Lorsque l'utilisateur clique sur l'élément "Map view", on affiche le fragment MapViewFragment
-                    if (mMapViewFragment == null) {
-                        mMapViewFragment = new MapViewFragment();
-                    }
                     fragment = mMapViewFragment;
                     break;
                 case R.id.nav_listview:
@@ -234,5 +256,86 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
+    }
+
+    private void logOutAndRedirect() {
+        mUserViewModel.logOut();
+        // Rediriger vers l'activité LoginActivity
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        this.finish();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getUserPosition();
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //stopLocationUpdates();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getUserPosition() {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                if (locationResult != null) {
+                    Location location = locationResult.getLastLocation();
+                    if (location != null) {
+                        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        // Mettez à jour la localisation de l'utilisateur avec la nouvelle position
+                        mLocationViewModel.updateUserLocation(userLocation);
+                        Log.d("MainActivity", "User location updated: " + userLocation.latitude + ", " + userLocation.longitude);
+                    }
+                }
+            }
+        }, null);
+    }
+
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(20000); // Intervalles de mise à jour de la position en millisecondes
+        return locationRequest;
+    }
+    @SuppressLint("MissingPermission")
+    private void stopLocationUpdates() {
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
+    }
+
+
+    private void checkLocationPermissions() {
+        if (EasyPermissions.hasPermissions(this, perms)){
+        } else {
+            EasyPermissions.requestPermissions(this, "You have to accept localisation", LOCATION_PERMISSION_REQUEST_CODE, perms);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        getUserPosition();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        logOutAndRedirect();
     }
 }

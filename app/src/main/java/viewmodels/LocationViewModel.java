@@ -1,29 +1,38 @@
 package viewmodels;
 
+
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import javax.inject.Inject;
-
 import repositories.LocationInterface;
+import repositories.LocationRepository;
 
-public class LocationViewModel extends ViewModel {
-    private MutableLiveData<LatLng> currentLocation = new MutableLiveData<>();
-    private LocationInterface locationInterface;
+public class LocationViewModel extends ViewModel  {
+    private LocationInterface mLocationInterface;
+    private LocationRepository mLocationRepository;
+    private MutableLiveData<LatLng>userLocation = new MutableLiveData<>();
 
-    @Inject
-    private LocationViewModel(LocationInterface locationInterface){
-        this.locationInterface = locationInterface;
+    public LocationViewModel(LocationRepository locationRepository){
+        this.mLocationRepository=locationRepository;
+    }
+    public LocationViewModel(){
+        mLocationRepository = new LocationRepository();
     }
 
-    public void updateLocation(LatLng location) {
-        LatLng newLocation = locationInterface.getCurrentLocation();
-        currentLocation.setValue(newLocation);
+    // Met à jour la position de l'utilisateur
+    public void updateUserLocation(LatLng location){
+        userLocation.setValue(location);
     }
 
-    public MutableLiveData<LatLng> getCurrentLocation() {
-        return currentLocation;
+    // Récupère les mises à jour de la position de l'utilisateur
+    public MutableLiveData<LatLng> getUserLocation(){
+        return userLocation;
+    }
+
+    public void setLocationRepository(LocationRepository locationRepository) {
+        mLocationRepository = locationRepository;
     }
 }
