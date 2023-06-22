@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private LocationViewModel mLocationViewModel;
     private LocationRepository mLocationRepository;
     private LatLng location;
+    private LocationCallback locationCallback;
 
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
@@ -275,18 +276,20 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onPause() {
         super.onPause();
+        stopLocationUpdates();
     }
+
 
     @Override
     public void onStop() {
         super.onStop();
-        //stopLocationUpdates();
+        stopLocationUpdates();
     }
 
     @SuppressLint("MissingPermission")
     private void getUserPosition() {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), new LocationCallback() {
+        locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
@@ -300,7 +303,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     }
                 }
             }
-        }, null);
+        };
+        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
     }
 
     private LocationRequest getLocationRequest() {
@@ -312,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @SuppressLint("MissingPermission")
     private void stopLocationUpdates() {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationProviderClient.removeLocationUpdates(new LocationCallback());
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
 
