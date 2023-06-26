@@ -27,6 +27,7 @@ import java.util.List;
 
 import models.Restaurant;
 import repositories.LocationRepository;
+import utils.LocationPermission;
 import viewmodels.LocationViewModel;
 
 
@@ -37,6 +38,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private List<Restaurant> restaurantListData;
     private LocationViewModel locationViewModel;
     private LatLng currentLocation;
+    private LocationPermission locationPermission;
 
 
 
@@ -84,15 +86,17 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
+    @SuppressLint("MissingPermission")
     public void updateUserLocation() {
         if (hasLocationPermission()){
             if (googleMap != null && currentLocation != null) {
+                this.googleMap.setMyLocationEnabled(true);
                 // Mettre à jour la position de l'utilisateur et placer le marqueur sur la carte
                 googleMap.clear(); // Supprimer les anciens marqueurs
-                    /*MarkerOptions markerOptions = new MarkerOptions()
-                            .position(location)
-                            .title("Your Location");
-                    googleMap.addMarker(markerOptions);*/
+                   /*MarkerOptions markerOptions = new MarkerOptions()
+                           .position(location)
+                           .title("Your Location");
+                   googleMap.addMarker(markerOptions);*/
                 LatLng userLocation = currentLocation;
                 // Zoom sur la position de l'utilisateur avec un niveau de zoom de 18
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation, MAX_ZOOM));
@@ -108,45 +112,28 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    updateUserLocation();
-    }
+     public void onStart() {
+         super.onStart();
+         updateUserLocation();
+     }
+
+     @Override
+     public void onResume() {
+         super.onResume();
+         updateUserLocation();
+     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if (googleMap != null) {
-            googleMap.clear();
-        }
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (googleMap != null) {
-            outState.putParcelable("map_position", googleMap.getCameraPosition().target);
-        }
-    }
+    public void onSaveInstanceState(@NonNull Bundle outState){
+             super.onSaveInstanceState(outState);
+             if (googleMap != null) {
+                 outState.putParcelable("map_position", googleMap.getCameraPosition().target);
+             }
+         }
 
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (googleMap != null) {
-            googleMap.clear();
-        }
-    }
 }

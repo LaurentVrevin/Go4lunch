@@ -77,6 +77,7 @@
     <string name="workmate_number">2</string>
     <string name="last_parenthesis">)</string>
     <string name="place_photo">place_photo</string>
+    <string name="need_location_permissions_message">We need your location</string>
 
 
 </resources>
