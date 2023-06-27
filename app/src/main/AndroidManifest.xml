@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -30,10 +31,10 @@
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
 
         <activity
-            android:name="ui.activities.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:exported="false" />
         <activity
-            android:name="ui.activities.Go4LunchLauncherActivity"
+            android:name=".ui.activities.Go4LunchLauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,15 +43,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ui.activities.YourLunchActivity"
+            android:name=".ui.activities.YourLunchActivity"
             android:exported="false"
             android:theme="@style/Theme.Go4lunch.NoActionBar"/>
         <activity
-            android:name="ui.activities.SettingsActivity"
+            android:name=".ui.activities.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name="ui.activities.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Go4lunch.NoActionBar">
@@ -61,7 +62,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="MyFirebaseMessagingServices"
+        <service android:name=".MyFirebaseMessagingServices"
             android:exported="true"
             tools:ignore="MissingClass">
             <intent-filter>
