@@ -3,6 +3,7 @@ package com.example.go4lunch.ui.fragments;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,6 +28,7 @@ import com.example.go4lunch.repositories.LocationInterface;
 import com.example.go4lunch.repositories.LocationRepository;
 import com.example.go4lunch.utils.LocationPermission;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 @AndroidEntryPoint
 public class MapViewFragment extends Fragment implements OnMapReadyCallback {
@@ -34,6 +37,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private List<Restaurant> restaurantListData;
     private LocationPermissionViewModel locationPermissionViewModel;
+    private RestaurantViewModel restaurantViewModel;
     private Location location;
 
     @Override
@@ -54,6 +58,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     private void configureViewModels() {
         locationPermissionViewModel = new ViewModelProvider(requireActivity()).get(LocationPermissionViewModel.class);
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
     }
 
     private void observePermission() {
@@ -63,6 +68,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private void observeData(Boolean hasPermission) {
         if (hasPermission) {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
+            restaurantViewModel.getRestaurantsLiveData().observe(requireActivity(), this::updateRestaurantList);
+            restaurantViewModel.getRestaurantsLiveData().observe(requireActivity(), this::setMarkers);
         }
     }
 
@@ -74,6 +81,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         if (location !=null) {
             getCurrentLocation(googleMap);
             googleMap.setMyLocationEnabled(true);
+            setMarkers(restaurantListData); // Affiche les marqueurs des restaurants sur la carte
         }
         googleMap.getUiSettings().setZoomControlsEnabled(false);
     }
@@ -104,6 +112,26 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             getCurrentLocation(googleMap);
         } else {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationPermissionViewModel.getUserLatLng(), MAX_ZOOM));
+        }
+    }
+    private void updateRestaurantList(List<Restaurant> restaurantList) {
+        restaurantListData = restaurantList;
+        setMarkers(restaurantListData);
+    }
+
+    private void setMarkers(List<Restaurant> restaurantList) {
+        googleMap.clear(); // Efface tous les marqueurs précédents
+
+
+        if(restaurantList !=null) {
+            for (Restaurant restaurant : restaurantList) {
+                LatLng latLng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(latLng)
+                        .title(restaurant.getName());
+                googleMap.addMarker(markerOptions);
+                Log.d("Restaurant", "Nom : " + restaurant.getName());
+            }
         }
     }
 

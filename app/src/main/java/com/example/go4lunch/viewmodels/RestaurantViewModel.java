@@ -10,28 +10,34 @@ import androidx.lifecycle.ViewModel;
 import java.util.List;
 
 import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.repositories.RestaurantInterface;
 import com.example.go4lunch.repositories.RestaurantRepository;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
+
+@HiltViewModel
 public class RestaurantViewModel extends ViewModel {
-    private MutableLiveData<List<Restaurant>> restaurantsLiveData;
-    private MutableLiveData<Restaurant> restaurantLiveData;
-    private RestaurantRepository restaurantRepository;
+    private final RestaurantInterface restaurantInterface;
+    private final MutableLiveData<List<Restaurant>> restaurantsLiveData = new MutableLiveData<>();
+    private final int radius = 200;
 
-    public RestaurantViewModel() {
-        restaurantRepository = new RestaurantRepository();
+    @Inject
+    public RestaurantViewModel(RestaurantInterface restaurantInterface) {
+        this.restaurantInterface = restaurantInterface;
     }
 
-    public LiveData<List<Restaurant>> getRestaurants(Location location, int radius, String type) {
-        if (restaurantsLiveData == null) {
-            restaurantsLiveData = restaurantRepository.getRestaurants(location, radius);
-        }
+    public void getRestaurants(Location location) {
+        restaurantInterface.getRestaurants(location, radius)
+                .observeForever(restaurants -> {
+                    if (restaurants != null) {
+                        restaurantsLiveData.setValue(restaurants);
+                    }
+                });
+    }
+
+    public LiveData<List<Restaurant>> getRestaurantsLiveData() {
         return restaurantsLiveData;
-    }
-
-    public LiveData<Restaurant> getRestaurantById(String placeId) {
-        if (restaurantLiveData == null) {
-            restaurantLiveData = restaurantRepository.getRestaurantById(placeId);
-        }
-        return restaurantLiveData;
     }
 }

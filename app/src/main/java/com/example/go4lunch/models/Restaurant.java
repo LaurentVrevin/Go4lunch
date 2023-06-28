@@ -22,27 +22,9 @@ public class Restaurant {
     @Nullable
     private Double distance;
 
-
-
     public Restaurant() {
         // constructeur sans argument requis pour Firestore
     }
-
-    /*public Restaurant(String id, String name, String address, String phone, String websiteUrl,
-                      List<Photo> photoUrl, double latitude, double longitude, String openingHours, String closingHours, Double rating, Double distance) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phone = phone;
-        this.websiteUrl = websiteUrl;
-        this.photoUrl = photoUrl;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.openingHours = openingHours;
-        this.closingHours = closingHours;
-        this.rating = rating;
-        this.distance = distance;
-    }*/
 
     public Restaurant(Result result) {
         this.id = result.getPlaceId();
@@ -53,14 +35,18 @@ public class Restaurant {
         this.photoUrl = result.getPhotos();
         this.latitude = result.getGeometry().getLocation().getLat();
         this.longitude = result.getGeometry().getLocation().getLng();
-        this.openingHours = result.getOpeningHours().getOpeningHours(result);
-        this.closingHours = result.getOpeningHours().getClosingHours(result);
+        if (result.getOpeningHours() != null) {
+            this.openingHours = result.getOpeningHours().getOpeningHours(result);
+        }
+        if (result.getOpeningHours() != null) {
+            this.closingHours = result.getOpeningHours().getClosingHours(result);
+        }
         this.rating = result.getRating();
         this.distance=null;
     }
 
 
-    public String getId() {
+    public String getPlaceId() {
         return id;
     }
 
@@ -105,7 +91,8 @@ public class Restaurant {
     }
 
     public Double getDistance() {
-        return distance;
+        //retourne 0.0 si la distance est null
+        return distance !=null ? distance : 0.0 ;
     }
     public void setDistance(Double distance) {
         this.distance = distance;

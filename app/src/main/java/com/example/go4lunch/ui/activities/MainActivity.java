@@ -28,10 +28,12 @@ import androidx.navigation.ui.NavigationUI;
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
+import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.ui.fragments.ListViewFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesFragment;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,6 +41,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,11 +68,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private ActivityMainBinding binding;
     private UserViewModel mUserViewModel;
     private LocationPermissionViewModel mLocationPermissionViewModel;
+    private RestaurantViewModel mRestaurantViewModel;
 
     private Location currentLocation;
 
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
+    private List<Restaurant> mRestaurantList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void configureViewModels() {
         mLocationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
         mUserViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(UserViewModel.class);
+        mRestaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
     }
 
     //VIEW
@@ -311,6 +317,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void updateLocation(Location location) {
         currentLocation = location;
+        mRestaurantViewModel.getRestaurants(currentLocation);
+            // Mettre à jour votre liste de restaurants avec restaurantList
+
+
     }
 
 

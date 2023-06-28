@@ -1,61 +1,74 @@
 package com.example.go4lunch.repositories;
 
-import android.util.Log;
 import android.location.Location;
+import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.maps.model.LatLng;
-
-
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.models.Restaurant;
-
 import com.example.go4lunch.models.nearbysearch.NearbySearchResponse;
 import com.example.go4lunch.models.nearbysearch.PlaceDetailsResponse;
 import com.example.go4lunch.models.nearbysearch.Result;
 import com.example.go4lunch.network.PlacesApi;
 import com.example.go4lunch.network.RetrofitBuilder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RestaurantRepository {
 
+public class RestaurantRepository implements RestaurantInterface{
+
+    private static final String PLACES_API_KEY = BuildConfig.MAPS_API_KEY;
     private MutableLiveData<List<Restaurant>> restaurantsLiveData;
     private final PlacesApi placesApi;
+    private Map<String, Restaurant> cachedRestaurants;
+    private final int radius = 200;
 
+    @Inject
     public RestaurantRepository() {
         restaurantsLiveData = new MutableLiveData<>();
         placesApi = RetrofitBuilder.buildPlacesApi();
+        cachedRestaurants = new HashMap<>();
     }
 
-
+    //On récupère les restaurants sur la position, et on les stocks dans une liste "Restaurant" observable
     public MutableLiveData<List<Restaurant>> getRestaurants(Location location, int radius) {
 
-        radius = 200;
+        String cacheKey = generateCacheKey(location.getLatitude(), location.getLongitude(), radius);
 
-        // Créer l'appel d'API pour rechercher les lieux à proximité
+        // Vérifie si le restaurant est en cache, si c'est le cas alors je me sers des restaurants mis en cache,
+        // ça limite les appels API et c'est bien pour le porte monnaie
+        if (cachedRestaurants.containsKey(cacheKey)) {
+            List<Restaurant> cachedData = new ArrayList<>(cachedRestaurants.values());
+            restaurantsLiveData.setValue(cachedData);
+            return restaurantsLiveData;
+        }
+
+        // Appel d'API pour rechercher les lieux à proximité
         Call<NearbySearchResponse> nearbySearchResponseCall = placesApi.nearbySearch(location.getLatitude() + "," + location.getLongitude(), radius);
         nearbySearchResponseCall.enqueue(new Callback<NearbySearchResponse>() {
             @Override
             public void onResponse(Call<NearbySearchResponse> call, Response<NearbySearchResponse> response) {
                 if (response.isSuccessful()) {
-                    // La réponse de l'appel d'API est réussie
                     NearbySearchResponse nearbySearchResponse = response.body();
                     if (nearbySearchResponse != null) {
-                        // Obtenir la liste des résultats de recherche
                         List<Result> resultList = nearbySearchResponse.getResults();
-
-                        // Convertir les résultats en objets Restaurant
                         List<Restaurant> restaurantListData = new ArrayList<>();
+
                         for (Result result : resultList) {
                             Restaurant restaurant = new Restaurant(result);
                             restaurantListData.add(restaurant);
                         }
-                        // Calculer et définir la distance entre la localisation de l'utilisateur et les restaurants
+
                         for (Restaurant restaurant : restaurantListData) {
                             Location restaurantLocation = new Location("userLocation");
                             restaurantLocation.setLatitude(restaurant.getLatitude());
@@ -63,15 +76,9 @@ public class RestaurantRepository {
                             restaurant.setDistance((double) location.distanceTo(restaurantLocation));
                         }
 
-                        // Afficher les données des restaurants dans le log
-                        for (Restaurant restaurant : restaurantListData) {
-                            Log.e("GETRESTOLIST", "onResponse: " + restaurant.toString());
-                        }
+                        // Met à jour les données en cache
+                        cacheRestaurants(location.getLatitude(), location.getLongitude(), radius, restaurantListData);
 
-                        // Mettre à jour la carte avec les marqueurs
-                        updateMapWithMarkers(restaurantListData);
-
-                        // Mettre à jour les données des restaurants LiveData
                         restaurantsLiveData.setValue(restaurantListData);
                     }
                 }
@@ -79,7 +86,7 @@ public class RestaurantRepository {
 
             @Override
             public void onFailure(Call<NearbySearchResponse> call, Throwable t) {
-                // Gérer l'échec de l'appel d'API
+                // Gère l'échec de l'appel d'API
             }
         });
 
@@ -89,28 +96,34 @@ public class RestaurantRepository {
     public MutableLiveData<Restaurant> getRestaurantById(String placeId) {
         MutableLiveData<Restaurant> restaurantLiveData = new MutableLiveData<>();
 
-        // Créer l'appel d'API pour obtenir les détails d'un lieu
+        // Vérifie si le restaurant est en cache, si c'est le cas alors je me sers des restaurants mis en cache,
+        // ça limite les appels API et c'est bien pour le porte monnaie
+        if (cachedRestaurants.containsKey(placeId)) {
+            Restaurant cachedRestaurant = cachedRestaurants.get(placeId);
+            restaurantLiveData.setValue(cachedRestaurant);
+            return restaurantLiveData;
+        }
+
+        // Appel d'API pour obtenir les détails d'un lieu
         Call<PlaceDetailsResponse> placeDetailsResponseCall = placesApi.getPlaceDetailsResponse("name,formatted_address,formatted_phone_number,website,photos,rating,geometry", placeId);
         placeDetailsResponseCall.enqueue(new Callback<PlaceDetailsResponse>() {
             @Override
             public void onResponse(Call<PlaceDetailsResponse> call, Response<PlaceDetailsResponse> response) {
                 if (response.isSuccessful()) {
-                    // La réponse de l'appel d'API est réussie
                     PlaceDetailsResponse placeDetailsResponse = response.body();
                     if (placeDetailsResponse != null) {
-                        // Obtenir les détails du restaurant à partir de la réponse
                         Result result = placeDetailsResponse.getResult();
                         if (result != null) {
-                            // Créer un objet Restaurant à partir des détails
                             Restaurant restaurant = new Restaurant(result);
 
-                            // Mettre à jour la distance entre la localisation de l'utilisateur et le restaurant
                             Location restaurantLocation = new Location("userLocation");
                             restaurantLocation.setLatitude(restaurant.getLatitude());
                             restaurantLocation.setLongitude(restaurant.getLongitude());
                             restaurant.setDistance((double) restaurantLocation.distanceTo(restaurantLocation));
 
-                            // Mettre à jour les données du restaurant LiveData
+                            // Mettre à jour le restaurant en cache
+                            cacheRestaurant(restaurant.getPlaceId(), restaurant);
+
                             restaurantLiveData.setValue(restaurant);
                         }
                     }
@@ -119,29 +132,30 @@ public class RestaurantRepository {
 
             @Override
             public void onFailure(Call<PlaceDetailsResponse> call, Throwable t) {
-                // Gérer l'échec de l'appel d'API
+                // Gère l'échec de l'appel d'API
             }
         });
 
         return restaurantLiveData;
     }
 
+    private void cacheRestaurants(double latitude, double longitude, int radius, List<Restaurant> restaurants) {
+        String cacheKey = generateCacheKey(latitude, longitude, radius);
 
-    private void updateMapWithMarkers(List<Restaurant> restaurantListData) {
-        // Parcourir la liste des restaurants
-        for (Restaurant restaurant : restaurantListData) {
-            // Obtenir les informations nécessaires du restaurant
-            String name = restaurant.getName();
-            double latitude = restaurant.getLatitude();
-            double longitude = restaurant.getLongitude();
-
-            // Créer un marqueur pour le restaurant sur la carte
-            LatLng restaurantLatLng = new LatLng(latitude, longitude);
-            /* googleMap.addMarker(new MarkerOptions()
-                    .position(restaurantLatLng)
-                    .title(name)); */
+        // Remplace les anciennes données en cache
+        cachedRestaurants.put(cacheKey, null);
+        for (Restaurant restaurant : restaurants) {
+            cachedRestaurants.put(restaurant.getPlaceId(), restaurant);
         }
+        Log.d("RestaurantRepository", "Restaurants cached successfully.");
+
     }
 
+    private void cacheRestaurant(String placeId, Restaurant restaurant) {
+        cachedRestaurants.put(placeId, restaurant);
+    }
 
+    private String generateCacheKey(double latitude, double longitude, int radius) {
+        return String.format("%.6f_%.6f_%d", latitude, longitude, radius);
+    }
 }
