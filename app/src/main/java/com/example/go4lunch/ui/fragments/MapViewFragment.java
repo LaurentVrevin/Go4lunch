@@ -77,13 +77,14 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
+        //this.googleMap.setMapStyle();
         locationPermissionViewModel.observePermission().observe(requireActivity(), this::setCamera);
         if (location !=null) {
             getCurrentLocation(googleMap);
             googleMap.setMyLocationEnabled(true);
             setMarkers(restaurantListData); // Affiche les marqueurs des restaurants sur la carte
         }
-        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
     private void updateLocation(Location location) {
@@ -130,7 +131,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                         .position(latLng)
                         .title(restaurant.getName());
                 googleMap.addMarker(markerOptions);
-                Log.d("Restaurant", "Nom : " + restaurant.getName());
+                Log.d("Restaurant", "Nom : " + restaurant.getName() + "les horaires " + restaurant.getOpeningHours());
             }
         }
     }

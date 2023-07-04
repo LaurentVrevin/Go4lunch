@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.BuildConfig;
+
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.nearbysearch.NearbySearchResponse;
 import com.example.go4lunch.models.nearbysearch.PlaceDetailsResponse;
@@ -114,7 +115,7 @@ public class RestaurantRepository implements RestaurantInterface{
                     if (placeDetailsResponse != null) {
                         Result result = placeDetailsResponse.getResult();
                         if (result != null) {
-                            Restaurant restaurant = new Restaurant(result);
+                           Restaurant restaurant = new Restaurant(result);
 
                             Location restaurantLocation = new Location("userLocation");
                             restaurantLocation.setLatitude(restaurant.getLatitude());
@@ -139,7 +140,7 @@ public class RestaurantRepository implements RestaurantInterface{
         return restaurantLiveData;
     }
 
-    private void cacheRestaurants(double latitude, double longitude, int radius, List<Restaurant> restaurants) {
+    private void cacheRestaurants(double latitude, double longitude, int radius, List<com.example.go4lunch.models.Restaurant> restaurants) {
         String cacheKey = generateCacheKey(latitude, longitude, radius);
 
         // Remplace les anciennes données en cache

@@ -1,9 +1,13 @@
 package com.example.go4lunch.models;
 
+import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.models.nearbysearch.Photo;
 import com.example.go4lunch.models.nearbysearch.Result;
 
@@ -18,9 +22,10 @@ public class Restaurant {
     private double longitude;
     private String openingHours;
     private String closingHours;
-    private Double rating;
+    private float rating;
     @Nullable
     private Double distance;
+    private int workmatesCount;
 
     public Restaurant() {
         // constructeur sans argument requis pour Firestore
@@ -29,7 +34,7 @@ public class Restaurant {
     public Restaurant(Result result) {
         this.id = result.getPlaceId();
         this.name = result.getName();
-        this.address = result.getFormattedAddress();
+        this.address = result.getVicinity();
         this.phone = result.getFormattedPhoneNumber();
         this.websiteUrl = result.getWebsite();
         this.photoUrl = result.getPhotos();
@@ -37,11 +42,12 @@ public class Restaurant {
         this.longitude = result.getGeometry().getLocation().getLng();
         if (result.getOpeningHours() != null) {
             this.openingHours = result.getOpeningHours().getOpeningHours(result);
+            Log.d("HEURE", "les horaires sont : " + result.getOpeningHours());
         }
         if (result.getOpeningHours() != null) {
             this.closingHours = result.getOpeningHours().getClosingHours(result);
         }
-        this.rating = result.getRating();
+        this.rating = (float) result.getRating();
         this.distance=null;
     }
 
@@ -66,8 +72,16 @@ public class Restaurant {
         return websiteUrl;
     }
 
-    public List<Photo> getPhotoUrl() {
-        return photoUrl;
+    public List<String> getPhotoUrls() {
+        List<String> photoUrls = new ArrayList<>();
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            for (Photo photo : photoUrl) {
+                String photoReference = photo.getPhotoReference();
+                String photoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoReference + "&key=" + BuildConfig.MAPS_API_KEY;
+                photoUrls.add(photoUrl);
+            }
+        }
+        return photoUrls;
     }
 
     public double getLatitude() {
@@ -79,6 +93,7 @@ public class Restaurant {
     }
 
     public String getOpeningHours() {
+
         return openingHours;
     }
 
@@ -86,15 +101,22 @@ public class Restaurant {
         return closingHours;
     }
 
-    public Double getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public Double getDistance() {
+    public double getDistance() {
         //retourne 0.0 si la distance est null
         return distance !=null ? distance : 0.0 ;
     }
     public void setDistance(Double distance) {
         this.distance = distance;
+    }
+    public int getWorkmatesCount() {
+        return workmatesCount;
+    }
+
+    public void setWorkmatesCount(int workmatesCount) {
+        this.workmatesCount = workmatesCount;
     }
 }

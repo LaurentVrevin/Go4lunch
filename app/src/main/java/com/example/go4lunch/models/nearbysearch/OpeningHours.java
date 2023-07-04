@@ -28,10 +28,10 @@ public class OpeningHours {
         OpeningHours openingHours = result.getOpeningHours();
         if (openingHours != null && openingHours.isOpenNow()) {
             // Le lieu est ouvert actuellement
-            return "Ouvert";
+            return "" + openingHours;
         } else {
             // Le lieu est fermé actuellement
-            return "Fermé";
+            return "";
         }
     }
 

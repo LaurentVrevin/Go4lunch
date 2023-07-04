@@ -77,6 +77,9 @@ public class Result {
     @SerializedName("website")
     @Expose
     private String website;
+    private int workmatesCount;
+
+
 
     public List<AddressComponent> getAddressComponents() {
         return addressComponents;
@@ -261,5 +264,11 @@ public class Result {
     public void setWebsite(String website) {
         this.website = website;
     }
+    public int getWorkmatesCount() {
+        return workmatesCount;
+    }
 
+    public void setWorkmatesCount(int workmatesCount) {
+        this.workmatesCount = workmatesCount;
+    }
 }
