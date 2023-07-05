@@ -81,15 +81,34 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
         public void bind(Restaurant restaurant) {
             // Mettre à jour les vues avec les données du restaurant
             placeNameTextView.setText(restaurant.getName());
-            placeRangeTextView.setText("Range Placeholder"); // Remplacer par les données réelles
             placeAddressTextView.setText(restaurant.getAddress());
 
-            //Gérer l'affichage de l'ouverture du restaurant
-            //Gérer l'affichage de l'ouverture du restaurant
+            // Gérer l'affichage de l'ouverture du restaurant
             placeOpeningTime.setText(getOpeningHours(restaurant));
 
+            // Mettre à jour la distance
+            updateDistance(restaurant);
 
-            // Charger l'image à partir de l'URL avec la transformation
+            // Charger l'image
+            loadRestaurantImage(restaurant);
+
+            // Mettre à jour le nombre de workmates
+            updateWorkmatesCount(restaurant);
+
+            ratingBar.setRating(restaurant.getRating());
+        }
+
+        private void updateDistance(Restaurant restaurant) {
+            if (restaurant.getDistance() != null) {
+                double distanceInMeters = restaurant.getDistance();
+                String distanceText = String.format("%.0f m", distanceInMeters);
+                placeRangeTextView.setText(distanceText);
+            } else {
+                placeRangeTextView.setText("");
+            }
+        }
+
+        private void loadRestaurantImage(Restaurant restaurant) {
             if (restaurant.getPhotoUrls() != null && !restaurant.getPhotoUrls().isEmpty()) {
                 String photoUrl = restaurant.getPhotoUrls().get(0); // Utilisez le premier URL de photo
 
@@ -106,10 +125,9 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
                 // Si l'URL de l'image est nulle, afficher une image de placeholder
                 placeImageView.setImageResource(R.drawable.lunch);
             }
+        }
 
-
-
-            // Set the visibility of workmateImageView and workmateNumberTextView based on the workmates count
+        private void updateWorkmatesCount(Restaurant restaurant) {
             int workmatesCount = restaurant.getWorkmatesCount();
             if (workmatesCount > 0) {
                 workmateImageView.setVisibility(View.VISIBLE);
@@ -119,33 +137,21 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
                 workmateImageView.setVisibility(View.GONE);
                 workmateNumberTextView.setVisibility(View.GONE);
             }
-            ratingBar.setRating(restaurant.getRating());
         }
-        private String getOpeningTime(Boolean isOpenNow) {
-            if (!isOpenNow) {
-                placeOpeningTime.setTextColor(Color.GREEN);
-                return "Closed";
-            } else {
-                placeOpeningTime.setTextColor(Color.RED);
-                return "Open now";
-            }
-        }
+
         private String getOpeningHours(Restaurant restaurant) {
-            if (restaurant.getOpeningHours() != null) {
-                placeOpeningTime.setTextColor(Color.RED);
-                return "Ouvert" + restaurant.getClosingHours();
-                } else {
-                placeOpeningTime.setTextColor(Color.BLUE);
-                return "Fermé";
+            String openingHours = restaurant.getOpeningHours();
+            if (openingHours != null) {
+                if (openingHours.equals("Ouvert")) {
+                    placeOpeningTime.setTextColor(Color.BLUE);
+                    return openingHours;
+                } else if (openingHours.equals("Fermé")) {
+                    placeOpeningTime.setTextColor(Color.RED);
+                    return openingHours;
                 }
             }
-
-        private String getClosingHours(Restaurant restaurant) {
-            if (restaurant.getClosingHours() != null) {
-                return restaurant.getClosingHours();
-            } else {
-                return "Inconnu";
-            }
+            placeOpeningTime.setTextColor(Color.RED);
+            return "Fermé";
         }
     }
 }

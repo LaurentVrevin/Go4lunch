@@ -24,9 +24,7 @@ import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.repositories.LocationInterface;
-import com.example.go4lunch.repositories.LocationRepository;
-import com.example.go4lunch.utils.LocationPermission;
+
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.google.android.gms.maps.model.MarkerOptions;
 

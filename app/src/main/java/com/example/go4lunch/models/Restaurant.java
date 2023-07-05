@@ -41,11 +41,10 @@ public class Restaurant {
         this.latitude = result.getGeometry().getLocation().getLat();
         this.longitude = result.getGeometry().getLocation().getLng();
         if (result.getOpeningHours() != null) {
-            this.openingHours = result.getOpeningHours().getOpeningHours(result);
-            Log.d("HEURE", "les horaires sont : " + result.getOpeningHours());
+            this.openingHours = result.getOpeningHours().isOpenNow() ? "Ouvert" : "Fermé";
         }
-        if (result.getOpeningHours() != null) {
-            this.closingHours = result.getOpeningHours().getClosingHours(result);
+        if (result.getOpeningHours() != null && result.getOpeningHours().getCloseTime() != null) {
+            this.closingHours = result.getOpeningHours().getCloseTime();
         }
         this.rating = (float) result.getRating();
         this.distance=null;
@@ -105,11 +104,11 @@ public class Restaurant {
         return rating;
     }
 
-    public double getDistance() {
+    public Double getDistance() {
         //retourne 0.0 si la distance est null
         return distance !=null ? distance : 0.0 ;
     }
-    public void setDistance(Double distance) {
+    public void setDistance(@Nullable Double distance) {
         this.distance = distance;
     }
     public int getWorkmatesCount() {
