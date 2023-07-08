@@ -29,6 +29,7 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.fragments.ListViewFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesFragment;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private RestaurantViewModel mRestaurantViewModel;
 
     private Location currentLocation;
-
+    private String userId;
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
     private List<Restaurant> mRestaurantList = new ArrayList<>();
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         mAuth = FirebaseAuth.getInstance();
 
         configureViewModels();
+        checkAuth();
+        observeUserData();
         setupToolbar();
         setupNavigationDrawer();
         setupBottomNavigation();
@@ -98,8 +101,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void configureViewModels() {
         mLocationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
-        mUserViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(UserViewModel.class);
+        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         mRestaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+    }
+    private void observeUserData() {
+        mUserViewModel.getCurrentUserFromFirestore(userId);
+        mUserViewModel.getUserLiveData().observe(this, this::displayUserInfo);
     }
 
     //VIEW
@@ -126,7 +133,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         tvUserName = headerView.findViewById(R.id.tv_header_profilename);
         tvUserEmail = headerView.findViewById(R.id.tv_header_email);
         imvProfilePhoto = headerView.findViewById(R.id.iv_header_Avatar);
-        displayUserInfo();
+        userId = mAuth.getCurrentUser().getUid();
+
+        mUserViewModel.getCurrentUserFromFirestore(userId);
+        mUserViewModel.getUserLiveData().observe(this, this::displayUserInfo);
+
     }
 
     private void setupNavController() {
@@ -200,30 +211,33 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     //USER
 
+    private void checkAuth() {
+        // Vérifier si l'utilisateur est connecté
+        if (mAuth.getCurrentUser() != null) {
+            userId = mAuth.getCurrentUser().getUid();
+            Log.d("USERAUTH", "L'id de l'utilisateur est : " + userId);
+            ; // Mettre à jour le LiveData de l'utilisateur
+        } else {
+            // Rediriger vers l'activité LoginActivity
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
+    }
+
     @SuppressLint("SetTextI18n")
-    private void displayUserInfo() {
+    private void displayUserInfo(User user) {
         Log.d("MainActivity", "displayUserInfo called");
-
-        // Récupère l'ID de l'utilisateur actuellement connecté
-        String userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-
-        // Vérifie que ViewModel a été initialisé
-        if (mUserViewModel != null) {
-            // Appelle la méthode getCurrentUserFromFirestore du ViewModel pour récupérer les données de l'utilisateur à partir de Firestore
-            mUserViewModel.getCurrentUserFromFirestore(userId);
-
-            // Crée un Observer pour recevoir les mises à jour de données d'utilisateur en direct
-            mUserViewModel.getUserLiveData().observe(this, user -> {
                 // Si les données de l'utilisateur ne sont pas nulles, les affiche dans les TextView correspondants
                 if (user != null) {
                     tvUserName.setText(user.getName());
                     tvUserEmail.setText(user.getEmail());
                     String profilePictureUrl = user.getPictureUrl();
+                    Log.d("USERIDLIVEDATA", "l'id de l'utilisateur via le livedata est : " +user.getUserId());
                     if (user.getPictureUrl() != null) {
                         setProfilePicture(profilePictureUrl);
                     }
-                }
-            });
         }
     }
 

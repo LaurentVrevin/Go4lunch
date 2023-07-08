@@ -1,8 +1,6 @@
 package com.example.go4lunch.repositories;
 
 
-
-
 import android.content.Context;
 import android.util.Log;
 
@@ -21,8 +19,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.inject.Inject;
 
 
 public class UserRepository implements UserInterface {
@@ -33,6 +34,9 @@ public class UserRepository implements UserInterface {
     private final MutableLiveData<User> userLiveData;
     private final MutableLiveData<List<User>> userListLiveData;
 
+    private User user;
+
+    @Inject
     public UserRepository() {
         instanceFirestore();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -43,27 +47,49 @@ public class UserRepository implements UserInterface {
 
     @Override
     public void instanceFirestore() {
-        //FirebaseFirestore.setLoggingEnabled(true); // Activation des logs Firestore
         firebaseFirestoreDB = FirebaseFirestore.getInstance();
     }
+
     @Override
-    public void setUserList(List<User> userList) {
-        userListLiveData.postValue(userList);
+    public void createUserInFirestore() {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            String userId = firebaseUser.getUid();
+
+            // Vérifier si l'utilisateur existe déjà dans Firestore
+            userCollection.document(userId).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                    // L'utilisateur existe déjà, récupérer les valeurs existantes
+                    DocumentSnapshot document = task.getResult();
+                    String email = document.getString("email");
+                    String name = document.getString("name");
+                    String pictureUrl = document.getString("pictureUrl");
+                    List<String> likedPlaces = (List<String>) document.get("likedPlaces");
+                    String selectedRestaurantId = document.getString("selectedRestaurantId");
+
+                    // Créer un nouvel objet User en incluant les valeurs existantes
+                     user = new User(userId, email,  name, pictureUrl, likedPlaces, selectedRestaurantId);
+
+                    // Mettre à jour le document existant avec les nouvelles valeurs
+                    //userCollection.document(userId).set(user);
+                } else {
+                    // L'utilisateur n'existe pas encore, créer un nouvel objet User
+                    User user = new User(userId, firebaseUser.getEmail(), firebaseUser.getDisplayName(), firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null, new ArrayList<>(),null);
+
+                    // Créer un nouveau document pour l'utilisateur
+                    userCollection.document(userId).set(user);
+
+
+                }
+            });
+        }
     }
+
+
 
     @Override
     public FirebaseUser getCurrentUserFromFirebase() {
         return firebaseAuth.getCurrentUser(); // Récupération de l'utilisateur actuel Firebase
-    }
-
-    @Override
-    public CollectionReference getUserCollection() {
-        return userCollection; // Renvoi de la collection "users" dans Firestore
-    }
-
-    @Override
-    public LiveData<User> getUserLiveData() {
-        return userLiveData; // Renvoi du LiveData pour un utilisateur
     }
 
     @Override
@@ -73,10 +99,30 @@ public class UserRepository implements UserInterface {
             if (task.isSuccessful() && task.getResult() != null) {
                 // Si la récupération des données est réussie et que les données ne sont pas nulles, on créé un objet User avec les données récupérées et on le poste dans le LiveData userLiveData
                 User user = task.getResult().toObject(User.class);
-                userLiveData.postValue(user);
+                if (user != null) {
+                    user.setUserId(userId); // Définition de l'ID de l'utilisateur de l'objet User via firestore
+                    userLiveData.postValue(user);
+                }
             }
         });
     }
+
+
+    @Override
+    public LiveData<User> getUserLiveData() {
+        return userLiveData; // Renvoi du LiveData pour un utilisateur
+    }
+
+    @Override
+    public CollectionReference getUserCollection() {
+        return userCollection; // Renvoi de la collection "users" dans Firestore
+    }
+
+    @Override
+    public void setUserList(List<User> userList) {
+        userListLiveData.postValue(userList);
+    }
+
 
     @Override
     public LiveData<List<User>> getUserListLiveData() {
@@ -88,40 +134,27 @@ public class UserRepository implements UserInterface {
         //instanceFirestore();
         // Récupération de la liste des utilisateurs depuis Firestore
         Log.d("UserRepositoryImpl", "getUserListFromFirestore() called");
-                userCollection.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        List<User> userList = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            User user = document.toObject(User.class);
-                            // Si l'utilisateur actuellement traité est l'utilisateur connecté,
-                            // on ignore cet utilisateur et on passe à l'itération suivante de la boucle
-                            if (user.getUserId().equals(getCurrentUserFromFirebase().getUid())){
-                                continue;
-                            }
-                            userList.add(user);
-                        }
-                        userListLiveData.postValue(userList);
-                        Log.d("UserRepositoryImpl", "getUserListFromFirestore() success - userList size: " + userList.size());
-                    } else {
-                        Log.e("UserRepositoryImpl", "getUserListFromFirestore() error: " + task.getException());
+        userCollection.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<User> userList = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    User user = document.toObject(User.class);
+                    // Si l'utilisateur actuellement traité est l'utilisateur connecté,
+                    // on ignore cet utilisateur et on passe à l'itération suivante de la boucle
+                    if (user.getUserId().equals(getCurrentUserFromFirebase().getUid())) {
+                        continue;
                     }
+                    userList.add(user);
+                }
+                userListLiveData.postValue(userList);
+                Log.d("UserRepositoryImpl", "getUserListFromFirestore() success - userList size: " + userList.size());
+            } else {
+                Log.e("UserRepositoryImpl", "getUserListFromFirestore() error: " + task.getException());
+            }
         });
     }
 
-    @Override
-    public void createUserInFirestore() {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null) {
-            // Récupération du nom de famille et de l'e-mail depuis le profil de l'utilisateur Firebase
-            String surname = firebaseUser.getDisplayName().split(" ")[1];
-            String email = firebaseUser.getEmail();
-            // Récupération de l'URL de la photo de profil
-            String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
-            // Création d'un objet User avec les informations de l'utilisateur actuellement connecté
-            User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail(), photoUrl, null, null);
-            userCollection.document(user.getUserId()).set(user);
-        }
-    }
+
     //Task<DocumentSnapshot> représente la requête de récupération de l'utilisateur dans Firestore
     @Override
     public Task<DocumentSnapshot> getUserId() {
@@ -132,6 +165,7 @@ public class UserRepository implements UserInterface {
             return null;
         }
     }
+
 
     @Override
     public void logOut() {
@@ -158,6 +192,23 @@ public class UserRepository implements UserInterface {
                     // Erreur lors de la mise à jour des données utilisateur dans Firestore
                 }
             });
+        }
+    }
+
+    @Override
+    public void updateUserSelectedRestaurant(String userId, User user) {
+        if (userId != null && user != null) {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("selectedRestaurantId", user.getSelectedRestaurantId());
+
+            userCollection.document(userId).update(updates)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            userLiveData.postValue(user);
+                        } else {
+                            // Erreur lors de la mise à jour des données utilisateur dans Firestore
+                        }
+                    });
         }
     }
 }

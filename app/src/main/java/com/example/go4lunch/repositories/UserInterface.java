@@ -38,4 +38,7 @@ public interface UserInterface {
     void deleteAccount(Context context);
 
     void updateUserInFirestore(String userId, User user);
+
+    void updateUserSelectedRestaurant(String userId, User user);
+
 }

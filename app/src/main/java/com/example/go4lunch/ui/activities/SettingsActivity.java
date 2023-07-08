@@ -2,6 +2,7 @@ package com.example.go4lunch.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -18,12 +19,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.viewmodels.UserViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SettingsActivity extends AppCompatActivity {
 
     private EditText etFirstName, etLastName;
     private Button btnDelete;
-
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private UserViewModel userViewModel;
@@ -56,6 +58,7 @@ public class SettingsActivity extends AppCompatActivity {
             currentUser = user;
             etFirstName.setText(user.getName().split(" ")[0]); // affiche le prénom
             etLastName.setText(user.getName().split(" ")[1]); // affiche le nom
+            Log.d("SETTINGUSERID", "user id is : " + currentUser.getUserId());
         });
 
         btnDelete.setOnClickListener(view -> {

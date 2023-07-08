@@ -1,5 +1,7 @@
 package com.example.go4lunch.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.models.nearbysearch.Photo;
 import com.example.go4lunch.models.nearbysearch.Result;
 
-public class Restaurant {
+public class Restaurant implements Parcelable {
     private String id;
     private String name;
     private String address;
@@ -50,6 +52,38 @@ public class Restaurant {
         this.distance=null;
     }
 
+
+    protected Restaurant(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        address = in.readString();
+        phone = in.readString();
+        websiteUrl = in.readString();
+        photoUrl = in.createTypedArrayList(Photo.CREATOR);
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        openingHours = in.readString();
+        closingHours = in.readString();
+        rating = in.readFloat();
+        if (in.readByte() == 0) {
+            distance = null;
+        } else {
+            distance = in.readDouble();
+        }
+        workmatesCount = in.readInt();
+    }
+
+    public static final Creator<Restaurant> CREATOR = new Creator<Restaurant>() {
+        @Override
+        public Restaurant createFromParcel(Parcel in) {
+            return new Restaurant(in);
+        }
+
+        @Override
+        public Restaurant[] newArray(int size) {
+            return new Restaurant[size];
+        }
+    };
 
     public String getPlaceId() {
         return id;
@@ -117,5 +151,32 @@ public class Restaurant {
 
     public void setWorkmatesCount(int workmatesCount) {
         this.workmatesCount = workmatesCount;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(address);
+        dest.writeString(phone);
+        dest.writeString(websiteUrl);
+        dest.writeTypedList(photoUrl);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeString(openingHours);
+        dest.writeString(closingHours);
+        dest.writeFloat(rating);
+        if (distance == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(distance);
+        }
+        dest.writeInt(workmatesCount);
     }
 }

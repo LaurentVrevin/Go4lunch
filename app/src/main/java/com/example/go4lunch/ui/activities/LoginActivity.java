@@ -20,7 +20,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Arrays;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class LoginActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
     private ActivityLoginBinding binding;
     private UserViewModel userViewModel;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +94,6 @@ public class LoginActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 // Si oui, création de l'utilisateur dans Firestore et démarrage de l'activité principale
                 userViewModel.createUserInFirestore();
-                //createUserInFirestore();
                 startMainActivity();
             } else {
                 // Si non, affichage d'un message d'erreur dans un Snackbar

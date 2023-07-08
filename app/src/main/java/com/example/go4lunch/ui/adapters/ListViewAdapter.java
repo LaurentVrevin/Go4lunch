@@ -1,11 +1,12 @@
 package com.example.go4lunch.ui.adapters;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.NumberPicker;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,8 +16,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
-import com.example.go4lunch.models.nearbysearch.OpeningHours;
-import com.example.go4lunch.models.nearbysearch.Result;
+
+import com.example.go4lunch.models.User;
+import com.example.go4lunch.ui.activities.YourLunchActivity;
 
 import java.util.List;
 
@@ -28,6 +30,8 @@ import android.widget.RatingBar;
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListViewViewHolder> {
 
     private List<Restaurant> restaurantList;
+    private static final String USER_ID = "userID";
+    private User user;
     private Location location;
 
     public ListViewAdapter(List<Restaurant> restaurantList, Location location) {
@@ -46,6 +50,17 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
     public void onBindViewHolder(@NonNull ListViewViewHolder holder, int position) {
         Restaurant restaurant = restaurantList.get(position);
         holder.bind(restaurant);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Ouvrir l'activité YourLunchActivity pour afficher les détails du restaurant
+                Intent intent = new Intent(view.getContext(), YourLunchActivity.class);
+                // Transmettre les données du restaurant à l'activité YourLunchActivity
+                intent.putExtra("restaurant", restaurant);
+
+                view.getContext().startActivity(intent);
+            }
+        });
     }
     public void setRestaurantList(List<Restaurant> restaurantList) {
         this.restaurantList = restaurantList;
