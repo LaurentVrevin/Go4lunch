@@ -75,9 +75,18 @@ public class LoginActivity extends AppCompatActivity {
 
     // Méthode pour démarrer l'activité principale
     private void startMainActivity() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
+        // Vérification si l'utilisateur existe déjà dans Firestore
+        userViewModel.getUserId().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
+                // L'utilisateur existe déjà, démarrage de l'activité principale
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                // L'utilisateur n'existe pas encore, création de l'utilisateur dans Firestore
+                userViewModel.createUserInFirestore();
+                startMainActivity();
+            }
+        });
     }
 
     // Méthode appelée après la fin de l'activité de connexion FirebaseUI

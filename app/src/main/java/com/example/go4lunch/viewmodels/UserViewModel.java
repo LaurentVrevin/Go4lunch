@@ -70,6 +70,11 @@ public class UserViewModel extends ViewModel {
     public void updateUserSelectedRestaurant(String userId, User user) {
         userInterface.updateUserSelectedRestaurant(userId, user);
     }
+    public void updateUserLikedPlaces(String userId, List<String> likedPlaces) {
+        if (userId != null) {
+            userInterface.updateUserLikedPlace(userId, likedPlaces);
+        }
+    }
 
 }
 

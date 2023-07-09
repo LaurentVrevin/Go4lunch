@@ -41,4 +41,5 @@ public interface UserInterface {
 
     void updateUserSelectedRestaurant(String userId, User user);
 
+    void updateUserLikedPlace(String userId, List<String> likedPlaces);
 }

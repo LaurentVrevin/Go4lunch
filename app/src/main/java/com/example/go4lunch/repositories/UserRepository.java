@@ -14,9 +14,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +35,8 @@ public class UserRepository implements UserInterface {
     private final CollectionReference userCollection;
     private final MutableLiveData<User> userLiveData;
     private final MutableLiveData<List<User>> userListLiveData;
-
     private User user;
+
 
     @Inject
     public UserRepository() {
@@ -55,36 +57,28 @@ public class UserRepository implements UserInterface {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null) {
             String userId = firebaseUser.getUid();
+            DocumentReference userDocument = userCollection.document(userId);
 
-            // Vérifier si l'utilisateur existe déjà dans Firestore
-            userCollection.document(userId).get().addOnCompleteListener(task -> {
+            userDocument.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                    // L'utilisateur existe déjà, récupérer les valeurs existantes
-                    DocumentSnapshot document = task.getResult();
-                    String email = document.getString("email");
-                    String name = document.getString("name");
-                    String pictureUrl = document.getString("pictureUrl");
-                    List<String> likedPlaces = (List<String>) document.get("likedPlaces");
-                    String selectedRestaurantId = document.getString("selectedRestaurantId");
-
-                    // Créer un nouvel objet User en incluant les valeurs existantes
-                     user = new User(userId, email,  name, pictureUrl, likedPlaces, selectedRestaurantId);
-
-                    // Mettre à jour le document existant avec les nouvelles valeurs
-                    //userCollection.document(userId).set(user);
+                    // L'utilisateur existe déjà dans Firestore, ne rien faire
                 } else {
-                    // L'utilisateur n'existe pas encore, créer un nouvel objet User
-                    User user = new User(userId, firebaseUser.getEmail(), firebaseUser.getDisplayName(), firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null, new ArrayList<>(),null);
+                    // L'utilisateur n'existe pas encore dans Firestore, créer un nouveau document
+                    String displayName = firebaseUser.getDisplayName();
+                    String email = firebaseUser.getEmail();
+                    String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
 
-                    // Créer un nouveau document pour l'utilisateur
-                    userCollection.document(userId).set(user);
+                    List<String> likedPlaces = new ArrayList<>();
 
+                    User newUser = new User(userId, displayName, email, photoUrl, likedPlaces, null);
 
+                    // Utiliser la méthode "set" avec l'option "merge" pour mettre à jour uniquement les champs spécifiques
+                    userDocument.set(newUser, SetOptions.merge());
+                    Log.d("DATA", "Les données sont : " + userId + " " + displayName + " " + email);
                 }
             });
         }
     }
-
 
 
     @Override
@@ -207,6 +201,23 @@ public class UserRepository implements UserInterface {
                             userLiveData.postValue(user);
                         } else {
                             // Erreur lors de la mise à jour des données utilisateur dans Firestore
+                        }
+                    });
+        }
+    }
+    @Override
+    public void updateUserLikedPlace(String userId, List<String> likedPlaces) {
+        if (userId != null) {
+            DocumentReference userDocument = userCollection.document(userId);
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("likedPlaces", likedPlaces);
+
+            userDocument.update(updates)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // Mise à jour réussie
+                        } else {
+                            // Erreur lors de la mise à jour
                         }
                     });
         }

@@ -12,28 +12,33 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
+import com.example.go4lunch.repositories.UserRepository;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class YourLunchActivity extends AppCompatActivity {
 
-    private static final String USER_ID = "userID";
     private ImageView placeImageView;
     private TextView placeNameTextView;
     private TextView placeAddressTextView;
@@ -44,6 +49,7 @@ public class YourLunchActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userId;
+    private Button buttonRestaurantLike;
 
     private String restaurantId;
     private UserViewModel userViewModel;
@@ -59,6 +65,7 @@ public class YourLunchActivity extends AppCompatActivity {
         placeAddressTextView = findViewById(R.id.tv_detail_restaurant_address);
         fabDetailChoice = findViewById(R.id.fab_detail_choice);
         ratingBar = findViewById(R.id.rb_detail_restaurant_rate);
+        buttonRestaurantLike = findViewById(R.id.bt_detail_restaurant_like);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -71,7 +78,7 @@ public class YourLunchActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("restaurant")) {
             Restaurant restaurant = intent.getParcelableExtra("restaurant");
-            userId = intent.getStringExtra(USER_ID);
+
 
             // Utiliser les données du restaurant pour afficher les détails appropriés
             placeNameTextView.setText(restaurant.getName());
@@ -88,6 +95,10 @@ public class YourLunchActivity extends AppCompatActivity {
         fabDetailChoice.setOnClickListener(view -> {
             // Inverser l'état du bouton
             updateUserSelectedRestaurant();
+        });
+
+        buttonRestaurantLike.setOnClickListener(view ->{
+            updateUserLikedPlace();
         });
 
         Toolbar toolbar = findViewById(R.id.tb_toolbar);
@@ -143,11 +154,24 @@ public class YourLunchActivity extends AppCompatActivity {
             userViewModel.updateUserSelectedRestaurant(userId, currentUser);
         }
     }
+    private void updateUserLikedPlace() {
+        if (currentUser != null && restaurantId != null) {
+            List<String> likedPlaces = currentUser.getLikedPlaces();
+            if (likedPlaces.contains(restaurantId)) {
+                // Le restaurant est déjà aimé, je lui affiche que c'est déjà liké
+                Toast.makeText(this, "Ce restaurant a déjà été liké", Toast.LENGTH_SHORT).show();
+            } else {
+                likedPlaces.add(restaurantId);
+                currentUser.setLikedPlaces(likedPlaces);
+                userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
+            }
+        }
+    }
 
     private void loadRestaurantImage(Restaurant restaurant) {
         List<String> photoUrls = restaurant.getPhotoUrls();
         if (photoUrls != null && !photoUrls.isEmpty()) {
-            String photoUrl = photoUrls.get(0); // Utilisez le premier URL de photo
+            String photoUrl = photoUrls.get(0); // Utilise le premier URL de photo
 
             RequestOptions requestOptions = new RequestOptions()
                     .placeholder(R.drawable.lunch)
@@ -159,7 +183,7 @@ public class YourLunchActivity extends AppCompatActivity {
                     .apply(requestOptions)
                     .into(placeImageView);
         } else {
-            // Si l'URL de l'image est nulle, afficher une image de placeholder
+            // Si l'URL de l'image est nulle, affiche une image standard
             placeImageView.setImageResource(R.drawable.lunch);
         }
     }

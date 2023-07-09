@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.adapters.ListViewAdapter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
@@ -27,6 +28,7 @@ public class ListViewFragment extends Fragment {
     private RestaurantViewModel restaurantViewModel;
     private List<Restaurant> restaurantListData;
     private Location location;
+    private User user;
     private RecyclerView recyclerView;
     private ListViewAdapter listViewAdapter;
 
