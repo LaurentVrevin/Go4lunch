@@ -11,7 +11,6 @@ import java.util.List;
 
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.repositories.RestaurantInterface;
-import com.example.go4lunch.repositories.RestaurantRepository;
 
 import javax.inject.Inject;
 
@@ -20,7 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel;
 @HiltViewModel
 public class RestaurantViewModel extends ViewModel {
     private final RestaurantInterface restaurantInterface;
-    private final MutableLiveData<List<Restaurant>> restaurantsLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Restaurant>> listRestaurantLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Restaurant> selectedRestaurantLiveData = new MutableLiveData<>();
+
     private final int radius = 200;
 
     @Inject
@@ -30,14 +31,28 @@ public class RestaurantViewModel extends ViewModel {
 
     public void getRestaurants(Location location) {
         restaurantInterface.getRestaurants(location, radius)
-                .observeForever(restaurants -> {
-                    if (restaurants != null) {
-                        restaurantsLiveData.setValue(restaurants);
+                .observeForever(restaurant -> {
+                    if (restaurant != null) {
+                        listRestaurantLiveData.setValue(restaurant);
                     }
                 });
     }
 
-    public LiveData<List<Restaurant>> getRestaurantsLiveData() {
-        return restaurantsLiveData;
+    public void getRestaurantById(String placeId) {
+        restaurantInterface.getRestaurantById(placeId)
+                .observeForever(restaurant -> {
+                    if (restaurant != null) {
+                        selectedRestaurantLiveData.setValue(restaurant);
+                    }
+                });
     }
+
+    public LiveData<List<Restaurant>> getListRestaurantLiveData() {
+        return listRestaurantLiveData;
+    }
+
+    public LiveData<Restaurant> getSelectedRestaurantLiveData() {
+        return selectedRestaurantLiveData;
+    }
+
 }

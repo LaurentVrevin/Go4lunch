@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -36,18 +37,14 @@ import com.example.go4lunch.ui.fragments.WorkmatesFragment;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
 
@@ -63,14 +60,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private TextView tvUserEmail;
     private AppBarConfiguration mAppBarConfiguration;
     private NavController navController;
-    private MapViewFragment mMapViewFragment;
-    private ListViewFragment mListViewFragment;
-    private WorkmatesFragment mWorkmatesFragment;
+    private MapViewFragment mapViewFragment;
+    private ListViewFragment listViewFragment;
+    private WorkmatesFragment workmatesFragment;
     private ActivityMainBinding binding;
-    private UserViewModel mUserViewModel;
-    private LocationPermissionViewModel mLocationPermissionViewModel;
-    private RestaurantViewModel mRestaurantViewModel;
-
+    private UserViewModel userViewModel;
+    private LocationPermissionViewModel locationPermissionViewModel;
+    private RestaurantViewModel restaurantViewModel;
     private Location currentLocation;
     private String userId;
     private FirebaseAuth mAuth;
@@ -97,17 +93,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupMapViewFragment();
         setupNavigationListener();
         observePermission();
+
     }
 
     private void configureViewModels() {
-        mLocationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
-        mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        mRestaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+        locationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
     }
     private void observeUserData() {
-        mUserViewModel.getCurrentUserFromFirestore(userId);
-        mUserViewModel.getUserLiveData().observe(this, this::displayUserInfo);
+        userViewModel.getCurrentUserFromFirestore(userId);
+        userViewModel.getUserLiveData().observe(this, this::displayUserInfo);
     }
+
 
     //VIEW
 
@@ -135,8 +133,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         imvProfilePhoto = headerView.findViewById(R.id.iv_header_Avatar);
         userId = mAuth.getCurrentUser().getUid();
 
-        mUserViewModel.getCurrentUserFromFirestore(userId);
-        mUserViewModel.getUserLiveData().observe(this, this::displayUserInfo);
+        userViewModel.getCurrentUserFromFirestore(userId);
+        userViewModel.getUserLiveData().observe(this, this::displayUserInfo);
 
     }
 
@@ -148,9 +146,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void setupMapViewFragment() {
-        mMapViewFragment = new MapViewFragment();
+        mapViewFragment = new MapViewFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment_content_main, mMapViewFragment)
+                .replace(R.id.nav_host_fragment_content_main, mapViewFragment)
                 .commit();
     }
 
@@ -159,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             Intent intent = null;
             switch (menuItem.getItemId()) {
                 case R.id.nav_yourlunch:
-                    intent = new Intent(MainActivity.this, YourLunchActivity.class);
+                    //showSelectedRestaurantDialog();
                     break;
                 case R.id.nav_settings:
                     intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -183,21 +181,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             Fragment fragment = null;
             switch (menuItem.getItemId()) {
                 case R.id.nav_mapview:
-                    fragment = mMapViewFragment;
+                    fragment = mapViewFragment;
                     break;
                 case R.id.nav_listview:
                     // Lorsque l'utilisateur clique sur l'élément "List view", on affiche le fragment ListViewFragment
-                    if (mListViewFragment == null) {
-                        mListViewFragment = new ListViewFragment();
+                    if (listViewFragment == null) {
+                        listViewFragment = new ListViewFragment();
                     }
-                    fragment = mListViewFragment;
+                    fragment = listViewFragment;
                     break;
                 case R.id.nav_workmates:
                     // Lorsque l'utilisateur clique sur l'élément "Workmates", on affiche le fragment WorkmatesFragment
-                    if (mWorkmatesFragment == null) {
-                        mWorkmatesFragment = new WorkmatesFragment();
+                    if (workmatesFragment == null) {
+                        workmatesFragment = new WorkmatesFragment();
                     }
-                    fragment = mWorkmatesFragment;
+                    fragment = workmatesFragment;
                     break;
             }
             if (fragment != null && !fragment.isVisible()) {
@@ -255,12 +253,35 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 
+    // YOUR LUNCH ACTIVITY
+
+    /*private void showSelectedRestaurantDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Your Lunch");
+
+        // Vérifie si un restaurant a été sélectionné
+        Restaurant selectedRestaurant = restaurantViewModel.getSelectedRestaurantLiveData().getValue();
+        if (selectedRestaurant != null) {
+            String restaurantName = selectedRestaurant.getName();
+            String restaurantAddress = selectedRestaurant.getAddress();
+            String message = "You have selected:\n\nRestaurant: " + restaurantName + "\nAddress: " + restaurantAddress;
+            builder.setMessage(message);
+        } else {
+            builder.setMessage("No restaurant has been selected yet.");
+        }
+
+        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }*/
+
     private void showLogoutConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.logout_title)
                 .setMessage(R.string.logout_message)
                 .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
-                    mUserViewModel.logOut();
+                    userViewModel.logOut();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -273,10 +294,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private void checkPermission(Boolean hasPermission) {
         if (hasPermission) {
-            mLocationPermissionViewModel.permissionSet(true);
+            locationPermissionViewModel.permissionSet(true);
             observeLocation();
         } else {
-            mLocationPermissionViewModel.permissionSet(false);
+            locationPermissionViewModel.permissionSet(false);
             requestPermission();
         }
     }
@@ -293,12 +314,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void observePermission() {
-        mLocationPermissionViewModel.liveDataHasPermission(this).observe(this, this::checkPermission);
+        locationPermissionViewModel.liveDataHasPermission(this).observe(this, this::checkPermission);
     }
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        mLocationPermissionViewModel.permissionSet(true);
+        locationPermissionViewModel.permissionSet(true);
         observeLocation();
     }
 
@@ -308,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     public void logOutAndRedirect() {
-        mUserViewModel.logOut();
+        userViewModel.logOut();
         // Rediriger vers l'activité LoginActivity
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -325,16 +346,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     //LOCATION
 
     private void observeLocation() {
-        mLocationPermissionViewModel.startUpdateLocation(this, this);
-        mLocationPermissionViewModel.getCurrentLocation().observe(this, this::updateLocation);
+        locationPermissionViewModel.startUpdateLocation(this, this);
+        locationPermissionViewModel.getCurrentLocation().observe(this, this::updateLocation);
     }
 
     private void updateLocation(Location location) {
         currentLocation = location;
-        mRestaurantViewModel.getRestaurants(currentLocation);
+        restaurantViewModel.getRestaurants(currentLocation);
             // Mettre à jour votre liste de restaurants avec restaurantList
-
-
     }
 
 

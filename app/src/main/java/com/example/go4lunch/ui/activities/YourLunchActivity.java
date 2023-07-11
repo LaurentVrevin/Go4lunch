@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.repositories.UserRepository;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,17 +44,21 @@ public class YourLunchActivity extends AppCompatActivity {
     private ImageView placeImageView;
     private TextView placeNameTextView;
     private TextView placeAddressTextView;
-    private boolean isRestaurantSelected = false;
+    private boolean isRestaurantSelected;
     private FloatingActionButton fabDetailChoice;
     private RatingBar ratingBar;
     private User currentUser;
+    private Restaurant restaurant;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userId;
     private Button buttonRestaurantLike;
+    private Button buttonRestaurantWebsite;
 
     private String restaurantId;
     private UserViewModel userViewModel;
+    private RestaurantViewModel restaurantViewModel;
+    private LiveData<Restaurant>restaurantsLiveData;
     private LiveData<User> userLiveData;
 
     @Override
@@ -66,6 +72,7 @@ public class YourLunchActivity extends AppCompatActivity {
         fabDetailChoice = findViewById(R.id.fab_detail_choice);
         ratingBar = findViewById(R.id.rb_detail_restaurant_rate);
         buttonRestaurantLike = findViewById(R.id.bt_detail_restaurant_like);
+        buttonRestaurantWebsite = findViewById(R.id.bt_detail_restaurant_website);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -73,24 +80,32 @@ public class YourLunchActivity extends AppCompatActivity {
         configureViewModel();
         observeUserData();
 
-
         // Récupérer les données du restaurant transmises depuis l'adapter
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("restaurant")) {
-            Restaurant restaurant = intent.getParcelableExtra("restaurant");
-
-
-            // Utiliser les données du restaurant pour afficher les détails appropriés
-            placeNameTextView.setText(restaurant.getName());
-            placeAddressTextView.setText(restaurant.getAddress());
-            ratingBar.setRating(restaurant.getRating());
-
-            loadRestaurantImage(restaurant);
-
+            restaurant = intent.getParcelableExtra("restaurant");
+            //je recupere bien le restaurant via l'intent
             // Stocker l'ID du restaurant dans la variable restaurantId
             restaurantId = restaurant.getPlaceId();
+            // Appeler la méthode getRestaurantById() du restaurantViewModel
+            restaurantViewModel.getRestaurantById(restaurantId);
 
-            }
+
+            // Observer le LiveData selectedRestaurantLiveData du restaurantViewModel
+            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
+                // Vérifier si le restaurant n'est pas null
+                if (restaurant != null) {
+                    // Mettre à jour les vues avec les détails du restaurant
+                    placeNameTextView.setText(restaurant.getName());
+                    placeAddressTextView.setText(restaurant.getAddress());
+                    ratingBar.setRating(restaurant.getRating());
+                    loadRestaurantImage(restaurant);
+                }
+            });
+
+
+        }
+
 
         fabDetailChoice.setOnClickListener(view -> {
             // Inverser l'état du bouton
@@ -99,6 +114,17 @@ public class YourLunchActivity extends AppCompatActivity {
 
         buttonRestaurantLike.setOnClickListener(view ->{
             updateUserLikedPlace();
+        });
+        buttonRestaurantWebsite.setOnClickListener(view -> {
+            // Vérifier si l'URL du site web du restaurant est disponible
+
+            // Ouvrir le site web du restaurant dans le navigateur par défaut
+            String websiteUrl = restaurantsLiveData.getValue().getWebsiteUrl();
+                /*Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
+                startActivity(webIntent);*/
+            Toast.makeText(YourLunchActivity.this, "Le site web est : " + websiteUrl, Toast.LENGTH_SHORT).show();
+
+
         });
 
         Toolbar toolbar = findViewById(R.id.tb_toolbar);
@@ -116,9 +142,9 @@ public class YourLunchActivity extends AppCompatActivity {
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
             userId = currentUser.getUserId();
-            Log.d("yourlunchuserid", "user id is : " + userId);
+
         });
-        observeUserData();
+        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
     }
 
     private void observeUserData() {
@@ -127,8 +153,10 @@ public class YourLunchActivity extends AppCompatActivity {
                 String selectedRestaurantId = user.getSelectedRestaurantId();
                 if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
                     setButtonColor(true); // Mettre le bouton en bleu
+
                 } else {
                     setButtonColor(false); // Mettre le bouton en blanc
+
                 }
             }
         });
@@ -136,9 +164,11 @@ public class YourLunchActivity extends AppCompatActivity {
 
     private void setButtonColor(boolean isSelected) {
         if (isSelected) {
-            fabDetailChoice.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.blue)));
+            int greenColor = ContextCompat.getColor(this, R.color.green);
+            fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(greenColor));
         } else {
-            fabDetailChoice.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white)));
+            int blackColor = ContextCompat.getColor(this, R.color.black);
+            fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(blackColor));
         }
     }
 
@@ -147,9 +177,13 @@ public class YourLunchActivity extends AppCompatActivity {
             if (currentUser.getSelectedRestaurantId() == null) {
                 currentUser.setSelectedRestaurantId(restaurantId);
                 setButtonColor(true);
+
+
             } else {
                 currentUser.setSelectedRestaurantId(null);
                 setButtonColor(false);
+
+
             }
             userViewModel.updateUserSelectedRestaurant(userId, currentUser);
         }

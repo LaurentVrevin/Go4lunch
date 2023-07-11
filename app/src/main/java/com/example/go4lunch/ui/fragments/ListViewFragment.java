@@ -67,7 +67,7 @@ public class ListViewFragment extends Fragment {
     private void observeData(Boolean hasPermission) {
         if (hasPermission) {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            restaurantViewModel.getRestaurantsLiveData().observe(requireActivity(), this::updateRestaurantList);
+            restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::updateRestaurantList);
         }
     }
 

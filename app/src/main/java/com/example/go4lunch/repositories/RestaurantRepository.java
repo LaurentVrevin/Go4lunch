@@ -3,6 +3,7 @@ package com.example.go4lunch.repositories;
 import android.location.Location;
 import android.util.Log;
 
+
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.BuildConfig;
@@ -29,14 +30,15 @@ import retrofit2.Response;
 public class RestaurantRepository implements RestaurantInterface{
 
     private static final String PLACES_API_KEY = BuildConfig.MAPS_API_KEY;
-    private MutableLiveData<List<Restaurant>> restaurantsLiveData;
+    private MutableLiveData<List<Restaurant>> restaurantsListLiveData;
+    private MutableLiveData<Restaurant> selectedRestaurantLiveData;
     private final PlacesApi placesApi;
     private Map<String, Restaurant> cachedRestaurants;
-    private final int radius = 200;
+    private int radius;
 
     @Inject
     public RestaurantRepository() {
-        restaurantsLiveData = new MutableLiveData<>();
+        restaurantsListLiveData = new MutableLiveData<>();
         placesApi = RetrofitBuilder.buildPlacesApi();
         cachedRestaurants = new HashMap<>();
     }
@@ -50,8 +52,8 @@ public class RestaurantRepository implements RestaurantInterface{
         // ça limite les appels API et c'est bien pour le porte monnaie
         if (cachedRestaurants.containsKey(cacheKey)) {
             List<Restaurant> cachedData = new ArrayList<>(cachedRestaurants.values());
-            restaurantsLiveData.setValue(cachedData);
-            return restaurantsLiveData;
+            restaurantsListLiveData.setValue(cachedData);
+            return restaurantsListLiveData;
         }
 
         // Appel d'API pour rechercher les lieux à proximité
@@ -80,7 +82,7 @@ public class RestaurantRepository implements RestaurantInterface{
                         // Met à jour les données en cache
                         cacheRestaurants(location.getLatitude(), location.getLongitude(), radius, restaurantListData);
 
-                        restaurantsLiveData.setValue(restaurantListData);
+                        restaurantsListLiveData.setValue(restaurantListData);
                     }
                 }
             }
@@ -91,7 +93,7 @@ public class RestaurantRepository implements RestaurantInterface{
             }
         });
 
-        return restaurantsLiveData;
+        return restaurantsListLiveData;
     }
 
     public MutableLiveData<Restaurant> getRestaurantById(String placeId) {
@@ -106,7 +108,7 @@ public class RestaurantRepository implements RestaurantInterface{
         }
 
         // Appel d'API pour obtenir les détails d'un lieu
-        Call<PlaceDetailsResponse> placeDetailsResponseCall = placesApi.getPlaceDetailsResponse("name,formatted_address,formatted_phone_number,website,photos,rating,geometry", placeId);
+        Call<PlaceDetailsResponse> placeDetailsResponseCall = placesApi.getPlaceDetailsResponse("name,vicinity,formatted_phone_number,website,photos,rating,geometry", placeId);
         placeDetailsResponseCall.enqueue(new Callback<PlaceDetailsResponse>() {
             @Override
             public void onResponse(Call<PlaceDetailsResponse> call, Response<PlaceDetailsResponse> response) {
@@ -140,12 +142,12 @@ public class RestaurantRepository implements RestaurantInterface{
         return restaurantLiveData;
     }
 
-    private void cacheRestaurants(double latitude, double longitude, int radius, List<com.example.go4lunch.models.Restaurant> restaurants) {
+    private void cacheRestaurants(double latitude, double longitude, int radius, List<Restaurant> restaurantsListDataCached) {
         String cacheKey = generateCacheKey(latitude, longitude, radius);
 
         // Remplace les anciennes données en cache
         cachedRestaurants.put(cacheKey, null);
-        for (Restaurant restaurant : restaurants) {
+        for (Restaurant restaurant : restaurantsListDataCached) {
             cachedRestaurants.put(restaurant.getPlaceId(), restaurant);
         }
         Log.d("RestaurantRepository", "Restaurants cached successfully.");
@@ -158,5 +160,9 @@ public class RestaurantRepository implements RestaurantInterface{
 
     private String generateCacheKey(double latitude, double longitude, int radius) {
         return String.format("%.6f_%.6f_%d", latitude, longitude, radius);
+    }
+
+    public void updateRadius(int selectedRadius) {
+        radius = selectedRadius;
     }
 }

@@ -66,8 +66,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private void observeData(Boolean hasPermission) {
         if (hasPermission) {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            restaurantViewModel.getRestaurantsLiveData().observe(requireActivity(), this::updateRestaurantList);
-            restaurantViewModel.getRestaurantsLiveData().observe(requireActivity(), this::setMarkers);
+            restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::updateRestaurantList);
+            restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::setMarkers);
         }
     }
 

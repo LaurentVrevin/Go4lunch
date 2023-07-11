@@ -2,7 +2,6 @@ package com.example.go4lunch.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +86,50 @@ public class Restaurant implements Parcelable {
 
     public String getPlaceId() {
         return id;
+    }
+
+    public void setPlaceId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
+    }
+
+    public void setPhotoUrl(List<Photo> photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public void setOpeningHours(String openingHours) {
+        this.openingHours = openingHours;
+    }
+
+    public void setClosingHours(String closingHours) {
+        this.closingHours = closingHours;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
     }
 
     public String getName() {
