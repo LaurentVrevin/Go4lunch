@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.repositories.RestaurantRepository;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -36,8 +37,11 @@ public class SettingsActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private UserViewModel userViewModel;
+    private RestaurantViewModel restaurantViewModel;
     private User currentUser;
-    private int selectedRadius;
+    private int radius;
+    private int currentRadius;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,73 +53,68 @@ public class SettingsActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         // Initialisation des vues
-        etFirstName  = findViewById(R.id.editTextFirstName);
-        etLastName  = findViewById(R.id.editTextLastName);
+        etFirstName = findViewById(R.id.editTextFirstName);
+        etLastName = findViewById(R.id.editTextLastName);
         btnDelete = findViewById(R.id.buttonDeleteAccount);
         seekBarRadius = findViewById(R.id.seekBarRadius);
         txtviewRadius = findViewById(R.id.txtviewRadius);
         btnOk = findViewById(R.id.buttonOk);
 
-        seekBarRadius.setMax(2000); // Valeur maximale de la distance
-        seekBarRadius.setProgress(50); // Valeur initiale de la distance
-        txtviewRadius.setText("Choisissez la distance : " + seekBarRadius.getProgress() + " mètres");
-
+        seekBarRadius.setMax(1950); // Valeur maximale de la distance (2000 - 50)
+        seekBarRadius.setProgress(0); // Valeur initiale de la distance (0 - 1950)
+        txtviewRadius.setText("Choisissez la distance : " + (seekBarRadius.getProgress() + 50) + " mètres");
 
         // Récupération de l'utilisateur actuellement connecté
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        // Initialisation du ViewModel
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
+        configureViewModels();
+        // Initialisation du ViewModel
+
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
             etFirstName.setText(user.getName().split(" ")[0]); // affiche le prénom
             etLastName.setText(user.getName().split(" ")[1]); // affiche le nom
             Log.d("SETTINGUSERID", "user id is : " + currentUser.getUserId());
         });
-
-        observeSelectedRadius();
-
-        btnDelete.setOnClickListener(view -> {
-            deleteUser(currentUser.getUserId());
+        restaurantViewModel.getRadiusLiveData().observe(this, radius ->{
+            currentRadius = radius;
         });
-
-        btnOk.setOnClickListener(view -> {
-            // Récupérer la valeur du radius sélectionné
-            int selectedRadius = seekBarRadius.getProgress() + 50; // Ajoute 50 pour obtenir la plage de 50 à 2000 mètres
-
-            // Mettre à jour le radius dans le Repository
-            RestaurantRepository restaurantRepository = new RestaurantRepository();
-            restaurantRepository.updateRadius(selectedRadius);
-
-            // Afficher un message de confirmation ou autre action souhaitée
-            Toast.makeText(SettingsActivity.this, "Radius updated: " + selectedRadius + " meters", Toast.LENGTH_SHORT).show();
-        });
-
-    }
-
-    private void observeSelectedRadius(){
 
         seekBarRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Mettre à jour le texte de la distance affichée
-
-                txtviewRadius.setText("Choisissez la distance : " + progress + " mètres");
+                // Mettre à jour le texte avec la valeur sélectionnée
+                txtviewRadius.setText("Choisissez la distance : " + (progress + 50) + " mètres");
+                radius = seekBarRadius.getProgress();
 
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                // Ne fait rien ici
+
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // Ne fait rien ici
+
             }
         });
+
+        btnOk.setOnClickListener(view -> {
+
+        });
+
+        btnDelete.setOnClickListener(view -> {
+            deleteUser(currentUser.getUserId());
+        });
+    }
+
+    private void configureViewModels() {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
+        restaurantViewModel.getRadiusLiveData();
+
     }
 
     @Override
@@ -124,6 +123,7 @@ public class SettingsActivity extends AppCompatActivity {
         onBackPressed();
         return true;
     }
+
     public void deleteUser(String userId) {
         // Supprimer l'utilisateur de Firebase Authentication
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

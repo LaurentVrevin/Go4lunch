@@ -22,7 +22,9 @@ public class RestaurantViewModel extends ViewModel {
     private final MutableLiveData<List<Restaurant>> listRestaurantLiveData = new MutableLiveData<>();
     private final MutableLiveData<Restaurant> selectedRestaurantLiveData = new MutableLiveData<>();
 
-    private final int radius = 200;
+    private final MutableLiveData<Integer>radiusLiveData = new MutableLiveData<>();
+
+    public int radius = 200;
 
     @Inject
     public RestaurantViewModel(RestaurantInterface restaurantInterface) {
@@ -53,6 +55,17 @@ public class RestaurantViewModel extends ViewModel {
 
     public LiveData<Restaurant> getSelectedRestaurantLiveData() {
         return selectedRestaurantLiveData;
+    }
+
+    public void updateRadius(int selectedRadius) {
+        restaurantInterface.updateRadius(selectedRadius);
+        radiusLiveData.setValue(selectedRadius);
+        radius = selectedRadius;
+    }
+
+    public LiveData<Integer> getRadiusLiveData() {
+
+        return this.radiusLiveData;
     }
 
 }

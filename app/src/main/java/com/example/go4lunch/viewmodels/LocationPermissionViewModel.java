@@ -24,10 +24,10 @@ import com.example.go4lunch.repositories.PermissionInterface;
 @HiltViewModel
 public class LocationPermissionViewModel extends ViewModel  {
 
-    private static final int DISTANCE = 200;
+
     private final PermissionInterface permissionInterface;
     private final LocationInterface locationInterface;
-    private Location userLocation;
+
     private final MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject

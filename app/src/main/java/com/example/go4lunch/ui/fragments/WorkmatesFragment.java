@@ -17,15 +17,19 @@ import com.example.go4lunch.R;
 import java.util.ArrayList;
 
 import com.example.go4lunch.models.User;
-import com.example.go4lunch.ui.adapters.UserAdapter;
+import com.example.go4lunch.ui.adapters.WorkmatesFragmentAdapter;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class WorkmatesFragment extends Fragment {
 
     private UserViewModel userViewModel;
+    private RestaurantViewModel restaurantViewModel;
     private RecyclerView workmatesRecyclerView;
-    private UserAdapter userAdapter;
+    private WorkmatesFragmentAdapter workmatesFragmentAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,25 +38,39 @@ public class WorkmatesFragment extends Fragment {
 
         workmatesRecyclerView = view.findViewById(R.id.rv_workmates_list_view);
 
-        userAdapter = new UserAdapter(new ArrayList<User>());
-        workmatesRecyclerView.setAdapter(userAdapter);
+        configureRecyclerView();
+        configureViewModels();
+
+
+        userViewModel.getUserListFromFirestore();
+
+        userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
+            if (userList != null) {
+                workmatesFragmentAdapter.setUserList(userList);
+            }
+        });
+        restaurantViewModel.getListRestaurantLiveData().observe(getViewLifecycleOwner(), restaurantList -> {
+            if (restaurantList != null) {
+                workmatesFragmentAdapter.setRestaurantList(restaurantList);
+            }
+        });
+
+
+        return view;
+    }
+
+    private void configureViewModels() {
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+    }
+
+    private void configureRecyclerView() {
+        workmatesFragmentAdapter = new WorkmatesFragmentAdapter(new ArrayList<>(), new ArrayList<>());
+        workmatesRecyclerView.setAdapter(workmatesFragmentAdapter);
 
         // Création d'un DividerItemDecoration
         workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         workmatesRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
-        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
-        userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
-            if (userList != null) {
-                // Mettre à jour votre RecyclerView avec la nouvelle liste d'utilisateurs
-                UserAdapter userAdapter = new UserAdapter(userList);
-                workmatesRecyclerView.setAdapter(userAdapter);
-            }
-        });
-
-        userViewModel.getUserListFromFirestore();
-
-        return view;
     }
 }
 

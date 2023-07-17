@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         userViewModel.getUserLiveData().observe(this, this::displayUserInfo);
     }
 
-
     //VIEW
 
     private void setupToolbar() {
@@ -210,18 +209,20 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     //USER
 
     private void checkAuth() {
-        // Vérifier si l'utilisateur est connecté
         if (mAuth.getCurrentUser() != null) {
+            // Utilisateur connecté, récupérer l'ID de l'utilisateur
             userId = mAuth.getCurrentUser().getUid();
             Log.d("USERAUTH", "L'id de l'utilisateur est : " + userId);
-            ; // Mettre à jour le LiveData de l'utilisateur
         } else {
-            // Rediriger vers l'activité LoginActivity
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+            // Utilisateur non connecté, rediriger vers LoginActivity
+            redirectToLogin();
         }
+    }
+    private void redirectToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     @SuppressLint("SetTextI18n")
@@ -281,11 +282,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         builder.setTitle(R.string.logout_title)
                 .setMessage(R.string.logout_message)
                 .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
-                    userViewModel.logOut();
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+                   logOutAndRedirect();
                 })
                 .setNegativeButton(R.string.logout_negative_button, null)
                 .show();
@@ -331,10 +328,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void logOutAndRedirect() {
         userViewModel.logOut();
         // Rediriger vers l'activité LoginActivity
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        this.finish();
+        redirectToLogin();
     }
 
     @Override
@@ -371,6 +365,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onStop() {
         super.onStop();
+        locationPermissionViewModel.stopUpdateLocation();
     }
 
     @Override

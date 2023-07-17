@@ -11,28 +11,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
+import com.example.go4lunch.models.User;
 
 import java.util.List;
 
-import com.example.go4lunch.models.User;
+public class WorkmatesListViewFragmentAdapter extends RecyclerView.Adapter<WorkmatesListViewFragmentAdapter.WorkmatesViewHolder> {
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
+
+    //Je dois récupérer la liste des Users qui ont uniquement le même restaurantId que dans le champ selectedRestaurantId
 
     private List<User> userList;
 
-    public UserAdapter(List<User> userList) {
+    public WorkmatesListViewFragmentAdapter(List<User> userList) {
         this.userList = userList;
+
     }
 
     @NonNull
     @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_workmates_listview, parent, false);
-        return new UserViewHolder(view);
+        return new WorkmatesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull WorkmatesViewHolder holder, int position) {
         User user = userList.get(position);
         holder.userNameTextView.setText(user.getName());
         String profilePictureUrl = user.getPictureUrl();
@@ -49,23 +52,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return userList.size();
     }
 
-    public static class UserViewHolder extends RecyclerView.ViewHolder {
+    public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
 
         private TextView userNameTextView;
         private ImageView workmatesAvatar;
 
-        public UserViewHolder(@NonNull View itemView) {
+        public WorkmatesViewHolder(@NonNull View itemView) {
             super(itemView);
             userNameTextView = itemView.findViewById(R.id.tv_workmate_name);
             workmatesAvatar = itemView.findViewById(R.id.im_workmate);
         }
-
-        /*public void bind(User user) {
-            userNameTextView.setText(user.getName());
-        }*/
     }
+
     public void setUserList(List<User> userList) {
         this.userList = userList;
         notifyDataSetChanged();
     }
+
+
 }

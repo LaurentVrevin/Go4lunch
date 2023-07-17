@@ -14,22 +14,20 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.List;
 
 public interface UserInterface {
-    void instanceFirestore();
-
-    FirebaseUser getCurrentUserFromFirebase();
-
-    CollectionReference getUserCollection();
 
     LiveData<User> getUserLiveData();
+    LiveData<List<User>> getUserListLiveData();
+    void createUserInFirestore();
 
     void getCurrentUserFromFirestore(String userId);
 
-    LiveData<List<User>> getUserListLiveData();
+
     void setUserList(List<User> userList);
 
     void getUserListFromFirestore();
-
-    void createUserInFirestore();
+    void updateUserInFirestore(String userId, User user);
+    void updateUserSelectedRestaurant(String userId, User user);
+    void updateUserLikedPlace(String userId, List<String> likedPlaces);
 
     Task<DocumentSnapshot> getUserId();
 
@@ -37,9 +35,9 @@ public interface UserInterface {
 
     void deleteAccount(Context context);
 
-    void updateUserInFirestore(String userId, User user);
 
-    void updateUserSelectedRestaurant(String userId, User user);
 
-    void updateUserLikedPlace(String userId, List<String> likedPlaces);
+
+
+
 }

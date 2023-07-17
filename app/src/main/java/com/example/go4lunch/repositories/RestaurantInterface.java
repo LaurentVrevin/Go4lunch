@@ -2,7 +2,7 @@ package com.example.go4lunch.repositories;
 
 import android.location.Location;
 
-import androidx.lifecycle.LiveData;
+
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.models.Restaurant;
@@ -15,4 +15,5 @@ public interface RestaurantInterface {
 
     MutableLiveData<Restaurant> getRestaurantById(String placeId);
 
+    void updateRadius(int selectedRadius);
 }
