@@ -222,4 +222,17 @@ public class Restaurant implements Parcelable {
         }
         dest.writeInt(workmatesCount);
     }
+
+    // Ajouter +1 au compteur quand un collègue a choisi ce restaurant
+    public void incrementWorkmatesCount() {
+        workmatesCount++;
+    }
+
+    // Soustraire -1 au compteur quand un collègue a déselectionné ce restaurant
+    public void decrementWorkmatesCount() {
+        if (workmatesCount > 0) {
+            workmatesCount--;
+        }
+    }
+
 }

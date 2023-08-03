@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
-import com.example.go4lunch.ui.adapters.WorkmatesListViewFragmentAdapter;
+import com.example.go4lunch.ui.adapters.YourLunchDetailWorkmatesAdapter;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -40,7 +38,7 @@ import java.util.List;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class YourLunchActivity extends AppCompatActivity {
+public class YourLunchDetailActivity extends AppCompatActivity {
 
     private ImageView placeImageView;
     private TextView placeNameTextView;
@@ -61,8 +59,9 @@ public class YourLunchActivity extends AppCompatActivity {
     private RestaurantViewModel restaurantViewModel;
 
     private LiveData<User> userLiveData;
+    private List<User> userList;
     private RecyclerView workmatesRecyclerView;
-    private WorkmatesListViewFragmentAdapter workmatesListViewFragmentAdapter;
+    private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;
 
 
     @Override
@@ -95,9 +94,6 @@ public class YourLunchActivity extends AppCompatActivity {
             restaurantId = restaurant.getPlaceId();
             // Appeler la méthode getRestaurantById() du restaurantViewModel
             restaurantViewModel.getRestaurantById(restaurantId);
-
-            // Filtrer les workmates par ID de restaurant
-            filterWorkmatesByRestaurantId(restaurantId);
 
             // Observer le LiveData selectedRestaurantLiveData du restaurantViewModel
             restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
@@ -132,7 +128,7 @@ public class YourLunchActivity extends AppCompatActivity {
             Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
 
             startActivity(webIntent);
-            Toast.makeText(YourLunchActivity.this, "Le site web est : " , Toast.LENGTH_SHORT).show();
+            Toast.makeText(YourLunchDetailActivity.this, "Le site web est : " , Toast.LENGTH_SHORT).show();
 
         });
 
@@ -145,18 +141,34 @@ public class YourLunchActivity extends AppCompatActivity {
         }
     }
 
-    private void filterWorkmatesByRestaurantId(String restaurantId) {
-
+    private void filterAndSortWorkmatesByRestaurantId(String restaurantId) {
+        if (userList != null) {
+            List<User> filteredList = new ArrayList<>();
+            for (User user : userList) {
+                if (user.getSelectedRestaurantId() != null && user.getSelectedRestaurantId().equals(restaurantId)) {
+                    filteredList.add(user);
+                }
+            }
+            workmatesListViewAdapter.setUserList(filteredList);
+        }
     }
-
 
     private void configureViewModel() {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
+        userViewModel.getWorkmatesListFromFirestore(false);
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
             userId = currentUser.getUserId();
+            userViewModel.getWorkmatesListFromFirestore(false);
+        });
 
+        // Observer les changements de la liste des workmates récupérée depuis Firestore
+        userViewModel.getUserListLiveData().observe(this, userList -> {
+            if (userList != null) {
+                this.userList = userList;
+                filterAndSortWorkmatesByRestaurantId(restaurantId);
+            }
         });
         restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
     }
@@ -178,31 +190,9 @@ public class YourLunchActivity extends AppCompatActivity {
     }
 
     private void configureRecyclerView() {
-        workmatesListViewFragmentAdapter = new WorkmatesListViewFragmentAdapter(new ArrayList<User>());
-        workmatesRecyclerView.setAdapter(workmatesListViewFragmentAdapter);
-
-        // Création d'un DividerItemDecoration
+        workmatesListViewAdapter = new YourLunchDetailWorkmatesAdapter(new ArrayList<User>());
+        workmatesRecyclerView.setAdapter(workmatesListViewAdapter);
         workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        workmatesRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        userViewModel.getUserListLiveData().observe(this, new Observer<List<User>>() {
-            @Override
-            public void onChanged(List<User> userList) {
-                if (userList != null) {
-                    // Filtrer les workmates en fonction de l'ID du restaurant sélectionné
-                    List<User> filteredList = new ArrayList<>();
-                    for (User user : userList) {
-                        if (user.getSelectedRestaurantId() != null && user.getSelectedRestaurantId().equals(restaurantId)) {
-                            filteredList.add(user);
-                        }
-                    }
-
-                    // Mettre à jour votre RecyclerView avec la nouvelle liste de workmates filtrés
-                    workmatesListViewFragmentAdapter.setUserList(filteredList);
-                }
-            }
-        });
     }
 
 

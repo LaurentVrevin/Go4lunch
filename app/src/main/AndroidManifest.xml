@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activities.YourLunchActivity"
+            android:name=".ui.activities.YourLunchDetailActivity"
             android:exported="false"
             android:theme="@style/Theme.Go4lunch.NoActionBar"/>
         <activity

@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.go4lunch.MyApplication;
 import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
@@ -37,7 +38,7 @@ public class UserRepository implements UserInterface {
     @Inject
     public UserRepository() {
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseFirestore = MyApplication.getFirestoreInstance();
         userCollection = firebaseFirestore.collection("users");
         userLiveData = new MutableLiveData<>();
         userListLiveData = new MutableLiveData<>();
@@ -98,8 +99,9 @@ public class UserRepository implements UserInterface {
     }
 
     @Override
-    public void getUserListFromFirestore() {
-        if (userListLiveData.getValue() == null || userListLiveData.getValue().isEmpty()) {
+    public void getWorkmatesListFromFirestore(boolean forceUpdate) {
+
+        if (userListLiveData.getValue() == null || userListLiveData.getValue().isEmpty() || forceUpdate)  {
             userCollection.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     List<User> userList = new ArrayList<>();
@@ -212,5 +214,7 @@ public class UserRepository implements UserInterface {
     public void setUserList(List<User> userList) {
         userListLiveData.postValue(userList);
     }
+
+
 
 }

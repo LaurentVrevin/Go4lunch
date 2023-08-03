@@ -18,10 +18,9 @@ import java.util.List;
 
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
-import com.example.go4lunch.repositories.RestaurantRepository;
-import com.example.go4lunch.ui.activities.YourLunchActivity;
+import com.example.go4lunch.ui.activities.YourLunchDetailActivity;
 
-public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFragmentAdapter.UserViewHolder> {
+public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFragmentAdapter.WorkmatesFragmentViewHolder> {
 
     private List<User> userList;
     private List<Restaurant> restaurantList;
@@ -36,6 +35,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         updateUsersLists();
     }
 
+    // Met à jour les listes des utilisateurs ayant un restaurant sélectionné ou non
     private void updateUsersLists() {
         usersWithRestaurantId.clear();
         usersWithoutRestaurantId.clear();
@@ -51,13 +51,14 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
 
     @NonNull
     @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public WorkmatesFragmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_workmates_listview, parent, false);
-        return new UserViewHolder(view);
+        return new WorkmatesFragmentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull WorkmatesFragmentViewHolder holder, int position) {
+        // Affiche les utilisateurs avec restaurant sélectionné en premier
         if (!usersWithRestaurantId.isEmpty() && position < usersWithRestaurantId.size()) {
             User user = usersWithRestaurantId.get(position);
             holder.userNameTextView.setText(user.getName() + " - (" + getSelectedRestaurantName(user) + ")");
@@ -70,6 +71,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
                         .into(holder.workmatesAvatar);
             }
         } else {
+            // Affiche les utilisateurs sans restaurant sélectionné ensuite
             int adjustedPosition = position - usersWithRestaurantId.size();
             User user = usersWithoutRestaurantId.get(adjustedPosition);
             holder.userNameTextView.setText(user.getName() + " - (Pas de restaurant choisi)");
@@ -82,6 +84,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         }
     }
 
+    // Récupère le nom du restaurant sélectionné par un utilisateur
     private String getSelectedRestaurantName(User user) {
         String selectedRestaurantId = user.getSelectedRestaurantId();
         for (Restaurant restaurant : restaurantList) {
@@ -92,12 +95,13 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         return "";
     }
 
+    // Définit le click listener pour un utilisateur
     private void setClickListener(View itemView, User user) {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (user != null) {
-                    Intent intent = new Intent(view.getContext(), YourLunchActivity.class);
+                    Intent intent = new Intent(view.getContext(), YourLunchDetailActivity.class);
                     intent.putExtra("restaurant", getSelectedRestaurant(user));
                     view.getContext().startActivity(intent);
                 }
@@ -105,6 +109,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         });
     }
 
+    // Récupère le restaurant sélectionné par un utilisateur
     private Restaurant getSelectedRestaurant(User user) {
         String selectedRestaurantId = user.getSelectedRestaurantId();
         for (Restaurant restaurant : restaurantList) {
@@ -127,12 +132,12 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         return count;
     }
 
-    public static class UserViewHolder extends RecyclerView.ViewHolder {
+    public static class WorkmatesFragmentViewHolder extends RecyclerView.ViewHolder {
 
         private TextView userNameTextView;
         private ImageView workmatesAvatar;
 
-        public UserViewHolder(@NonNull View itemView) {
+        public WorkmatesFragmentViewHolder(@NonNull View itemView) {
             super(itemView);
             userNameTextView = itemView.findViewById(R.id.tv_workmate_name);
             workmatesAvatar = itemView.findViewById(R.id.im_workmate);

@@ -13,31 +13,32 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class WorkmatesListViewFragmentAdapter extends RecyclerView.Adapter<WorkmatesListViewFragmentAdapter.WorkmatesViewHolder> {
-
-
-    //Je dois récupérer la liste des Users qui ont uniquement le même restaurantId que dans le champ selectedRestaurantId
+public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLunchDetailWorkmatesAdapter.YourLunchDetailWorkmatesViewHolder> {
 
     private List<User> userList;
 
-    public WorkmatesListViewFragmentAdapter(List<User> userList) {
-        this.userList = userList;
-
+    public YourLunchDetailWorkmatesAdapter(List<User> userList) {
+        if (userList == null) {
+            this.userList = new ArrayList<>();
+        } else {
+            this.userList = userList;
+        }
     }
 
     @NonNull
     @Override
-    public WorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_workmates_listview, parent, false);
-        return new WorkmatesViewHolder(view);
+    public YourLunchDetailWorkmatesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_detail_workmates_view, parent, false);
+        return new YourLunchDetailWorkmatesViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull WorkmatesViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull YourLunchDetailWorkmatesViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.userNameTextView.setText(user.getName());
+        holder.userNameTextView.setText(user.getName() + " vous êtes sur WorkmatesListViewAdapter !");
         String profilePictureUrl = user.getPictureUrl();
         if (profilePictureUrl != null) {
             Glide.with(holder.itemView.getContext())
@@ -49,15 +50,16 @@ public class WorkmatesListViewFragmentAdapter extends RecyclerView.Adapter<Workm
 
     @Override
     public int getItemCount() {
+
         return userList.size();
     }
 
-    public class WorkmatesViewHolder extends RecyclerView.ViewHolder {
+    public class YourLunchDetailWorkmatesViewHolder extends RecyclerView.ViewHolder {
 
         private TextView userNameTextView;
         private ImageView workmatesAvatar;
 
-        public WorkmatesViewHolder(@NonNull View itemView) {
+        public YourLunchDetailWorkmatesViewHolder(@NonNull View itemView) {
             super(itemView);
             userNameTextView = itemView.findViewById(R.id.tv_workmate_name);
             workmatesAvatar = itemView.findViewById(R.id.im_workmate);

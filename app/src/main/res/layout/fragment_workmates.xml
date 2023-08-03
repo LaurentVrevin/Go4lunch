@@ -6,7 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/swipe_refresh_workmates_fragment_rv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintLeft_toRightOf="parent"
+    app:layout_constraintRight_toLeftOf="parent">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_workmates_list_view"
         android:layout_width="match_parent"
@@ -22,8 +29,8 @@
         android:layout_marginTop="?attr/actionBarSize"
         tools:context=".ui.fragments.WorkmatesFragment"
         tools:listitem="@layout/item_workmates_listview"
-
         />
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

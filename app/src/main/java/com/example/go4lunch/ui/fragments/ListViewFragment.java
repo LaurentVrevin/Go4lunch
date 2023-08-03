@@ -2,6 +2,7 @@ package com.example.go4lunch.ui.fragments;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,9 @@ import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.adapters.ListViewAdapter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
+import com.example.go4lunch.viewmodels.UserViewModel;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ListViewFragment extends Fragment {
@@ -27,10 +30,12 @@ public class ListViewFragment extends Fragment {
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
     private List<Restaurant> restaurantListData;
+    private List<User> userListData;
     private Location location;
     private User user;
     private RecyclerView recyclerView;
     private ListViewAdapter listViewAdapter;
+    private UserViewModel userViewModel;
 
 
     @Override
@@ -58,6 +63,7 @@ public class ListViewFragment extends Fragment {
     private void configureViewModels() {
         locationPermissionViewModel = new ViewModelProvider(requireActivity()).get(LocationPermissionViewModel.class);
         restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
+        userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
 
     private void observePermission() {
@@ -67,7 +73,15 @@ public class ListViewFragment extends Fragment {
     private void observeData(Boolean hasPermission) {
         if (hasPermission) {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
-            restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::updateRestaurantList);
+            restaurantViewModel.getListRestaurantLiveData().observe(getViewLifecycleOwner(), this::updateRestaurantList);
+            userViewModel.getWorkmatesListFromFirestore(false);
+
+            userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
+                if (userList != null) {
+                    updateWorkmatesList(userList);
+                    Log.d("LISTVIEWWORKMATES", "la liste des workmates est : " + userList);
+                }
+            });
         }
     }
 
@@ -79,12 +93,18 @@ public class ListViewFragment extends Fragment {
         }
     }
 
+    private void updateWorkmatesList(List<User> users){
+        userListData = users;
+        if(listViewAdapter != null){
+            listViewAdapter.setUserList(userListData);
+            listViewAdapter.notifyDataSetChanged();
+        }
+    }
+
     private void updateLocation(Location location) {
         if (this.isAdded()) {
             this.location = location;
         }
     }
-
-
 
 }

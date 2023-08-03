@@ -38,8 +38,8 @@ public class UserViewModel extends ViewModel {
         userInterface.getCurrentUserFromFirestore(userId);
     }
 
-    public void getUserListFromFirestore() {
-        userInterface.getUserListFromFirestore();
+    public void getWorkmatesListFromFirestore(boolean forceUpdate) {
+        userInterface.getWorkmatesListFromFirestore( forceUpdate);
     }
 
     public void createUserInFirestore() {

@@ -18,8 +18,11 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 
 import com.example.go4lunch.models.User;
-import com.example.go4lunch.ui.activities.YourLunchActivity;
+import com.example.go4lunch.ui.activities.YourLunchDetailActivity;
+import com.example.go4lunch.utils.WorkmatesCounter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -30,13 +33,17 @@ import android.widget.RatingBar;
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListViewViewHolder> {
 
     private List<Restaurant> restaurantList;
-    private static final String USER_ID = "userID";
     private User user;
+    private List<User> userList;
     private Location location;
+    private static HashMap<String, Integer> workmatesCountMap = new HashMap<>();
+
+
 
     public ListViewAdapter(List<Restaurant> restaurantList, Location location) {
         this.restaurantList = restaurantList;
         this.location = location;
+        this.userList = new ArrayList<>();
     }
 
     @NonNull
@@ -54,10 +61,9 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
             @Override
             public void onClick(View view) {
                 // Ouvrir l'activité YourLunchActivity pour afficher les détails du restaurant
-                Intent intent = new Intent(view.getContext(), YourLunchActivity.class);
+                Intent intent = new Intent(view.getContext(), YourLunchDetailActivity.class);
                 // Transmettre les données du restaurant à l'activité YourLunchActivity
                 intent.putExtra("restaurant", restaurant);
-
                 view.getContext().startActivity(intent);
             }
         });
@@ -65,6 +71,14 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
     public void setRestaurantList(List<Restaurant> restaurantList) {
         this.restaurantList = restaurantList;
     }
+
+    // Mettre à jour la liste des workmates
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+        WorkmatesCounter.updateWorkmatesCount(userList, workmatesCountMap); // Update workmatesCountMap
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount() {
@@ -107,11 +121,20 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
             // Charger l'image
             loadRestaurantImage(restaurant);
 
-            // Mettre à jour le nombre de workmates
-            updateWorkmatesCount(restaurant);
 
+            // Mettre à jour la valeur du nombre de workmates ayant choisi ce restaurant
+            //si la clé (l'id du restaurant) existe dans workmatesCountMap,
+            // alors workmatesCount prendra la valeur du nombre de workmates associés à ce restaurant.
+            // Si la clé n'existe pas, workmatesCount sera défini à 0
+            int workmatesCount = workmatesCountMap.containsKey(restaurant.getPlaceId())
+                    ? workmatesCountMap.get(restaurant.getPlaceId()) : 0;
+            workmateNumberTextView.setText(String.valueOf(workmatesCount));
+
+
+            //Mettre à jour le nombre d'étoiles
             ratingBar.setRating(restaurant.getRating());
         }
+
 
         private void updateDistance(Restaurant restaurant) {
             if (restaurant.getDistance() != null) {
@@ -139,18 +162,6 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
             } else {
                 // Si l'URL de l'image est nulle, afficher une image de placeholder
                 placeImageView.setImageResource(R.drawable.lunch);
-            }
-        }
-
-        private void updateWorkmatesCount(Restaurant restaurant) {
-            int workmatesCount = restaurant.getWorkmatesCount();
-            if (workmatesCount > 0) {
-                workmateImageView.setVisibility(View.VISIBLE);
-                workmateNumberTextView.setVisibility(View.VISIBLE);
-                workmateNumberTextView.setText(String.valueOf(workmatesCount));
-            } else {
-                workmateImageView.setVisibility(View.GONE);
-                workmateNumberTextView.setVisibility(View.GONE);
             }
         }
 

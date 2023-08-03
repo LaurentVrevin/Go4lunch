@@ -67,11 +67,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private UserViewModel userViewModel;
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
+    private Restaurant restaurant;
+    private User user;
     private Location currentLocation;
     private String userId;
     private FirebaseAuth mAuth;
     private ImageView imvProfilePhoto;
     private List<Restaurant> mRestaurantList = new ArrayList<>();
+    private String restaurantSelectedIdByUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +97,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupNavigationListener();
         observePermission();
 
-    }
 
-    private void configureViewModels() {
-        locationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-    }
-    private void observeUserData() {
-        userViewModel.getCurrentUserFromFirestore(userId);
-        userViewModel.getUserLiveData().observe(this, this::displayUserInfo);
     }
 
     //VIEW
@@ -156,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             Intent intent = null;
             switch (menuItem.getItemId()) {
                 case R.id.nav_yourlunch:
-                    //showSelectedRestaurantDialog();
+                    checkRestaurantSelection();
                     break;
                 case R.id.nav_settings:
                     intent = new Intent(MainActivity.this, SettingsActivity.class);
@@ -205,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
     }
+
 
     //USER
 
@@ -256,26 +251,37 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     // YOUR LUNCH ACTIVITY
 
-    /*private void showSelectedRestaurantDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Your Lunch");
+    private void configureViewModels() {
+        locationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        // Vérifie si un restaurant a été sélectionné
-        Restaurant selectedRestaurant = restaurantViewModel.getSelectedRestaurantLiveData().getValue();
-        if (selectedRestaurant != null) {
-            String restaurantName = selectedRestaurant.getName();
-            String restaurantAddress = selectedRestaurant.getAddress();
-            String message = "You have selected:\n\nRestaurant: " + restaurantName + "\nAddress: " + restaurantAddress;
-            builder.setMessage(message);
-        } else {
-            builder.setMessage("No restaurant has been selected yet.");
-        }
+        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+        restaurantViewModel.getRestaurantById(restaurantSelectedIdByUser);
+    }
+    private void observeUserData() {
+        userViewModel.getCurrentUserFromFirestore(userId);
+        userViewModel.getUserLiveData().observe(this, this::displayUserInfo);
+        userViewModel.getUserLiveData().observe(this, user -> {
+            restaurantSelectedIdByUser = user.getSelectedRestaurantId();
+            Log.d("IDRESTOMAINACTIVITY", "L'id du restaurant récupéré est :" + restaurantSelectedIdByUser);
+        });
+    }
 
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+    private void checkRestaurantSelection() {
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }*/
+        restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
+            if (restaurant != null) {
+                openYourLunchActivity(restaurant);
+            } else {
+                Toast.makeText(MainActivity.this, "Le restaurant sélectionné n'existe pas", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void openYourLunchActivity(Restaurant restaurant) {
+        Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
+        intent.putExtra("restaurant", restaurant);
+        startActivity(intent);
+    }
 
     private void showLogoutConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -354,6 +360,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onResume() {
         super.onResume();
+        //configureViewModels();
+        //observeUserData();
     }
 
     @Override

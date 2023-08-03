@@ -22,7 +22,7 @@ public class RestaurantViewModel extends ViewModel {
     private final MutableLiveData<List<Restaurant>> listRestaurantLiveData = new MutableLiveData<>();
     private final MutableLiveData<Restaurant> selectedRestaurantLiveData = new MutableLiveData<>();
 
-    private final MutableLiveData<Integer>radiusLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> radiusLiveData = new MutableLiveData<>();
 
     public int radius = 200;
 
