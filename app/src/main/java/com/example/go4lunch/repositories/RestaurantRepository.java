@@ -31,7 +31,7 @@ public class RestaurantRepository implements RestaurantInterface{
 
     private static final String PLACES_API_KEY = BuildConfig.MAPS_API_KEY;
     private MutableLiveData<List<Restaurant>> restaurantsListLiveData;
-    private MutableLiveData<Restaurant> selectedRestaurantLiveData;
+
     private final PlacesApi placesApi;
     private Map<String, Restaurant> cachedRestaurants;
     private int radius;

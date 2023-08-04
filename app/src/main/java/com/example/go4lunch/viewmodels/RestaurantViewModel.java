@@ -57,6 +57,12 @@ public class RestaurantViewModel extends ViewModel {
         return selectedRestaurantLiveData;
     }
 
+    // Méthode pour récupérer les détails du restaurant sélectionné par l'utilisateur
+    public void setSelectedRestaurant(Restaurant restaurant) {
+        selectedRestaurantLiveData.setValue(restaurant);
+    }
+
+
     public void updateRadius(int selectedRadius) {
         restaurantInterface.updateRadius(selectedRadius);
         radiusLiveData.setValue(selectedRadius);

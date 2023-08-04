@@ -60,10 +60,6 @@ public class SettingsActivity extends AppCompatActivity {
         txtviewRadius = findViewById(R.id.txtviewRadius);
         btnOk = findViewById(R.id.buttonOk);
 
-        seekBarRadius.setMax(1950); // Valeur maximale de la distance (2000 - 50)
-        seekBarRadius.setProgress(0); // Valeur initiale de la distance (0 - 1950)
-        txtviewRadius.setText("Choisissez la distance : " + (seekBarRadius.getProgress() + 50) + " mètres");
-
         // Récupération de l'utilisateur actuellement connecté
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -77,29 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
             etLastName.setText(user.getName().split(" ")[1]); // affiche le nom
             Log.d("SETTINGUSERID", "user id is : " + currentUser.getUserId());
         });
-        restaurantViewModel.getRadiusLiveData().observe(this, radius ->{
-            currentRadius = radius;
-        });
 
-        seekBarRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Mettre à jour le texte avec la valeur sélectionnée
-                txtviewRadius.setText("Choisissez la distance : " + (progress + 50) + " mètres");
-                radius = seekBarRadius.getProgress();
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
 
         btnOk.setOnClickListener(view -> {
 
@@ -113,7 +87,7 @@ public class SettingsActivity extends AppCompatActivity {
     private void configureViewModels() {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
-        restaurantViewModel.getRadiusLiveData();
+
 
     }
 

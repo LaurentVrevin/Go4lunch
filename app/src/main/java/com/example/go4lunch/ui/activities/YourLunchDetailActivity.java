@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -208,12 +209,16 @@ public class YourLunchDetailActivity extends AppCompatActivity {
 
     private void updateUserSelectedRestaurant() {
         if (currentUser != null) {
-            if (currentUser.getSelectedRestaurantId() == null) {
+            if (currentUser.getSelectedRestaurantId() == null || !currentUser.getSelectedRestaurantId().equals(restaurantId)) {
+                // L'utilisateur n'a pas encore sélectionné de restaurant ou a sélectionné un autre restaurant
                 currentUser.setSelectedRestaurantId(restaurantId);
-                setButtonColor(true);
+                setButtonColor(true); // Mettre le bouton en vert
+                restaurantViewModel.setSelectedRestaurant(restaurant); // Mettre à jour le restaurant choisi
             } else {
+                // L'utilisateur a déjà sélectionné ce restaurant, il souhaite le désélectionner
                 currentUser.setSelectedRestaurantId(null);
-                setButtonColor(false);
+                setButtonColor(false); // Enlever la couleur du bouton
+                restaurantViewModel.setSelectedRestaurant(null); // Réinitialiser le restaurant choisi
             }
             userViewModel.updateUserSelectedRestaurant(userId, currentUser);
         }
