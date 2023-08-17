@@ -23,6 +23,9 @@ public interface UserInterface {
     void setUserList(List<User> userList);
 
     void getWorkmatesListFromFirestore(boolean forceUpdate);
+
+    void getAllUsersFromFirestore();
+
     void updateUserInFirestore(String userId, User user);
     void updateUserSelectedRestaurant(String userId, User user);
     void updateUserLikedPlace(String userId, List<String> likedPlaces);

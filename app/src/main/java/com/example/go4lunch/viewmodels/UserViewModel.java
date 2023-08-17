@@ -3,12 +3,16 @@ package com.example.go4lunch.viewmodels;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+
 import androidx.lifecycle.ViewModel;
+
 
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.repositories.UserInterface;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+
 
 import java.util.List;
 
@@ -65,4 +69,9 @@ public class UserViewModel extends ViewModel {
     public void deleteAccount(Context context) {
         userInterface.deleteAccount(context);
     }
+
+    public void getAllUsersFromFirestore() {
+        userInterface.getAllUsersFromFirestore();
+    }
+
 }

@@ -19,6 +19,7 @@ import com.example.go4lunch.models.Restaurant;
 
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.activities.YourLunchDetailActivity;
+import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.utils.WorkmatesCounter;
 
 import java.util.ArrayList;
@@ -33,17 +34,17 @@ import android.widget.RatingBar;
 public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListViewViewHolder> {
 
     private List<Restaurant> restaurantList;
-    private User user;
+    private User currentUser;
     private List<User> userList;
     private Location location;
     private static HashMap<String, Integer> workmatesCountMap = new HashMap<>();
 
 
 
-    public ListViewAdapter(List<Restaurant> restaurantList, Location location) {
+    public ListViewAdapter(List<Restaurant> restaurantList, Location location, List<User>userList) {
         this.restaurantList = restaurantList;
         this.location = location;
-        this.userList = new ArrayList<>();
+        this.userList = userList;
     }
 
     @NonNull
@@ -64,6 +65,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
                 Intent intent = new Intent(view.getContext(), YourLunchDetailActivity.class);
                 // Transmettre les données du restaurant à l'activité YourLunchActivity
                 intent.putExtra("restaurant", restaurant);
+
                 view.getContext().startActivity(intent);
             }
         });
@@ -76,8 +78,23 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
     public void setUserList(List<User> userList) {
         this.userList = userList;
         WorkmatesCounter.updateWorkmatesCount(userList, workmatesCountMap); // Update workmatesCountMap
+        LikesCounter.getLikesCountMap(restaurantList, userList); // Update workmatesCountMap
         notifyDataSetChanged();
     }
+    public void updateRestaurantLikes(HashMap<String, Integer> likesCountMap) {
+        for (Restaurant restaurant : restaurantList) {
+            String restaurantId = restaurant.getPlaceId();
+
+            if (likesCountMap.containsKey(restaurantId)) {
+                int likesCount = likesCountMap.get(restaurantId);
+                restaurant.setLikesCount(likesCount);
+            } else {
+                restaurant.setLikesCount(0); // Si le restaurant n'a pas de likes
+            }
+        }
+        notifyDataSetChanged();
+    }
+
 
 
     @Override
@@ -108,31 +125,33 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
         }
 
         public void bind(Restaurant restaurant) {
-            // Mettre à jour les vues avec les données du restaurant
-            placeNameTextView.setText(restaurant.getName());
-            placeAddressTextView.setText(restaurant.getAddress());
+            if(restaurant !=null){
+                // Mettre à jour les vues avec les données du restaurant
+                placeNameTextView.setText(restaurant.getName());
+                placeAddressTextView.setText(restaurant.getAddress());
 
-            // Gérer l'affichage de l'ouverture du restaurant
-            placeOpeningTime.setText(getOpeningHours(restaurant));
+                // Gérer l'affichage de l'ouverture du restaurant
+                placeOpeningTime.setText(getOpeningHours(restaurant));
 
-            // Mettre à jour la distance
-            updateDistance(restaurant);
+                // Mettre à jour la distance
+                updateDistance(restaurant);
 
-            // Charger l'image
-            loadRestaurantImage(restaurant);
-
-
-            // Mettre à jour la valeur du nombre de workmates ayant choisi ce restaurant
-            //si la clé (l'id du restaurant) existe dans workmatesCountMap,
-            // alors workmatesCount prendra la valeur du nombre de workmates associés à ce restaurant.
-            // Si la clé n'existe pas, workmatesCount sera défini à 0
-            int workmatesCount = workmatesCountMap.containsKey(restaurant.getPlaceId())
-                    ? workmatesCountMap.get(restaurant.getPlaceId()) : 0;
-            workmateNumberTextView.setText(String.valueOf(workmatesCount));
+                // Charger l'image
+                loadRestaurantImage(restaurant);
 
 
-            //Mettre à jour le nombre d'étoiles
-            ratingBar.setRating(restaurant.getRating());
+                // Mettre à jour la valeur du nombre de workmates ayant choisi ce restaurant
+                //si la clé (l'id du restaurant) existe dans workmatesCountMap,
+                // alors workmatesCount prendra la valeur du nombre de workmates associés à ce restaurant.
+                // Si la clé n'existe pas, workmatesCount sera défini à 0
+                int workmatesCount = workmatesCountMap.containsKey(restaurant.getPlaceId())
+                        ? workmatesCountMap.get(restaurant.getPlaceId()) : 0;
+                workmateNumberTextView.setText(String.valueOf(workmatesCount));
+
+                //Mettre à jour le nombre d'étoiles
+                ratingBar.setRating(restaurant.getRating());
+            }
+
         }
 
 

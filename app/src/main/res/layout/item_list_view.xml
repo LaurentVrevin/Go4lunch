@@ -115,6 +115,8 @@
         android:numStars="3"
         android:rating="0"
         android:stepSize="0.5"
+        android:progressTint="@color/yellow"
+        android:secondaryProgressTint="@color/yellow"
         app:layout_constraintBottom_toBottomOf="@id/im_place"
         app:layout_constraintEnd_toStartOf="@id/im_place" />
 

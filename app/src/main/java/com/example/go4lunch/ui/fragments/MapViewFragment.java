@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,7 +82,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::updateRestaurantList);
             restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::setMarkers);
-            userViewModel.getWorkmatesListFromFirestore(false);
+            //userViewModel.getWorkmatesListFromFirestore(false);
 
             userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
                 if (userList != null) {
@@ -155,8 +156,10 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
         }
     }
     private void updateRestaurantList(List<Restaurant> restaurantList) {
-        restaurantListData = restaurantList;
-        setMarkers(restaurantListData);
+        if (restaurantList != null) {
+            restaurantListData = restaurantList;
+            setMarkers(restaurantListData);
+        }
     }
 
     //Je passe la liste du livedata dans userListData avec pour objet User via users
@@ -172,26 +175,27 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
         if(restaurantList !=null) {
             for (Restaurant restaurant : restaurantList) {
-                LatLng latLng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
-                MarkerOptions markerOptions = new MarkerOptions()
-                        .position(latLng)
-                        .title(restaurant.getName());
+                if(restaurant !=null){
+                    LatLng latLng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .position(latLng)
+                            .title(restaurant.getName());
 
-                // Vérifier si le restaurant a été choisi par un ou plusieurs workmates
-                if (workmatesCountMap.containsKey(restaurant.getPlaceId())) {
-                    // Le restaurant a été choisi, donc marquer en vert
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                } else {
-                    // Le restaurant n'a pas été choisi, garder l'icône par défaut
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    // Vérifier si le restaurant a été choisi par un ou plusieurs workmates
+                    if (workmatesCountMap.containsKey(restaurant.getPlaceId())) {
+                        // Le restaurant a été choisi, donc marquer en vert
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    } else {
+                        // Le restaurant n'a pas été choisi, garder l'icône par défaut
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }
+                    googleMap.addMarker(markerOptions);
+                    Log.d("Restaurant", "Nom : " + restaurant.getName() + "les horaires " + restaurant.getOpeningHours());
                 }
-                googleMap.addMarker(markerOptions);
-                Log.d("Restaurant", "Nom : " + restaurant.getName() + "les horaires " + restaurant.getOpeningHours());
+
             }
         }
     }
-
-
     private void openYourLunchDetailActivity(Restaurant restaurant) {
 
         Intent intent = new Intent(requireContext(), YourLunchDetailActivity.class);
@@ -221,5 +225,30 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
                  outState.putParcelable("map_position", googleMap.getCameraPosition().target);
              }
          }
+    //SEARCH
+    public void filterMarkers(String query) {
+        googleMap.clear(); // Effacer tous les marqueurs précédents
+
+        if (restaurantListData != null) {
+            for (Restaurant restaurant : restaurantListData) {
+                if (restaurant != null && restaurant.getName() != null && restaurant.getName().toLowerCase().contains(query.toLowerCase())) {
+                    LatLng latLng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .position(latLng)
+                            .title(restaurant.getName());
+
+                    // Vérifier si le restaurant a été choisi par un ou plusieurs workmates
+                    if (workmatesCountMap.containsKey(restaurant.getPlaceId())) {
+                        // Le restaurant a été choisi, donc marquer en vert
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    } else {
+                        // Le restaurant n'a pas été choisi, garder l'icône par défaut
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    }
+                    googleMap.addMarker(markerOptions);
+                }
+            }
+        }
+    }
 
 }

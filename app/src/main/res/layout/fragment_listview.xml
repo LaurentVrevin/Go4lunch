@@ -7,6 +7,14 @@
     android:id="@+id/fragment_listview"
     android:layout_margin="@dimen/nav_header_vertical_spacing"
     tools:context=".ui.fragments.MapViewFragment">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_listview_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_list_view"
@@ -20,5 +28,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".ui.fragments.ListViewFragment"
         tools:listitem="@layout/item_list_view" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

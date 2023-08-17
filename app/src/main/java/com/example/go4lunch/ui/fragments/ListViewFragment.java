@@ -1,5 +1,8 @@
 package com.example.go4lunch.ui.fragments;
 
+
+
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
@@ -22,9 +26,12 @@ import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ListViewFragment extends Fragment {
 
     private LocationPermissionViewModel locationPermissionViewModel;
@@ -32,12 +39,14 @@ public class ListViewFragment extends Fragment {
     private List<Restaurant> restaurantListData;
     private List<User> userListData;
     private Location location;
-    private User user;
+    private User currentUser;
     private RecyclerView recyclerView;
     private ListViewAdapter listViewAdapter;
     private UserViewModel userViewModel;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_listview, container, false);
@@ -45,11 +54,15 @@ public class ListViewFragment extends Fragment {
         configureViewModels();
         configureRecyclerView();
 
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_listview_fragment);
+        swipeRefreshLayout.setOnRefreshListener(this::refreshListView);
+
+
         return view;
     }
 
     private void configureRecyclerView() {
-        listViewAdapter = new ListViewAdapter(restaurantListData, location);
+        listViewAdapter = new ListViewAdapter(restaurantListData, location, userListData);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(listViewAdapter);
     }
@@ -64,6 +77,11 @@ public class ListViewFragment extends Fragment {
         locationPermissionViewModel = new ViewModelProvider(requireActivity()).get(LocationPermissionViewModel.class);
         restaurantViewModel = new ViewModelProvider(requireActivity()).get(RestaurantViewModel.class);
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+        userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
+            currentUser = user;
+            Log.d("USERAUTH", "L'id de l'utilisateur est : " + currentUser.getName());
+        });
+
     }
 
     private void observePermission() {
@@ -79,12 +97,14 @@ public class ListViewFragment extends Fragment {
             userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
                 if (userList != null) {
                     updateWorkmatesList(userList);
+                    //voir pour le COMPTEUR DE LIKES ici peut-être
                     Log.d("LISTVIEWWORKMATES", "la liste des workmates est : " + userList);
                 }
             });
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void updateRestaurantList(List<Restaurant> restaurants) {
         restaurantListData = restaurants;
         if (listViewAdapter != null) {
@@ -105,6 +125,26 @@ public class ListViewFragment extends Fragment {
         if (this.isAdded()) {
             this.location = location;
         }
+    }
+
+    //SEARCH
+    public void filterRestaurantList(String query) {
+        List<Restaurant> filteredList = new ArrayList<>();
+
+        for (Restaurant restaurant : restaurantListData) {
+            if (restaurant.getName().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(restaurant);
+            }
+        }
+
+        listViewAdapter.setRestaurantList(filteredList);
+        listViewAdapter.notifyDataSetChanged();
+    }
+    private void refreshListView() {
+        //Rafraichit la liste des workmates
+        userViewModel.getWorkmatesListFromFirestore(true);
+        // Stop l'animation
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 }

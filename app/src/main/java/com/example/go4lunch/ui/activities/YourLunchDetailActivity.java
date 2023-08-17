@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.go4lunch.MyApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
@@ -31,10 +34,10 @@ import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -44,13 +47,13 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private ImageView placeImageView;
     private TextView placeNameTextView;
     private TextView placeAddressTextView;
-    private boolean isRestaurantSelected;
+    private TextView numberofNote;
+
     private FloatingActionButton fabDetailChoice;
     private RatingBar ratingBar;
     private User currentUser;
     private Restaurant restaurant;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
     private String userId;
     private Button buttonRestaurantLike;
     private Button buttonRestaurantWebsite;
@@ -60,79 +63,63 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private RestaurantViewModel restaurantViewModel;
 
     private LiveData<User> userLiveData;
-    private List<User> userList;
+    private List<User> workmatesList;
+
     private RecyclerView workmatesRecyclerView;
     private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;
 
-
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_your_lunch);
 
+        initializeViews();
+        setupFirebaseAuth();
+        configureViewModel();
+        observeSelectedRestaurantByUser();
+        configureRecyclerView();
+        observeWorkmateList();
+        getIntentData();
+        setupButtonActions();
+        setupToolbar();
+    }
+
+    // Initialisation
+    private void initializeViews() {
         placeImageView = findViewById(R.id.im_detail_place);
         placeNameTextView = findViewById(R.id.tv_detail_restaurant_name);
         placeAddressTextView = findViewById(R.id.tv_detail_restaurant_address);
         fabDetailChoice = findViewById(R.id.fab_detail_choice);
+        numberofNote = findViewById(R.id.tv_note);
         ratingBar = findViewById(R.id.rb_detail_restaurant_rate);
         buttonRestaurantLike = findViewById(R.id.bt_detail_restaurant_like);
         buttonRestaurantWebsite = findViewById(R.id.bt_detail_restaurant_website);
         workmatesRecyclerView = findViewById(R.id.rv_detail_restaurant_workmates);
+    }
 
+    // Firebase
+    private void setupFirebaseAuth() {
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+    }
 
-        configureViewModel();
-        observeUserData();
-        configureRecyclerView();
+    // ViewModels
+    private void configureViewModel() {
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+        //userViewModel.getCurrentUserFromFirestore(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
+        //userViewModel.getWorkmatesListFromFirestore(false);
 
-        // Récupérer les données du restaurant transmises depuis l'adapter
-        Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("restaurant")) {
-            restaurant = intent.getParcelableExtra("restaurant");
-            //je recupere bien le restaurant via l'intent
-            // Stocker l'ID du restaurant dans la variable restaurantId
-            restaurantId = restaurant.getPlaceId();
-            // Appeler la méthode getRestaurantById() du restaurantViewModel
-            restaurantViewModel.getRestaurantById(restaurantId);
-
-            // Observer le LiveData selectedRestaurantLiveData du restaurantViewModel
-            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
-                // Vérifier si le restaurant n'est pas null
-                if (restaurant != null) {
-                    // Mettre à jour les vues avec les détails du restaurant
-                    placeNameTextView.setText(restaurant.getName());
-                    placeAddressTextView.setText(restaurant.getAddress());
-                    ratingBar.setRating(restaurant.getRating());
-                    loadRestaurantImage(restaurant);
-                }
-            });
-
-        }
-        //Bouton pour sélection un restaurant
-        fabDetailChoice.setOnClickListener(view -> {
-            // Inverser l'état du bouton
-            updateUserSelectedRestaurant();
+        userViewModel.getUserLiveData().observe(this, user -> {
+            currentUser = user;
+            userId = currentUser.getUserId();
+            Log.d("BLABLA", "L'id de l'utilisateur est : " + currentUser.getName());
+            //userViewModel.getWorkmatesListFromFirestore(false);
         });
+    }
 
-        //Bouton pour liker un restaurant
-        buttonRestaurantLike.setOnClickListener(view -> {
-            updateUserLikedPlace();
-        });
-
-        //Bouton pour ouvrir le site du restaurant
-        buttonRestaurantWebsite.setOnClickListener(view -> {
-            // Vérifier si l'URL du site web du restaurant est disponible
-
-            // Ouvrir le site web du restaurant dans le navigateur par défaut
-            String websiteUrl = restaurantViewModel.getSelectedRestaurantLiveData().getValue().getWebsiteUrl();
-            Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
-
-            startActivity(webIntent);
-            Toast.makeText(YourLunchDetailActivity.this, "Le site web est : " , Toast.LENGTH_SHORT).show();
-
-        });
-
+    // Barre d'outils
+    private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.tb_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -142,118 +129,142 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void filterAndSortWorkmatesByRestaurantId(String restaurantId) {
-        if (userList != null) {
-            List<User> filteredList = new ArrayList<>();
-            for (User user : userList) {
-                if (user.getSelectedRestaurantId() != null && user.getSelectedRestaurantId().equals(restaurantId)) {
-                    filteredList.add(user);
-                }
-            }
-            workmatesListViewAdapter.setUserList(filteredList);
-        }
+    // Actions des boutons
+    private void setupButtonActions() {
+        fabDetailChoice.setOnClickListener(view -> updateUserSelectedRestaurant());
+        buttonRestaurantLike.setOnClickListener(view -> updateUserLikedPlace());
+        buttonRestaurantWebsite.setOnClickListener(view -> openRestaurantWebsite());
     }
 
-    private void configureViewModel() {
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
-        userViewModel.getWorkmatesListFromFirestore(false);
-        userViewModel.getUserLiveData().observe(this, user -> {
-            currentUser = user;
-            userId = currentUser.getUserId();
-            userViewModel.getWorkmatesListFromFirestore(false);
-        });
-
-        // Observer les changements de la liste des workmates récupérée depuis Firestore
-        userViewModel.getUserListLiveData().observe(this, userList -> {
-            if (userList != null) {
-                this.userList = userList;
-                filterAndSortWorkmatesByRestaurantId(restaurantId);
-            }
-        });
-        restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+    private void openRestaurantWebsite() {
+        // Ouvrir le site web du restaurant dans le navigateur par défaut
+        String websiteUrl = Objects.requireNonNull(restaurantViewModel.getSelectedRestaurantLiveData().getValue()).getWebsiteUrl();
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
+        startActivity(webIntent);
     }
 
-    private void observeUserData() {
-        userViewModel.getUserLiveData().observe(this, user -> {
-            if (user != null) {
-                String selectedRestaurantId = user.getSelectedRestaurantId();
+    private void setSelectionRestaurantButtonColor(boolean isRestaurantSelected) {
+        int color = isRestaurantSelected ? R.color.green : R.color.black;
+        int tintColor = ContextCompat.getColor(this, color);
+        fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(tintColor));
+    }
+    private void updateStarButtonColor(boolean isLiked) {
+        int textColorId = isLiked ? R.color.yellow : R.color.orange;
 
-                if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
-                    setButtonColor(true); // Mettre le bouton en bleu
-
-                } else {
-                    setButtonColor(false); // Mettre le bouton en blanc
-
-                }
-            }
-        });
+        buttonRestaurantLike.setTextColor(ContextCompat.getColor(this, textColorId));
     }
 
     private void configureRecyclerView() {
-        workmatesListViewAdapter = new YourLunchDetailWorkmatesAdapter(new ArrayList<User>());
+        workmatesListViewAdapter = new YourLunchDetailWorkmatesAdapter(new ArrayList<>());
         workmatesRecyclerView.setAdapter(workmatesListViewAdapter);
         workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
+    // Observations
+    private void observeWorkmateList(){
+        userViewModel.getUserListLiveData().observe(this, userList -> {
+            if (userList != null) {
+                Log.d("YOURLUNCHVERIF", "Workmates list size: " + userList.size()); // Ajoutez ce log pour afficher la taille de la liste des workmates
+                this.workmatesList = userList;
+                // Filtrer et obtenir la liste des collègues ayant choisi le même restaurant
+                List<User> filteredList = new ArrayList<>();
+                for (User user : workmatesList) {
+                    if (user.getSelectedRestaurantId() != null && user.getSelectedRestaurantId().equals(restaurantId)) {
+                        filteredList.add(user);
+                        Log.d("YOURLUNCHVERIF", "Workmates filtered list size: " + filteredList.size()); // Ajoutez ce log pour afficher la taille de la liste des workmates
+                    }
+                }
+                workmatesListViewAdapter.setWorkmatesList(filteredList);
 
-    private void setButtonColor(boolean isSelected) {
-        if (isSelected) {
-            int greenColor = ContextCompat.getColor(this, R.color.green);
-            fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(greenColor));
-        } else {
-            int blackColor = ContextCompat.getColor(this, R.color.black);
-            fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(blackColor));
+            }
+        });
+    }
+
+    private void observeSelectedRestaurantByUser() {
+        userViewModel.getUserLiveData().observe(this, user -> {
+            if (user != null) {
+                String selectedRestaurantId = user.getSelectedRestaurantId();
+                if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
+                    setSelectionRestaurantButtonColor(true);
+                } else {
+                    setSelectionRestaurantButtonColor(false);
+                }
+            }
+        });
+    }
+
+    // Intent
+    private void getIntentData() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("restaurant")) {
+            restaurant = intent.getParcelableExtra("restaurant");
+            restaurantId = restaurant.getPlaceId();
+            restaurantViewModel.getRestaurantById(restaurantId);
+            // Obtenir la liste des restaurants likés par l'utilisateur
+
+
+            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
+                if (restaurant != null) {
+                    placeNameTextView.setText(restaurant.getName());
+                    placeAddressTextView.setText(restaurant.getAddress());
+                    ratingBar.setRating(restaurant.getRating());
+                    loadRestaurantImage(restaurant);
+                }
+            });
         }
     }
 
+    // Updates
     private void updateUserSelectedRestaurant() {
         if (currentUser != null) {
-            if (currentUser.getSelectedRestaurantId() == null || !currentUser.getSelectedRestaurantId().equals(restaurantId)) {
-                // L'utilisateur n'a pas encore sélectionné de restaurant ou a sélectionné un autre restaurant
-                currentUser.setSelectedRestaurantId(restaurantId);
-                setButtonColor(true); // Mettre le bouton en vert
-                restaurantViewModel.setSelectedRestaurant(restaurant); // Mettre à jour le restaurant choisi
-            } else {
-                // L'utilisateur a déjà sélectionné ce restaurant, il souhaite le désélectionner
-                currentUser.setSelectedRestaurantId(null);
-                setButtonColor(false); // Enlever la couleur du bouton
-                restaurantViewModel.setSelectedRestaurant(null); // Réinitialiser le restaurant choisi
-            }
+            boolean isRestaurantSelected = currentUser.getSelectedRestaurantId() != null
+                    && currentUser.getSelectedRestaurantId().equals(restaurantId);
+
+            currentUser.setSelectedRestaurantId(isRestaurantSelected ? null : restaurantId);
+            setSelectionRestaurantButtonColor(!isRestaurantSelected);
             userViewModel.updateUserSelectedRestaurant(userId, currentUser);
         }
     }
 
     private void updateUserLikedPlace() {
+
         if (currentUser != null && restaurantId != null) {
             List<String> likedPlaces = currentUser.getLikedPlaces();
+
             if (likedPlaces.contains(restaurantId)) {
-                // Le restaurant est déjà aimé, je lui affiche que c'est déjà liké
-                Toast.makeText(this, "Ce restaurant a déjà été liké", Toast.LENGTH_SHORT).show();
+                likedPlaces.remove(restaurantId);
+                currentUser.setLikedPlaces(likedPlaces);
+                userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
+                restaurant.decrementlikesCount();
+                Toast.makeText(this, "Vous avez enlevé le like de ce restaurant", Toast.LENGTH_SHORT).show();
+                updateStarButtonColor(false);
             } else {
                 likedPlaces.add(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
+                restaurant.incrementlikesCount();
+                Toast.makeText(this, "Vous avez liké ce restaurant", Toast.LENGTH_SHORT).show();
+                updateStarButtonColor(true);
             }
         }
     }
 
+    // Images
     private void loadRestaurantImage(Restaurant restaurant) {
         List<String> photoUrls = restaurant.getPhotoUrls();
         if (photoUrls != null && !photoUrls.isEmpty()) {
-            String photoUrl = photoUrls.get(0); // Utilise le premier URL de photo
+            String photoUrl = photoUrls.get(0);
 
             RequestOptions requestOptions = new RequestOptions()
                     .placeholder(R.drawable.lunch)
-                    .override(placeImageView.getWidth(), placeImageView.getWidth()) // Ajuste la taille de l'image
-                    .centerCrop(); // Effectue un recadrage centré pour obtenir un format carré
+                    .override(placeImageView.getWidth(), placeImageView.getWidth())
+                    .centerCrop();
 
             Glide.with(this)
                     .load(photoUrl)
                     .apply(requestOptions)
                     .into(placeImageView);
         } else {
-            // Si l'URL de l'image est nulle, affiche une image standard
             placeImageView.setImageResource(R.drawable.lunch);
         }
     }
@@ -261,7 +272,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed(); // Effectue l'action de retour arrière
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

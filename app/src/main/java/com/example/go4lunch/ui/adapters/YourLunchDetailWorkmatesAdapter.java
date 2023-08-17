@@ -18,13 +18,13 @@ import java.util.List;
 
 public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLunchDetailWorkmatesAdapter.YourLunchDetailWorkmatesViewHolder> {
 
-    private List<User> userList;
+    private List<User> workmatesList;
 
     public YourLunchDetailWorkmatesAdapter(List<User> userList) {
         if (userList == null) {
-            this.userList = new ArrayList<>();
+            this.workmatesList = new ArrayList<>();
         } else {
-            this.userList = userList;
+            this.workmatesList = userList;
         }
     }
 
@@ -37,8 +37,8 @@ public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLu
 
     @Override
     public void onBindViewHolder(@NonNull YourLunchDetailWorkmatesViewHolder holder, int position) {
-        User user = userList.get(position);
-        holder.userNameTextView.setText(user.getName() + " vous êtes sur WorkmatesListViewAdapter !");
+        User user = workmatesList.get(position);
+        holder.userNameTextView.setText(user.getName() + " is joigning");
         String profilePictureUrl = user.getPictureUrl();
         if (profilePictureUrl != null) {
             Glide.with(holder.itemView.getContext())
@@ -50,8 +50,7 @@ public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLu
 
     @Override
     public int getItemCount() {
-
-        return userList.size();
+        return workmatesList.size();
     }
 
     public class YourLunchDetailWorkmatesViewHolder extends RecyclerView.ViewHolder {
@@ -66,8 +65,8 @@ public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLu
         }
     }
 
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
+    public void setWorkmatesList(List<User> filteredList) {
+        this.workmatesList = filteredList;
         notifyDataSetChanged();
     }
 

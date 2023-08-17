@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.MyApplication;
+import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
@@ -18,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class UserRepository implements UserInterface {
     private static final String TAG = "UserRepository";
 
@@ -34,11 +38,12 @@ public class UserRepository implements UserInterface {
     private CollectionReference userCollection;
     private MutableLiveData<User> userLiveData;
     private MutableLiveData<List<User>> userListLiveData;
+    private List<Restaurant>restaurantList;
 
     @Inject
     public UserRepository() {
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = MyApplication.getFirestoreInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
         userCollection = firebaseFirestore.collection("users");
         userLiveData = new MutableLiveData<>();
         userListLiveData = new MutableLiveData<>();
@@ -87,6 +92,7 @@ public class UserRepository implements UserInterface {
 
     @Override
     public void getCurrentUserFromFirestore(String userId) {
+        Log.d("TESTWORKMATEUPDATE", "currentuser");
         userCollection.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 User user = task.getResult().toObject(User.class);
@@ -102,6 +108,7 @@ public class UserRepository implements UserInterface {
     public void getWorkmatesListFromFirestore(boolean forceUpdate) {
 
         if (userListLiveData.getValue() == null || userListLiveData.getValue().isEmpty() || forceUpdate)  {
+            Log.d("TESTWORKMATEUPDATE", "coucou");
             userCollection.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     List<User> userList = new ArrayList<>();
@@ -110,25 +117,75 @@ public class UserRepository implements UserInterface {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         User user = document.toObject(User.class);
 
-                        if (currentUser != null && user.getUserId().equals(currentUser.getUid())) {
+                        /*if (currentUser != null && user.getUserId().equals(currentUser.getUid())) {
                             continue;
-                        }
+                        }*/
                         String selectedRestaurantId = document.getString("selectedRestaurantId");
                         user.setSelectedRestaurantId(selectedRestaurantId);
-
                         userList.add(user);
                     }
 
                     userListLiveData.postValue(userList);
                     Log.d(TAG, "Retrieved user list from Firestore. User count: " + userList.size());
-                    Log.d(TAG, "Retrieved user list from Firestore. User count: " +
-                            userList.get(1).getUserId() + " " + userList.get(1).getName() + " " + userList.get(1).getSelectedRestaurantId());
+                    // Log des lieux appréciés de tous les utilisateurs
+                    for (User user : userList) {
+                        Log.d(TAG, user.getName() + user.getLikedPlaces());
+                    }
+                    /*Log.d(TAG, "Retrieved user list from Firestore. User count: " +
+                            userList.get(1).getUserId() + " " + userList.get(1).getName() + " " + userList.get(1).getSelectedRestaurantId());*/
                 } else {
                     Log.e(TAG, "Failed to retrieve user list from Firestore", task.getException());
                 }
             });
         }
+
     }
+    @Override
+    public void getAllUsersFromFirestore() {
+        userCollection.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                List<User> userList = new ArrayList<>();
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    User user = document.toObject(User.class);
+                    if (currentUser != null && user.getUserId().equals(currentUser.getUid())) {
+                        continue;
+                    }
+                    userList.add(user);
+                }
+
+                updateRestaurantLikes(userList); // Appel de la méthode pour mettre à jour les likes
+
+            } else {
+                Log.e(TAG, "Failed to retrieve user list from Firestore", task.getException());
+            }
+        });
+    }
+
+    private void updateRestaurantLikes(List<User> userList) {
+        List<Restaurant> restaurantList = new ArrayList<>(); // La liste de restaurants
+
+        // Remplissez votre liste de restaurants ici (peut-être à partir de Firestore)
+
+        for (User user : userList) {
+            List<String> likedPlaces = user.getLikedPlaces();
+            for (String likedPlace : likedPlaces) {
+                for (Restaurant restaurant : restaurantList) {
+                    if (restaurant.getPlaceId().equals(likedPlace)) {
+                        restaurant.incrementlikesCount();
+
+
+                        break;
+                    }
+                    Log.d(TAG, "le restaurant a :" + String.valueOf(restaurant.getLikesCount()));
+                }
+            }
+        }
+
+        //userListLiveData.postValue(restaurantList); // Mettez à jour la liste de LiveData
+    }
+
 
     @Override
     public void updateUserInFirestore(String userId, User user) {

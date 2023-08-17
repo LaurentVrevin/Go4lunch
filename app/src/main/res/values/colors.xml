@@ -14,4 +14,5 @@
 
     <color name="com_facebook_button_background_color_focused_disabled">#C9C9C9</color>
     <color name="green">#4CAF50</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

@@ -54,8 +54,8 @@ dependencies {
     implementation 'androidx.preference:preference:1.1.1'
 
     //FIREBASE
-    implementation 'com.google.firebase:firebase-firestore:24.5.0'
-    implementation 'com.google.firebase:firebase-auth:21.3.0'
+    implementation 'com.google.firebase:firebase-firestore:24.7.0'
+    implementation 'com.google.firebase:firebase-auth:22.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.0'
 
     implementation 'com.google.firebase:firebase-messaging:23.1.2'

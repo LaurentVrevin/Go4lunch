@@ -27,6 +27,7 @@ public class Restaurant implements Parcelable {
     @Nullable
     private Double distance;
     private int workmatesCount;
+    private int likesCount;
 
     public Restaurant() {
         // constructeur sans argument requis pour Firestore
@@ -70,6 +71,35 @@ public class Restaurant implements Parcelable {
             distance = in.readDouble();
         }
         workmatesCount = in.readInt();
+        likesCount = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeString(address);
+        dest.writeString(phone);
+        dest.writeString(websiteUrl);
+        dest.writeTypedList(photoUrl);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+        dest.writeString(openingHours);
+        dest.writeString(closingHours);
+        dest.writeFloat(rating);
+        if (distance == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(distance);
+        }
+        dest.writeInt(workmatesCount);
+        dest.writeInt(likesCount);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Restaurant> CREATOR = new Creator<Restaurant>() {
@@ -169,7 +199,6 @@ public class Restaurant implements Parcelable {
     }
 
     public String getOpeningHours() {
-
         return openingHours;
     }
 
@@ -196,31 +225,12 @@ public class Restaurant implements Parcelable {
         this.workmatesCount = workmatesCount;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getLikesCount() {
+        return likesCount;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(name);
-        dest.writeString(address);
-        dest.writeString(phone);
-        dest.writeString(websiteUrl);
-        dest.writeTypedList(photoUrl);
-        dest.writeDouble(latitude);
-        dest.writeDouble(longitude);
-        dest.writeString(openingHours);
-        dest.writeString(closingHours);
-        dest.writeFloat(rating);
-        if (distance == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeDouble(distance);
-        }
-        dest.writeInt(workmatesCount);
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
     }
 
     // Ajouter +1 au compteur quand un collègue a choisi ce restaurant
@@ -234,5 +244,16 @@ public class Restaurant implements Parcelable {
             workmatesCount--;
         }
     }
+    public void incrementlikesCount() {
+        likesCount++;
+    }
+
+    // Soustraire -1 au compteur quand un collègue a dislike ce restaurant
+    public void decrementlikesCount() {
+        if (likesCount > 0) {
+            likesCount--;
+        }
+    }
+
 
 }
