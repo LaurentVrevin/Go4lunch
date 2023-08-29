@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         firebaseAuth = FirebaseAuth.getInstance();
-        Log.d("FIREAUTH", String.valueOf(firebaseAuth.getCurrentUser()));
         firebaseFirestore = FirebaseFirestore.getInstance();
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 

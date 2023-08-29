@@ -78,22 +78,10 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
     public void setUserList(List<User> userList) {
         this.userList = userList;
         WorkmatesCounter.updateWorkmatesCount(userList, workmatesCountMap); // Update workmatesCountMap
-        LikesCounter.getLikesCountMap(restaurantList, userList); // Update workmatesCountMap
+        LikesCounter.updateLikesCount(restaurantList,userList);
         notifyDataSetChanged();
     }
-    public void updateRestaurantLikes(HashMap<String, Integer> likesCountMap) {
-        for (Restaurant restaurant : restaurantList) {
-            String restaurantId = restaurant.getPlaceId();
 
-            if (likesCountMap.containsKey(restaurantId)) {
-                int likesCount = likesCountMap.get(restaurantId);
-                restaurant.setLikesCount(likesCount);
-            } else {
-                restaurant.setLikesCount(0); // Si le restaurant n'a pas de likes
-            }
-        }
-        notifyDataSetChanged();
-    }
 
 
 

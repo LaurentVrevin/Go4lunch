@@ -34,6 +34,7 @@ import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +54,11 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private User currentUser;
     private Restaurant restaurant;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
     private String userId;
     private Button buttonRestaurantLike;
     private Button buttonRestaurantWebsite;
-
     private String restaurantId;
     private UserViewModel userViewModel;
     private RestaurantViewModel restaurantViewModel;
@@ -67,6 +68,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
 
     private RecyclerView workmatesRecyclerView;
     private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;
+    private String selectedRestaurantId;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -78,12 +80,19 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         setupFirebaseAuth();
         configureViewModel();
         observeSelectedRestaurantByUser();
-        configureRecyclerView();
-        observeWorkmateList();
         getIntentData();
         setupButtonActions();
+        configureRecyclerView();
+        observeWorkmateList();
+
         setupToolbar();
+
+
+
+
     }
+
+
 
     // Initialisation
     private void initializeViews() {
@@ -100,21 +109,20 @@ public class YourLunchDetailActivity extends AppCompatActivity {
 
     // Firebase
     private void setupFirebaseAuth() {
-        mAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
     }
 
     // ViewModels
     private void configureViewModel() {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-        //userViewModel.getCurrentUserFromFirestore(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-        //userViewModel.getWorkmatesListFromFirestore(false);
 
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
             userId = currentUser.getUserId();
-            Log.d("BLABLA", "L'id de l'utilisateur est : " + currentUser.getName());
-            //userViewModel.getWorkmatesListFromFirestore(false);
+            //selectedRestaurantId = currentUser.getSelectedRestaurantId();
         });
     }
 
@@ -164,14 +172,14 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private void observeWorkmateList(){
         userViewModel.getUserListLiveData().observe(this, userList -> {
             if (userList != null) {
-                Log.d("YOURLUNCHVERIF", "Workmates list size: " + userList.size()); // Ajoutez ce log pour afficher la taille de la liste des workmates
                 this.workmatesList = userList;
                 // Filtrer et obtenir la liste des collègues ayant choisi le même restaurant
                 List<User> filteredList = new ArrayList<>();
                 for (User user : workmatesList) {
-                    if (user.getSelectedRestaurantId() != null && user.getSelectedRestaurantId().equals(restaurantId)) {
+                        if (!user.getUserId().equals(currentUser.getUserId())
+                                && user.getSelectedRestaurantId() != null
+                                && user.getSelectedRestaurantId().equals(restaurantId)) {
                         filteredList.add(user);
-                        Log.d("YOURLUNCHVERIF", "Workmates filtered list size: " + filteredList.size()); // Ajoutez ce log pour afficher la taille de la liste des workmates
                     }
                 }
                 workmatesListViewAdapter.setWorkmatesList(filteredList);
@@ -183,7 +191,8 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private void observeSelectedRestaurantByUser() {
         userViewModel.getUserLiveData().observe(this, user -> {
             if (user != null) {
-                String selectedRestaurantId = user.getSelectedRestaurantId();
+                selectedRestaurantId = user.getSelectedRestaurantId();
+                Log.d("USERAUTH", "YourLunchActivity, observeSelectedRestaurantByUser : " + user.getName() + " " + user.getSelectedRestaurantId());
                 if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
                     setSelectionRestaurantButtonColor(true);
                 } else {
@@ -198,17 +207,23 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("restaurant")) {
             restaurant = intent.getParcelableExtra("restaurant");
+            Log.d("USERAUTH", "getIntentData : " + restaurant.getName());
             restaurantId = restaurant.getPlaceId();
             restaurantViewModel.getRestaurantById(restaurantId);
+            int likesCount = restaurant.getLikesCount();
+            float ratingCount = restaurant.getRating();
             // Obtenir la liste des restaurants likés par l'utilisateur
 
-
-            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
-                if (restaurant != null) {
+            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
+                if (observeRestaurant != null) {
+                    Log.d("USERAUTH", "getIntentData + getSelectedRestaurantLiveData : " + restaurant.getName());
                     placeNameTextView.setText(restaurant.getName());
                     placeAddressTextView.setText(restaurant.getAddress());
-                    ratingBar.setRating(restaurant.getRating());
+                    ratingBar.setRating(ratingCount);
                     loadRestaurantImage(restaurant);
+                    numberofNote.setText(String.valueOf(likesCount) + "/" + workmatesList.size());
+                    Log.d("LIKES_COUNTER", "Nombre de like : " + restaurant.getLikesCount() + " " + likesCount + " " + restaurant.getName());
+
                 }
             });
         }
@@ -235,16 +250,16 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 likedPlaces.remove(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
-                restaurant.decrementlikesCount();
+
                 Toast.makeText(this, "Vous avez enlevé le like de ce restaurant", Toast.LENGTH_SHORT).show();
-                updateStarButtonColor(false);
+                //updateStarButtonColor(false);
             } else {
                 likedPlaces.add(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
-                restaurant.incrementlikesCount();
+
                 Toast.makeText(this, "Vous avez liké ce restaurant", Toast.LENGTH_SHORT).show();
-                updateStarButtonColor(true);
+                //updateStarButtonColor(true);
             }
         }
     }

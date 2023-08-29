@@ -95,5 +95,30 @@ public class WorkmatesFragment extends Fragment {
         // Stop l'animation
         swipeRefreshLayout.setRefreshing(false);
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //userViewModel.getUserLiveData().removeObservers(this);
+        //userViewModel.getUserListLiveData().removeObservers(this);
+       // restaurantViewModel.getListRestaurantLiveData().removeObservers(this);
+        Log.d("USERAUTH", "onStop : Workmates Fragment " + currentUser.getName());
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("USERAUTH", "onPause : Workmates Fragment " + currentUser.getName());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        //userViewModel.getUserLiveData().removeObservers(this);
+        //userViewModel.getUserListLiveData().removeObservers(this);
+        //restaurantViewModel.getListRestaurantLiveData().removeObservers(this);
+        Log.d("USERAUTH", "onDestroyView : Workmates Fragment " + currentUser.getName());
+    }
+
 }
 

@@ -1,46 +1,56 @@
 package com.example.go4lunch.utils;
 
+import android.util.Log;
+
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LikesCounter {
-    public static void getLikesCountMap(List<Restaurant> restaurantList, List<User> userList) {
-        HashMap<String, Integer> likesCountMap = new HashMap<>();
+    public static void updateLikesCount(List<Restaurant> restaurantList, List<User> userList) {
+        Map<String, Integer> likesCountMap = new HashMap<>();
+
+        // Initialiser la map avec des compteurs de likes à zéro pour chaque restaurant
+        for (Restaurant restaurant : restaurantList) {
+            likesCountMap.put(restaurant.getPlaceId(), 0);
+        }
 
         // Parcourir la liste des utilisateurs
         for (User user : userList) {
-            if (user == null) {
-                continue;
-            }
-            // Récupérer la liste des restaurants likés par l'utilisateur
             List<String> likedPlaces = user.getLikedPlaces();
 
-            // Parcourir la liste des restaurants likés par l'utilisateur
+            Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liked places: " + likedPlaces.toString());
+
             for (String restaurantId : likedPlaces) {
-                // Vérifier si le restaurant est déjà dans la likesCountMap
+                Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liking restaurant: " + restaurantId);
+
                 if (likesCountMap.containsKey(restaurantId)) {
-                    // S'il est présent, incrémenter le compteur de likes pour ce restaurant
-                    int count = likesCountMap.get(restaurantId);
-                    likesCountMap.put(restaurantId, count + 1);
+                    int currentLikesCount = likesCountMap.get(restaurantId);
+                    likesCountMap.put(restaurantId, currentLikesCount + 1);
                 } else {
-                    // S'il n'est pas présent, ajouter le restaurant à la likesCountMap avec un compteur initial de 1
                     likesCountMap.put(restaurantId, 1);
                 }
             }
         }
 
-        // Mettre à jour les compteurs de likes des restaurants
+        // Mettre à jour les compteurs de likes des restaurants dans la liste
         for (Restaurant restaurant : restaurantList) {
             String restaurantId = restaurant.getPlaceId();
-
             if (likesCountMap.containsKey(restaurantId)) {
                 int likesCount = likesCountMap.get(restaurantId);
                 restaurant.setLikesCount(likesCount);
+
+                // Calculer la note en étoiles en fonction des likes
+                float rating = calculateRatingFromLikesPercentage(likesCount, userList.size());
+                restaurant.setRating(rating);
+                Log.d("LIKES_COUNTER", "Restaurant: " + restaurant.getName() + " " + restaurant.getPlaceId() + " " + " - Likes: " + likesCount + " étoiles :" + restaurant.getRating());
             } else {
-                restaurant.setLikesCount(0); // Si le restaurant n'a pas de likes
+                restaurant.setLikesCount(0);
+                restaurant.setLikesCount(0);
+                restaurant.setRating(0.0f);
             }
         }
     }

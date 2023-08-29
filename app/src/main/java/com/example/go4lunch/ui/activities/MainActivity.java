@@ -3,6 +3,7 @@ package com.example.go4lunch.ui.activities;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -46,7 +47,6 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -57,7 +57,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    //private final String[] perms = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
@@ -72,14 +71,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private UserViewModel userViewModel;
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
-    private Restaurant restaurantForIntent;
+    private Restaurant restaurant;
     private User currentUser;
     private Location currentLocation;
     private String userId;
     private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
     private ImageView imvProfilePhoto;
 
     private String restaurantSelectedIdByUser;
+    private List<User> workmateslist;
+    private List<Restaurant> restaurantslisteLike;
 
 
     @Override
@@ -90,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setContentView(binding.getRoot());
 
         firebaseAuth = FirebaseAuth.getInstance();
-
         checkAuth();
         configureViewModels();
         observeUserData();
+        observeWorkmatesData();
         setupToolbar();
         setupNavigationDrawer();
         setupBottomNavigation();
@@ -102,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupMapViewFragment();
         setupNavigationListener();
         observePermission();
+        observeRestaurantsData();
+        Log.d("USERAUTH", "onCreate" + restaurantSelectedIdByUser);
+
     }
 
     private void checkAuth() {
@@ -109,6 +114,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (firebaseUser != null) {
             // Utilisateur connecté, récupérer l'ID de l'utilisateur
             userId = firebaseUser.getUid();
+
+            Log.d("USERAUTH", "checkAuth / firebaseUser : " + firebaseUser.getDisplayName() +" " + firebaseUser.getUid() + " "
+                    + " firebaseAuth : " + firebaseAuth.getCurrentUser().getDisplayName());
 
         } else {
             // Utilisateur non connecté, rediriger vers LoginActivity
@@ -120,42 +128,59 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         locationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-        userViewModel.getUserLiveData().observe(this, user -> {
-            currentUser = user;
-            Log.d("USERAUTH", "L'id de l'utilisateur est : " + currentUser.getName());
-        });
 
     }
 
-    //Initialisation de l'user et observation du livedata
-    //je passe l'information à la méthode displayUserInfo qui a pour paramètre "user"
-    //ça me permet de récupérer les données via le livedata de l'user
-    //je passe ensuite la donnée de l'id du restaurant sélectionné par l'user à la variable :"restaurantSelectedIdByUser"
-    //ça me permettra de passer l'objet restaurant de celui qui est sélectionné dans l'intent
-    //si pas de restaurant, alors = null
     private void observeUserData() {
-        userViewModel.getCurrentUserFromFirestore(userId);
-        userViewModel.getUserLiveData().observe(this, user -> {
-            currentUser = user;
-            Log.d("USERAUTH", "L'id de l'utilisateur est : " + currentUser.getName());
-            displayUserInfo(user);
-            restaurantSelectedIdByUser = user.getSelectedRestaurantId();
-            observeRestaurantSelectedByUser();
-
-        });
+        if (userId != null) {
+            userViewModel.getCurrentUserFromFirestore(userId);
+            userViewModel.getUserLiveData().observe(this, user -> {
+                if (user != null && user.getUserId().equals(userId)) {
+                    currentUser = user;
+                    displayUserInfo(user);
+                    restaurantSelectedIdByUser = user.getSelectedRestaurantId();
+                    observeRestaurantSelectedByUser();
+                }
+            });
+        }
     }
-    private void observeRestaurantSelectedByUser(){
+
+    private void observeRestaurantSelectedByUser() {
         if (restaurantSelectedIdByUser != null) {
+
             // Récupérez le restaurant sélectionné en utilisant restaurantSelectedIdByUser
             restaurantViewModel.getRestaurantById(restaurantSelectedIdByUser);
-            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurant -> {
-                if (restaurant != null) {
-                    restaurantForIntent = restaurant;
+            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurantSelected -> {
+                if (restaurantSelected != null) {
+                    restaurant = restaurantSelected;
+                    Log.d("USERAUTH", "observeRestaurantSelectedByUser " + restaurantSelectedIdByUser + " objet restaurant :" + restaurant );
+                    // Maintenant que les données du restaurant sont disponibles, ouvrez les détails du restaurant
+
                 }
             });
         } else {
-            restaurantForIntent = null;
+            restaurant = null;
         }
+    }
+
+    private void openYourLunchActivityWithSelectedRestaurant() {
+        if (restaurant != null) {
+            observeRestaurantSelectedByUser();
+            // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
+            Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
+            intent.putExtra("restaurant", restaurant);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "Vous n'avez pas choisi de restaurant", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void observeWorkmatesData() {
+        userViewModel.getWorkmatesListFromFirestore(false);
+        userViewModel.getUserListLiveData().observe(this, userList -> {
+            workmateslist = userList;
+        });
     }
 
     private void setupToolbar() {
@@ -180,8 +205,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         tvUserName = headerView.findViewById(R.id.tv_header_profilename);
         tvUserEmail = headerView.findViewById(R.id.tv_header_email);
         imvProfilePhoto = headerView.findViewById(R.id.iv_header_Avatar);
-
-
     }
 
     private void setupNavController() {
@@ -281,18 +304,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
 
-    private void openYourLunchActivityWithSelectedRestaurant() {
 
-        if (restaurantForIntent != null) {
-            // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
-            Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
-            intent.putExtra("restaurant", restaurantForIntent);
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Vous n'avez pas choisi de restaurant", Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
 
     private void showLogoutConfirmationDialog() {
@@ -346,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void logOutAndRedirect() {
         userViewModel.logOut();
         redirectToLogin();
+
     }
 
     @Override
@@ -372,12 +385,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (currentLocation != null) {
             restaurantViewModel.getRestaurants(currentLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(this, restaurantListData -> {
-                Log.d("MAINACTIVITYLOCATION", String.valueOf(currentLocation.getLatitude()));
+                restaurantslisteLike = restaurantListData;
+                Log.d("MAINACTIVITYLOCATION", workmateslist.size() + " Le nombre de restaurants trouvés est : " + restaurantListData.size());
+                //LikesCounter.updateLikesCount(restaurantListData, workmateslist);
             });
         }
     }
 
     private void redirectToLogin() {
+
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -415,19 +431,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         return true;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         observeUserData();
+        Log.d("USERAUTH", "onResume : MainActivity ");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        // Supprimez les observations pour éviter les fuites de mémoire
-        userViewModel.getUserLiveData().removeObservers(this);
-        restaurantViewModel.getSelectedRestaurantLiveData().removeObservers(this);
+
+        Log.d("USERAUTH", "onPause : MainActivity ");
     }
 
 
@@ -435,12 +450,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onStop() {
         super.onStop();
         locationPermissionViewModel.stopUpdateLocation();
+
+        Log.d("USERAUTH", "onStop : mainActivity ");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        userViewModel.logOut();
+        userViewModel.getUserLiveData().removeObservers(this);
+
+        Log.d("USERAUTH", "onDestroy : mainActivity " +  firebaseAuth.getCurrentUser());
 
     }
+
 
 }

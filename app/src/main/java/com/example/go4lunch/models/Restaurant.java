@@ -24,9 +24,11 @@ public class Restaurant implements Parcelable {
     private String openingHours;
     private String closingHours;
     private float rating;
+
     @Nullable
     private Double distance;
     private int workmatesCount;
+    @Nullable
     private int likesCount;
 
     public Restaurant() {
@@ -49,7 +51,9 @@ public class Restaurant implements Parcelable {
             this.closingHours = result.getOpeningHours().getCloseTime();
         }
         this.rating = (float) result.getRating();
+
         this.distance=null;
+
     }
 
 
@@ -244,6 +248,13 @@ public class Restaurant implements Parcelable {
             workmatesCount--;
         }
     }
+    public void updateLikesCount(boolean isLiked) {
+        if (isLiked) {
+            incrementlikesCount();
+        } else {
+            decrementlikesCount();
+        }
+    }
     public void incrementlikesCount() {
         likesCount++;
     }
@@ -254,6 +265,7 @@ public class Restaurant implements Parcelable {
             likesCount--;
         }
     }
+
 
 
 }

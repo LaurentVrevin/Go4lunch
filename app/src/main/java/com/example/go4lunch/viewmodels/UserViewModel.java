@@ -70,8 +70,5 @@ public class UserViewModel extends ViewModel {
         userInterface.deleteAccount(context);
     }
 
-    public void getAllUsersFromFirestore() {
-        userInterface.getAllUsersFromFirestore();
-    }
 
 }

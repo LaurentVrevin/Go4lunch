@@ -22,6 +22,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.adapters.ListViewAdapter;
+import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
@@ -56,8 +57,6 @@ public class ListViewFragment extends Fragment {
 
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_listview_fragment);
         swipeRefreshLayout.setOnRefreshListener(this::refreshListView);
-
-
         return view;
     }
 
@@ -79,7 +78,6 @@ public class ListViewFragment extends Fragment {
         userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
             currentUser = user;
-            Log.d("USERAUTH", "L'id de l'utilisateur est : " + currentUser.getName());
         });
 
     }
@@ -92,13 +90,20 @@ public class ListViewFragment extends Fragment {
         if (hasPermission) {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(getViewLifecycleOwner(), this::updateRestaurantList);
-            userViewModel.getWorkmatesListFromFirestore(false);
 
             userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
-                if (userList != null) {
-                    updateWorkmatesList(userList);
+                if (userList != null && currentUser != null) {
+                        // Exclure l'utilisateur connecté de la liste des workmates
+                        List<User> filteredWorkmatesList = new ArrayList<>();
+
+                        for (User user : userList) {
+                            if (!user.getUserId().equals(currentUser.getUserId())) {
+                                filteredWorkmatesList.add(user);
+                            }
+                        }
+                    updateWorkmatesList(filteredWorkmatesList);
                     //voir pour le COMPTEUR DE LIKES ici peut-être
-                    Log.d("LISTVIEWWORKMATES", "la liste des workmates est : " + userList);
+
                 }
             });
         }
@@ -143,6 +148,7 @@ public class ListViewFragment extends Fragment {
     private void refreshListView() {
         //Rafraichit la liste des workmates
         userViewModel.getWorkmatesListFromFirestore(true);
+        LikesCounter.updateLikesCount(restaurantListData,userListData);
         // Stop l'animation
         swipeRefreshLayout.setRefreshing(false);
     }

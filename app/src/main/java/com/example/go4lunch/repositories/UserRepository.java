@@ -48,6 +48,9 @@ public class UserRepository implements UserInterface {
         userLiveData = new MutableLiveData<>();
         userListLiveData = new MutableLiveData<>();
     }
+    private FirebaseUser getCurrentFirebaseUser() {
+        return firebaseAuth.getCurrentUser();
+    }
       @Override
     public LiveData<User> getUserLiveData() {
         return userLiveData;
@@ -92,16 +95,22 @@ public class UserRepository implements UserInterface {
 
     @Override
     public void getCurrentUserFromFirestore(String userId) {
-        Log.d("TESTWORKMATEUPDATE", "currentuser");
-        userCollection.document(userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                User user = task.getResult().toObject(User.class);
-                if (user != null) {
-                    user.setUserId(userId);
-                    userLiveData.postValue(user);
+        FirebaseUser firebaseUser = getCurrentFirebaseUser();
+
+        if (firebaseUser != null) {
+            userCollection.document(userId).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult() != null) {
+                    User user = task.getResult().toObject(User.class);
+                    if (user != null) {
+                        userLiveData.postValue(user);
+                    }
+                } else {
+                    Log.e(TAG, "Failed to fetch current user data from Firestore: ");
                 }
-            }
-        });
+            });
+        } else {
+            Log.e(TAG, "getCurrentUserFromFirestore: Firebase user is null.");
+        }
     }
 
     @Override
@@ -117,9 +126,6 @@ public class UserRepository implements UserInterface {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         User user = document.toObject(User.class);
 
-                        /*if (currentUser != null && user.getUserId().equals(currentUser.getUid())) {
-                            continue;
-                        }*/
                         String selectedRestaurantId = document.getString("selectedRestaurantId");
                         user.setSelectedRestaurantId(selectedRestaurantId);
                         userList.add(user);
@@ -140,52 +146,6 @@ public class UserRepository implements UserInterface {
         }
 
     }
-    @Override
-    public void getAllUsersFromFirestore() {
-        userCollection.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                List<User> userList = new ArrayList<>();
-                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    User user = document.toObject(User.class);
-                    if (currentUser != null && user.getUserId().equals(currentUser.getUid())) {
-                        continue;
-                    }
-                    userList.add(user);
-                }
-
-                updateRestaurantLikes(userList); // Appel de la méthode pour mettre à jour les likes
-
-            } else {
-                Log.e(TAG, "Failed to retrieve user list from Firestore", task.getException());
-            }
-        });
-    }
-
-    private void updateRestaurantLikes(List<User> userList) {
-        List<Restaurant> restaurantList = new ArrayList<>(); // La liste de restaurants
-
-        // Remplissez votre liste de restaurants ici (peut-être à partir de Firestore)
-
-        for (User user : userList) {
-            List<String> likedPlaces = user.getLikedPlaces();
-            for (String likedPlace : likedPlaces) {
-                for (Restaurant restaurant : restaurantList) {
-                    if (restaurant.getPlaceId().equals(likedPlace)) {
-                        restaurant.incrementlikesCount();
-
-
-                        break;
-                    }
-                    Log.d(TAG, "le restaurant a :" + String.valueOf(restaurant.getLikesCount()));
-                }
-            }
-        }
-
-        //userListLiveData.postValue(restaurantList); // Mettez à jour la liste de LiveData
-    }
-
 
     @Override
     public void updateUserInFirestore(String userId, User user) {

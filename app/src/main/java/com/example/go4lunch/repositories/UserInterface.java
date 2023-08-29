@@ -24,7 +24,6 @@ public interface UserInterface {
 
     void getWorkmatesListFromFirestore(boolean forceUpdate);
 
-    void getAllUsersFromFirestore();
 
     void updateUserInFirestore(String userId, User user);
     void updateUserSelectedRestaurant(String userId, User user);
@@ -35,10 +34,6 @@ public interface UserInterface {
     void logOut();
 
     void deleteAccount(Context context);
-
-
-
-
 
 
 }
