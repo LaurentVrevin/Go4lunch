@@ -5,7 +5,6 @@ package com.example.go4lunch.ui.fragments;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,8 @@ public class ListViewFragment extends Fragment {
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
     private List<Restaurant> restaurantListData;
-    private List<User> userListData;
+    private List<User> workmatesListData;
+    private List<User> usersList;
     private Location location;
     private User currentUser;
     private RecyclerView recyclerView;
@@ -61,7 +61,7 @@ public class ListViewFragment extends Fragment {
     }
 
     private void configureRecyclerView() {
-        listViewAdapter = new ListViewAdapter(restaurantListData, location, userListData);
+        listViewAdapter = new ListViewAdapter(restaurantListData, location, workmatesListData);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(listViewAdapter);
     }
@@ -101,8 +101,9 @@ public class ListViewFragment extends Fragment {
                                 filteredWorkmatesList.add(user);
                             }
                         }
-                    updateWorkmatesList(filteredWorkmatesList);
-                    //voir pour le COMPTEUR DE LIKES ici peut-être
+                    listViewAdapter.setAllUsersList(userList);
+                    updateWorkmatesList(filteredWorkmatesList, userList);
+
 
                 }
             });
@@ -118,10 +119,13 @@ public class ListViewFragment extends Fragment {
         }
     }
 
-    private void updateWorkmatesList(List<User> users){
-        userListData = users;
+    private void updateWorkmatesList(List<User> filteredWorkmatesList, List<User>allUsersList){
+        workmatesListData = filteredWorkmatesList;
+        usersList = allUsersList;
         if(listViewAdapter != null){
-            listViewAdapter.setUserList(userListData);
+            listViewAdapter.setWorkmatesList(workmatesListData);
+            listViewAdapter.setAllUsersList(usersList);
+
             listViewAdapter.notifyDataSetChanged();
         }
     }
@@ -148,7 +152,7 @@ public class ListViewFragment extends Fragment {
     private void refreshListView() {
         //Rafraichit la liste des workmates
         userViewModel.getWorkmatesListFromFirestore(true);
-        LikesCounter.updateLikesCount(restaurantListData,userListData);
+        LikesCounter.updateLikesCount(restaurantListData, usersList);
         // Stop l'animation
         swipeRefreshLayout.setRefreshing(false);
     }

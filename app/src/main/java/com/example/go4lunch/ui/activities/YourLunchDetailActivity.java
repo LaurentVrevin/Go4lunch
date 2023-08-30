@@ -1,17 +1,20 @@
 package com.example.go4lunch.ui.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,7 +28,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.go4lunch.MyApplication;
 import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
@@ -45,6 +47,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class YourLunchDetailActivity extends AppCompatActivity {
 
+    private static final int CALL_PERMISSION_REQUEST_CODE = 0631;
+
     private ImageView placeImageView;
     private TextView placeNameTextView;
     private TextView placeAddressTextView;
@@ -57,6 +61,8 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private String userId;
+
+    private Button getButtonRestaurantCall;
     private Button buttonRestaurantLike;
     private Button buttonRestaurantWebsite;
     private String restaurantId;
@@ -65,7 +71,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
 
     private LiveData<User> userLiveData;
     private List<User> workmatesList;
-
     private RecyclerView workmatesRecyclerView;
     private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;
     private String selectedRestaurantId;
@@ -84,14 +89,9 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         setupButtonActions();
         configureRecyclerView();
         observeWorkmateList();
-
         setupToolbar();
 
-
-
-
     }
-
 
 
     // Initialisation
@@ -100,8 +100,8 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         placeNameTextView = findViewById(R.id.tv_detail_restaurant_name);
         placeAddressTextView = findViewById(R.id.tv_detail_restaurant_address);
         fabDetailChoice = findViewById(R.id.fab_detail_choice);
-        numberofNote = findViewById(R.id.tv_note);
         ratingBar = findViewById(R.id.rb_detail_restaurant_rate);
+        getButtonRestaurantCall = findViewById(R.id.bt_detail_restaurant_call);
         buttonRestaurantLike = findViewById(R.id.bt_detail_restaurant_like);
         buttonRestaurantWebsite = findViewById(R.id.bt_detail_restaurant_website);
         workmatesRecyclerView = findViewById(R.id.rv_detail_restaurant_workmates);
@@ -122,7 +122,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
             userId = currentUser.getUserId();
-            //selectedRestaurantId = currentUser.getSelectedRestaurantId();
         });
     }
 
@@ -142,6 +141,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         fabDetailChoice.setOnClickListener(view -> updateUserSelectedRestaurant());
         buttonRestaurantLike.setOnClickListener(view -> updateUserLikedPlace());
         buttonRestaurantWebsite.setOnClickListener(view -> openRestaurantWebsite());
+        getButtonRestaurantCall.setOnClickListener(view -> callRestaurantPhoneNumber());
     }
 
     private void openRestaurantWebsite() {
@@ -150,16 +150,43 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
         startActivity(webIntent);
     }
+    private void callRestaurantPhoneNumber() {
+        String phoneNumber = restaurant.getPhone();
+        if (phoneNumber != null && !phoneNumber.isEmpty()) {
+            // Créer une intention pour l'action d'appel
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + phoneNumber));
+
+            // Vérifier si l'application a la permission CALL_PHONE
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                startActivity(callIntent);
+            } else {
+                // Demander la permission d'appel si elle n'est pas accordée
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, CALL_PERMISSION_REQUEST_CODE);
+            }
+        } else {
+            // Le restaurant n'a pas de numéro de téléphone
+            Toast.makeText(this, "Ce restaurant n'a pas de numéro de téléphone disponible.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CALL_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // La permission d'appel a été accordée
+                callRestaurantPhoneNumber();
+            } else {
+                // La permission d'appel a été refusée
+                Toast.makeText(this, "La permission d'appel est nécessaire pour effectuer un appel.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private void setSelectionRestaurantButtonColor(boolean isRestaurantSelected) {
         int color = isRestaurantSelected ? R.color.green : R.color.black;
         int tintColor = ContextCompat.getColor(this, color);
         fabDetailChoice.getDrawable().setTintList(ColorStateList.valueOf(tintColor));
-    }
-    private void updateStarButtonColor(boolean isLiked) {
-        int textColorId = isLiked ? R.color.yellow : R.color.orange;
-
-        buttonRestaurantLike.setTextColor(ContextCompat.getColor(this, textColorId));
     }
 
     private void configureRecyclerView() {
@@ -207,22 +234,17 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("restaurant")) {
             restaurant = intent.getParcelableExtra("restaurant");
-            Log.d("USERAUTH", "getIntentData : " + restaurant.getName());
             restaurantId = restaurant.getPlaceId();
             restaurantViewModel.getRestaurantById(restaurantId);
-            int likesCount = restaurant.getLikesCount();
             float ratingCount = restaurant.getRating();
-            // Obtenir la liste des restaurants likés par l'utilisateur
 
             restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
                 if (observeRestaurant != null) {
-                    Log.d("USERAUTH", "getIntentData + getSelectedRestaurantLiveData : " + restaurant.getName());
                     placeNameTextView.setText(restaurant.getName());
                     placeAddressTextView.setText(restaurant.getAddress());
                     ratingBar.setRating(ratingCount);
                     loadRestaurantImage(restaurant);
-                    numberofNote.setText(String.valueOf(likesCount) + "/" + workmatesList.size());
-                    Log.d("LIKES_COUNTER", "Nombre de like : " + restaurant.getLikesCount() + " " + likesCount + " " + restaurant.getName());
+
 
                 }
             });
@@ -252,14 +274,14 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
                 Toast.makeText(this, "Vous avez enlevé le like de ce restaurant", Toast.LENGTH_SHORT).show();
-                //updateStarButtonColor(false);
+
             } else {
                 likedPlaces.add(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
                 Toast.makeText(this, "Vous avez liké ce restaurant", Toast.LENGTH_SHORT).show();
-                //updateStarButtonColor(true);
+
             }
         }
     }

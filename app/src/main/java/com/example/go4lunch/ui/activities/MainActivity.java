@@ -39,6 +39,7 @@ import com.example.go4lunch.models.User;
 import com.example.go4lunch.ui.fragments.ListViewFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesFragment;
+import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
@@ -166,14 +167,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void openYourLunchActivityWithSelectedRestaurant() {
         if (restaurant != null) {
             observeRestaurantSelectedByUser();
-            // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
-            Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
-            intent.putExtra("restaurant", restaurant);
-            startActivity(intent);
+
+            // Vérifier si l'ID du restaurant sélectionné correspond à restaurantSelectedIdByUser
+            if (restaurantSelectedIdByUser != null && restaurantSelectedIdByUser.equals(restaurant.getPlaceId())) {
+                // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
+                Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
+                intent.putExtra("restaurant", restaurant);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Vous n'avez pas choisi ce restaurant", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, "Vous n'avez pas choisi de restaurant", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void observeWorkmatesData() {
@@ -386,8 +392,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             restaurantViewModel.getRestaurants(currentLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(this, restaurantListData -> {
                 restaurantslisteLike = restaurantListData;
-                Log.d("MAINACTIVITYLOCATION", workmateslist.size() + " Le nombre de restaurants trouvés est : " + restaurantListData.size());
-                //LikesCounter.updateLikesCount(restaurantListData, workmateslist);
+                /*for(Restaurant restaurant : restaurantListData){
+                    Log.d("MAINACTIVITYLOCATION", restaurant.getName() + " " + restaurant.getPhone());
+                }*/
+
+                LikesCounter.updateLikesCount(restaurantListData, workmateslist);
             });
         }
     }
@@ -435,6 +444,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onResume() {
         super.onResume();
         observeUserData();
+
         Log.d("USERAUTH", "onResume : MainActivity ");
     }
 

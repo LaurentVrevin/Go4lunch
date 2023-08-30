@@ -13,14 +13,17 @@ import com.example.go4lunch.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Objects;
+
 public class MyFirebaseMessagingServices extends FirebaseMessagingService {
     private static final String CANAL = "MyNotifCanal";
+
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
 
-        String myMessage = message.getNotification().getBody();
+        String myMessage = Objects.requireNonNull(message.getNotification()).getBody();
         Log.d("FirebaseMessage", "Vous avez reçu un message"+ myMessage);
 
         //Créer une notification

@@ -3,6 +3,7 @@ package com.example.go4lunch.ui.adapters;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.example.go4lunch.ui.activities.YourLunchDetailActivity;
 import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.utils.WorkmatesCounter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,16 +35,17 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
 
     private List<Restaurant> restaurantList;
     private User currentUser;
-    private List<User> userList;
+    private List<User> workmatesList;
+    private List<User> allUsersList;
     private Location location;
     private static HashMap<String, Integer> workmatesCountMap = new HashMap<>();
 
 
 
-    public ListViewAdapter(List<Restaurant> restaurantList, Location location, List<User>userList) {
+    public ListViewAdapter(List<Restaurant> restaurantList, Location location, List<User> workmatesList) {
         this.restaurantList = restaurantList;
         this.location = location;
-        this.userList = userList;
+        this.workmatesList = workmatesList;
     }
 
     @NonNull
@@ -74,16 +75,19 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
         this.restaurantList = restaurantList;
     }
 
-    // Mettre à jour la liste des workmates
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
-        WorkmatesCounter.updateWorkmatesCount(userList, workmatesCountMap); // Update workmatesCountMap
-        LikesCounter.updateLikesCount(restaurantList,userList);
+    public void setAllUsersList(List<User> allUsersList) {
+        this.allUsersList = allUsersList;
+        LikesCounter.updateLikesCount(restaurantList, allUsersList);
         notifyDataSetChanged();
     }
 
+    // Mettre à jour la liste des workmates
+    public void setWorkmatesList(List<User> workmatesList) {
+        this.workmatesList = workmatesList;
+        WorkmatesCounter.updateWorkmatesCount(workmatesList, workmatesCountMap); // Update workmatesCountMap
 
-
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getItemCount() {
@@ -107,13 +111,19 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
             placeRangeTextView = itemView.findViewById(R.id.tv_place_range);
             placeAddressTextView = itemView.findViewById(R.id.tv_place_address);
             placeOpeningTime = itemView.findViewById(R.id.tv_place_open);
-            workmateImageView = itemView.findViewById(R.id.im_workmate);
+            workmateImageView = itemView.findViewById(R.id.im_workmate_icon_number);
             workmateNumberTextView = itemView.findViewById(R.id.tv_workmate_number);
             ratingBar = itemView.findViewById(R.id.rb_list_view_rate);
         }
 
         public void bind(Restaurant restaurant) {
             if(restaurant !=null){
+
+                int likesCount = restaurant.getLikesCount();
+                float ratingCount = restaurant.getRating();
+                // Obtenir la liste des restaurants likés par l'utilisateur
+                Log.d("LIKES_COUNTER", "Nombre de like : " + restaurant.getLikesCount() + " " + likesCount);
+
                 // Mettre à jour les vues avec les données du restaurant
                 placeNameTextView.setText(restaurant.getName());
                 placeAddressTextView.setText(restaurant.getAddress());
@@ -137,9 +147,8 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
                 workmateNumberTextView.setText(String.valueOf(workmatesCount));
 
                 //Mettre à jour le nombre d'étoiles
-                ratingBar.setRating(restaurant.getRating());
+                ratingBar.setRating(ratingCount);
             }
-
         }
 
 

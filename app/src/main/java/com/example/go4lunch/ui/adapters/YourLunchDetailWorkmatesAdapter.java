@@ -60,8 +60,8 @@ public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLu
 
         public YourLunchDetailWorkmatesViewHolder(@NonNull View itemView) {
             super(itemView);
-            userNameTextView = itemView.findViewById(R.id.tv_workmate_name);
-            workmatesAvatar = itemView.findViewById(R.id.im_workmate);
+            userNameTextView = itemView.findViewById(R.id.tv_workmate_detail_name);
+            workmatesAvatar = itemView.findViewById(R.id.im_workmate_detail_avatar);
         }
     }
 

@@ -82,7 +82,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             locationPermissionViewModel.getCurrentLocation().observe(requireActivity(), this::updateLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::updateRestaurantList);
             restaurantViewModel.getListRestaurantLiveData().observe(requireActivity(), this::setMarkers);
-            //userViewModel.getWorkmatesListFromFirestore(false);
 
             userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
                 if (userList != null) {
@@ -92,7 +91,6 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
             });
         }
     }
-
 
 
     @SuppressLint("MissingPermission")
@@ -211,6 +209,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
      @Override
      public void onResume() {
          super.onResume();
+
      }
 
     @Override
