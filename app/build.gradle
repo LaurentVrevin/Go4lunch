@@ -84,7 +84,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.9.0'
-
+    implementation 'androidx.work:work-runtime:2.7.1'
 
 
     // Glide v4 uses this new annotation processor -- see https://bumptech.github.io/glide/doc/generatedapi.html
@@ -95,7 +95,14 @@ dependencies {
     annotationProcessor 'com.google.dagger:hilt-compiler:2.42'
 
     //TEST
-    testImplementation 'junit:junit:4.13.2'
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+
+    // Dépendance pour JUnit 4 (pour les tests unitaires)
+    testImplementation 'junit:junit:4.13.2'
+
+    // Dépendance pour Mockito (pour la simulation d'objets)
+    testImplementation 'org.mockito:mockito-core:3.11.2'
 }

@@ -45,7 +45,7 @@ public class Restaurant implements Parcelable {
         this.latitude = result.getGeometry().getLocation().getLat();
         this.longitude = result.getGeometry().getLocation().getLng();
         if (result.getOpeningHours() != null) {
-            this.openingHours = result.getOpeningHours().isOpenNow() ? "Ouvert" : "Fermé";
+            this.openingHours = result.getOpeningHours().isOpenNow() ? "Opened" : "Closed";
         }
         if (result.getOpeningHours() != null && result.getOpeningHours().getCloseTime() != null) {
             this.closingHours = result.getOpeningHours().getCloseTime();

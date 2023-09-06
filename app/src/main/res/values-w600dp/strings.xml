@@ -14,10 +14,10 @@
     <string name="logout_message">Are you sure you want to logout ?</string>
     <string name="logout_positive_button">Yes</string>
     <string name="logout_negative_button">No</string>
-    <string name="place_image">Place image</string>
-    <string name="call">call</string>
-    <string name="like">like</string>
-    <string name="button_to_save_place_choice">Button to save place choice</string>
+    <string name="your_lunch_detail_place_image">Place image</string>
+    <string name="your_lunch_detail_call_button">call</string>
+    <string name="your_lunch_detail_like_button">like</string>
+    <string name="your_lunch_detail_select_restaurant_button">Button to save place choice</string>
     <string name="delete_title">delete_title</string>
     <string name="delete_message">"Are you sure to want delete your account ? "</string>
     <string name="notification_channel_id">myCanal</string>
@@ -33,9 +33,18 @@
     <string name="permission_denied_message">To use the app, we need your location. Do you want to enable location now? Otherwise you will be disconnected.</string>
     <string name="permission_denied_positive_button">yes</string>
     <string name="permission_denied_negative_button">no</string>
-    <string name="first_parenthesis">(</string>
-    <string name="workmate_number">2</string>
-    <string name="last_parenthesis">)</string>
-    <string name="place_photo">place_photo</string>
+    <string name="item_list_view_first_parenthesis">(</string>
+    <string name="item_list_view_workmate_number">2</string>
+    <string name="item_list_view_last_parenthesis">)</string>
+    <string name="item_list_view_place_photo">place_photo</string>
     <string name="need_location_permissions_message">We need your location</string>
+    <string name="workmates_fragment_adapter_no_restaurant_selected">- (no restaurant selected)</string>
+    <string name="your_lunch_detail_you_disliked">You removed your like for this restaurant</string>
+    <string name="your_lunch_detail_you_liked">You liked this restaurant</string>
+    <string name="your_lunch_detail_call_permission_needed">Call permission is required to make a call.</string>
+    <string name="your_lunch_detail_no_phone_number">This restaurant does not have a telephone number available.</string>
+    <string name="main_activity_no_restaurant_selected">You have not chosen a restaurant</string>
+    <string name="listview_adapter_restaurant_opened">Open</string>
+    <string name="listview_adapter_restaurant_closed">Closed</string>
+    <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
 </resources>

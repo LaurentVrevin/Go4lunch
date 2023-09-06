@@ -3,7 +3,6 @@ package com.example.go4lunch.ui.adapters;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -121,8 +120,6 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
 
                 int likesCount = restaurant.getLikesCount();
                 float ratingCount = restaurant.getRating();
-                // Obtenir la liste des restaurants likés par l'utilisateur
-                Log.d("LIKES_COUNTER", "Nombre de like : " + restaurant.getLikesCount() + " " + likesCount);
 
                 // Mettre à jour les vues avec les données du restaurant
                 placeNameTextView.setText(restaurant.getName());
@@ -183,17 +180,19 @@ public class ListViewAdapter extends RecyclerView.Adapter<ListViewAdapter.ListVi
 
         private String getOpeningHours(Restaurant restaurant) {
             String openingHours = restaurant.getOpeningHours();
+            String restaurantIsOpen = itemView.getContext().getString(R.string.listview_adapter_restaurant_opened);
+            String restaurantIsClosed = itemView.getContext().getString(R.string.listview_adapter_restaurant_closed);
             if (openingHours != null) {
-                if (openingHours.equals("Ouvert")) {
+                if (openingHours.equals("Opened")) {
                     placeOpeningTime.setTextColor(Color.BLUE);
-                    return openingHours;
-                } else if (openingHours.equals("Fermé")) {
+                    return restaurantIsOpen;
+                } else if (openingHours.equals("Closed")) {
                     placeOpeningTime.setTextColor(Color.RED);
-                    return openingHours;
+                    return restaurantIsClosed;
                 }
             }
             placeOpeningTime.setTextColor(Color.RED);
-            return "Fermé";
+            return restaurantIsClosed;
         }
     }
 }

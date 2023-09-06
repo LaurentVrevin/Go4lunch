@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.go4lunch.MyApplication;
+import com.example.go4lunch.R;
 import com.example.go4lunch.models.Restaurant;
 import com.example.go4lunch.models.User;
 import com.firebase.ui.auth.AuthUI;
@@ -77,9 +78,15 @@ public class UserRepository implements UserInterface {
                     String email = firebaseUser.getEmail();
                     String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
 
+                    // Vérifiez si photoUrl est nul, si oui, définissez l'image par défaut
+                    if (photoUrl == null) {
+                        // Mettez l'image de base depuis les ressources locales (drawable)
+                        photoUrl = "https://i.pravatar.cc/300";
+                    }
+
                     User newUser = new User(userId, displayName, email, photoUrl, new ArrayList<>(), null);
 
-                    // Utiliser la méthode "set" avec l'option "merge" pour mettre à jour uniquement les champs spécifiques
+                    // Utilisez la méthode "set" avec l'option "merge" pour mettre à jour uniquement les champs spécifiques
                     userDocument.set(newUser, SetOptions.merge())
                             .addOnCompleteListener(createUserTask -> {
                                 if (createUserTask.isSuccessful()) {
@@ -117,7 +124,6 @@ public class UserRepository implements UserInterface {
     public void getWorkmatesListFromFirestore(boolean forceUpdate) {
 
         if (userListLiveData.getValue() == null || userListLiveData.getValue().isEmpty() || forceUpdate)  {
-            Log.d("TESTWORKMATEUPDATE", "coucou");
             userCollection.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     List<User> userList = new ArrayList<>();
@@ -137,8 +143,6 @@ public class UserRepository implements UserInterface {
                     for (User user : userList) {
                         Log.d(TAG, user.getName() + user.getLikedPlaces());
                     }
-                    /*Log.d(TAG, "Retrieved user list from Firestore. User count: " +
-                            userList.get(1).getUserId() + " " + userList.get(1).getName() + " " + userList.get(1).getSelectedRestaurantId());*/
                 } else {
                     Log.e(TAG, "Failed to retrieve user list from Firestore", task.getException());
                 }

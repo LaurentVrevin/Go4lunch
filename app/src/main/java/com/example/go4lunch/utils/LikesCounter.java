@@ -23,17 +23,19 @@ public class LikesCounter {
             List<String> likedPlaces = user.getLikedPlaces();
 
             Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liked places: " + likedPlaces.toString());
+            if (likedPlaces != null) {
+                for (String restaurantId : likedPlaces) {
+                    Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liking restaurant: " + restaurantId);
 
-            for (String restaurantId : likedPlaces) {
-                Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liking restaurant: " + restaurantId);
-
-                if (likesCountMap.containsKey(restaurantId)) {
-                    int currentLikesCount = likesCountMap.get(restaurantId);
-                    likesCountMap.put(restaurantId, currentLikesCount + 1);
-                } else {
-                    likesCountMap.put(restaurantId, 1);
+                    if (likesCountMap.containsKey(restaurantId)) {
+                        int currentLikesCount = likesCountMap.get(restaurantId);
+                        likesCountMap.put(restaurantId, currentLikesCount + 1);
+                    } else {
+                        likesCountMap.put(restaurantId, 1);
+                    }
                 }
             }
+
         }
 
         // Mettre à jour les compteurs de likes des restaurants dans la liste

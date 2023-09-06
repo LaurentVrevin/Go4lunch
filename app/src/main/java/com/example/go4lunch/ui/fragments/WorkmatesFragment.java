@@ -42,7 +42,6 @@ public class WorkmatesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("WorkmatesFragment", "onCreateView() called");
         View view = inflater.inflate(R.layout.fragment_workmates, container, false);
         workmatesRecyclerView = view.findViewById(R.id.rv_workmates_list_view);
 
@@ -63,9 +62,7 @@ public class WorkmatesFragment extends Fragment {
         userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
             setAllUsersListForLike(userList);
             workmatesFragmentAdapter.setAllUsersList(userList);
-                    for (User user : userList) {
-                        Log.d("USERAUTH", "User : " + user.getName() + " Restaurant liké " + user.getLikedPlaces() + " url de la photo de l'user : " + user.getPictureUrl());
-                    }
+
 
             if (userList != null && currentUser != null) {
                 // Exclure l'utilisateur connecté de la liste des workmates
@@ -74,7 +71,6 @@ public class WorkmatesFragment extends Fragment {
                 for (User user : userList) {
                     if (!user.getUserId().equals(currentUser.getUserId())) {
                         filteredList.add(user);
-                        Log.d("USERAUTH", "User : " + user.getName() + " Restaurant liké " + user.getLikedPlaces() + " url de la photo de l'user : " + user.getPictureUrl());
                     }
                 }
                 workmatesFragmentAdapter.setfilteredUsersList(filteredList);
@@ -106,6 +102,7 @@ public class WorkmatesFragment extends Fragment {
         workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         workmatesRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
+
     // Méthode de rafraîchissement de la liste des workmates
     private void refreshWorkmatesList() {
         //Rafraichit la liste des workmates
@@ -117,25 +114,16 @@ public class WorkmatesFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        //userViewModel.getUserLiveData().removeObservers(this);
-        //userViewModel.getUserListLiveData().removeObservers(this);
-       // restaurantViewModel.getListRestaurantLiveData().removeObservers(this);
-        Log.d("USERAUTH", "onStop : Workmates Fragment " + currentUser.getName());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("USERAUTH", "onPause : Workmates Fragment " + currentUser.getName());
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //userViewModel.getUserLiveData().removeObservers(this);
-        //userViewModel.getUserListLiveData().removeObservers(this);
-        //restaurantViewModel.getListRestaurantLiveData().removeObservers(this);
-        Log.d("USERAUTH", "onDestroyView : Workmates Fragment " + currentUser.getName());
     }
 
 }

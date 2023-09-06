@@ -31,7 +31,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+
 import com.bumptech.glide.Glide;
+
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.models.Restaurant;
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
     private Restaurant restaurant;
-    private User currentUser;
     private Location currentLocation;
     private String userId;
     private FirebaseAuth firebaseAuth;
@@ -106,18 +107,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupNavigationListener();
         observePermission();
         observeRestaurantsData();
-        Log.d("USERAUTH", "onCreate" + restaurantSelectedIdByUser);
+
 
     }
 
+
     private void checkAuth() {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null) {
             // Utilisateur connecté, récupérer l'ID de l'utilisateur
             userId = firebaseUser.getUid();
-
-            Log.d("USERAUTH", "checkAuth / firebaseUser : " + firebaseUser.getDisplayName() +" " + firebaseUser.getUid() + " "
-                    + " firebaseAuth : " + firebaseAuth.getCurrentUser().getDisplayName());
 
         } else {
             // Utilisateur non connecté, rediriger vers LoginActivity
@@ -137,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             userViewModel.getCurrentUserFromFirestore(userId);
             userViewModel.getUserLiveData().observe(this, user -> {
                 if (user != null && user.getUserId().equals(userId)) {
-                    currentUser = user;
                     displayUserInfo(user);
                     restaurantSelectedIdByUser = user.getSelectedRestaurantId();
                     observeRestaurantSelectedByUser();
@@ -154,9 +152,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurantSelected -> {
                 if (restaurantSelected != null) {
                     restaurant = restaurantSelected;
-                    Log.d("USERAUTH", "observeRestaurantSelectedByUser " + restaurantSelectedIdByUser + " objet restaurant :" + restaurant );
-                    // Maintenant que les données du restaurant sont disponibles, ouvrez les détails du restaurant
-
                 }
             });
         } else {
@@ -167,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void openYourLunchActivityWithSelectedRestaurant() {
         if (restaurant != null) {
             observeRestaurantSelectedByUser();
-
             // Vérifier si l'ID du restaurant sélectionné correspond à restaurantSelectedIdByUser
             if (restaurantSelectedIdByUser != null && restaurantSelectedIdByUser.equals(restaurant.getPlaceId())) {
                 // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
@@ -175,18 +169,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 intent.putExtra("restaurant", restaurant);
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Vous n'avez pas choisi ce restaurant", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.main_activity_no_restaurant_selected, Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(this, "Vous n'avez pas choisi de restaurant", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,  R.string.main_activity_no_restaurant_selected, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void observeWorkmatesData() {
         userViewModel.getWorkmatesListFromFirestore(false);
-        userViewModel.getUserListLiveData().observe(this, userList -> {
-            workmateslist = userList;
-        });
+        userViewModel.getUserListLiveData().observe(this, userList -> workmateslist = userList);
     }
 
     private void setupToolbar() {
@@ -252,6 +244,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     // Configuration des éléments de la barre de navigation inférieure
+    @SuppressLint("NonConstantResourceId")
     private void configureBottomNavItem() {
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             Fragment fragment = null;
@@ -305,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
+
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
@@ -317,9 +311,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.logout_title)
                 .setMessage(R.string.logout_message)
-                .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> {
-                    logOutAndRedirect();
-                })
+                .setPositiveButton(R.string.logout_positive_button, (dialog, which) -> logOutAndRedirect())
                 .setNegativeButton(R.string.logout_negative_button, null)
                 .show();
     }
@@ -392,11 +384,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             restaurantViewModel.getRestaurants(currentLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(this, restaurantListData -> {
                 restaurantslisteLike = restaurantListData;
-                /*for(Restaurant restaurant : restaurantListData){
-                    Log.d("MAINACTIVITYLOCATION", restaurant.getName() + " " + restaurant.getPhone());
-                }*/
-
-                LikesCounter.updateLikesCount(restaurantListData, workmateslist);
+                LikesCounter.updateLikesCount(restaurantslisteLike, workmateslist);
             });
         }
     }
@@ -430,9 +418,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 if (listViewFragment != null) {
                     listViewFragment.filterRestaurantList(newText);
                 }
-                /*if (workmatesFragment != null) {
-                    workmatesFragment.filterWorkmatesList(newText);
-                }*/
                 return true;
             }
         });
@@ -445,14 +430,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onResume();
         observeUserData();
 
-        Log.d("USERAUTH", "onResume : MainActivity ");
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        Log.d("USERAUTH", "onPause : MainActivity ");
     }
 
 
@@ -461,7 +444,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onStop();
         locationPermissionViewModel.stopUpdateLocation();
 
-        Log.d("USERAUTH", "onStop : mainActivity ");
     }
 
     @Override
@@ -470,7 +452,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         userViewModel.logOut();
         userViewModel.getUserLiveData().removeObservers(this);
 
-        Log.d("USERAUTH", "onDestroy : mainActivity " +  firebaseAuth.getCurrentUser());
 
     }
 

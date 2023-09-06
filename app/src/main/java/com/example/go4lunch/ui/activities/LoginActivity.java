@@ -52,8 +52,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void startLoginActivity() {
-        //OAuthProvider.Builder provider = OAuthProvider.newBuilder("twitter.com");
-
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),

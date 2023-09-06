@@ -68,26 +68,19 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
             User user = usersWithRestaurantId.get(position);
             String selectedRestaurantId = user.getSelectedRestaurantId();
             profilePictureUrl = user.getPictureUrl();
-            Log.d("USERAUTH", "1er log / User : " + user.getName() + " url de la photo de l'user : " + user.getPictureUrl());
 
             if (isRestaurantInList(selectedRestaurantId)) {
                 String selectedRestaurantName = getSelectedRestaurantName(user);
-                holder.userNameTextView.setText(user.getName() + " - (" + selectedRestaurantName + ")");
+                holder.userNameTextView.setText(user.getName() +  holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_is_eating_at) + "(" +  selectedRestaurantName + ")");
                 setClickListener(holder.itemView, user);
             } else {
-                holder.userNameTextView.setText(user.getName() + " - (Pas de restaurant choisi)");
+                holder.userNameTextView.setText(user.getName() + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
                 setClickListener(holder.itemView, null);
             }
 
-            Log.d("USERAUTH", "2eme log / User : " + user.getName() + " url de la photo de l'user : " + user.getPictureUrl());
             if (profilePictureUrl != null) {
                 Glide.with(holder.itemView.getContext())
                         .load(profilePictureUrl)
-                        .circleCrop()
-                        .into(holder.workmatesAvatar);
-            }else{
-                Glide.with(holder.itemView.getContext())
-                        .load(R.drawable.avatar)
                         .circleCrop()
                         .into(holder.workmatesAvatar);
             }
@@ -95,18 +88,13 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
             // Affiche les utilisateurs sans restaurant sélectionné ensuite
             int adjustedPosition = position - usersWithRestaurantId.size();
             User user = usersWithoutRestaurantId.get(adjustedPosition);
-            holder.userNameTextView.setText(user.getName() + " - (Pas de restaurant choisi)");
+            holder.userNameTextView.setText(user.getName() + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
             setClickListener(holder.itemView, null);
             profilePictureUrl = user.getPictureUrl();
 
             if (profilePictureUrl != null) {
                 Glide.with(holder.itemView.getContext())
                         .load(profilePictureUrl)
-                        .circleCrop()
-                        .into(holder.workmatesAvatar);
-            }else{
-                Glide.with(holder.itemView.getContext())
-                        .load(R.drawable.avatar)
                         .circleCrop()
                         .into(holder.workmatesAvatar);
             }

@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Go4lunch</string>
+
+    <!-- MAIN ACTIVITY-->
+    <string name="main_activity_no_restaurant_selected">You have not chosen a restaurant</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Go4Lunch</string>
@@ -20,7 +23,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="toolbar_title">toolbar title</string>
-    <string name="nav_header_profilename">Prénom NOM</string>
+    <string name="nav_header_profilename">Firstname Name</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
@@ -37,7 +40,7 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="text_setting">page de settings</string>
+    <string name="text_setting">Settings page</string>
     <string name="facebook_login_btn_txt">SIGN IN WITH FACEBOOK</string>
     <string name="google_login_btn_txt">SIGN IN WITH GOOGLE</string>
     <string name="connection_succeed">Connection succeed !!!</string>
@@ -53,19 +56,33 @@
     <string name="facebook_client_token">10baba866d9c65dcc89fc173ef8e9636</string>
     <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
     <string name="facebook_login_protocol_scheme" translatable="false">fb927722528466481</string>
-    <string name="place_image">Place image</string>
-    <string name="call">call</string>
-    <string name="like">like</string>
-    <string name="website">website</string>
-    <string name="button_to_save_place_choice">Button to save place choice</string>
+
+
+    <!-- YOUR LUNCH ACTIVITY -->
+    <string name="your_lunch_detail_place_image">Place image</string>
+    <string name="your_lunch_detail_call_button">call</string>
+    <string name="your_lunch_detail_like_button">like</string>
+    <string name="your_lunch_detail_website_button">website</string>
+    <string name="your_lunch_detail_select_restaurant_button">Button to save place choice</string>
+    <string name="your_lunch_detail_you_disliked">You removed your like for this restaurant</string>
+    <string name="your_lunch_detail_you_liked">You liked this restaurant</string>
+    <string name="your_lunch_detail_call_permission_needed">Call permission is required to make a call.</string>
+    <string name="your_lunch_detail_no_phone_number">This restaurant does not have a telephone number available.</string>
+
+    <!-- SETTINGS -->
     <string name="delete_title">Delete account</string>
     <string name="delete_message">"Are you sure you want delete your account ? "</string>
+
+    <!-- NOTIFICATION -->
     <string name="notification_channel_id">myCanal</string>
     <string name="notification_channel_title">myTitle</string>
     <string name="notification_channel_description">This is the good channel</string>
+
     <string name="user_avatar">User avatar</string>
     <string name="Search_Description">Search</string>
     <string name="search_title">Search</string>
+
+    <!-- LOCATION PERMISSION -->
     <string name="location_permission_denied">Permission denied !</string>
     <string name="permission_required_toast">Permission required</string>
     <string name="permission_rationale_location">Need permission location</string>
@@ -73,13 +90,19 @@
     <string name="permission_denied_message">To use the app, we need your location. Do you want to enable location now? Otherwise you will be disconnected.</string>
     <string name="permission_denied_positive_button">yes</string>
     <string name="permission_denied_negative_button">no</string>
-    <string name="first_parenthesis">(</string>
-    <string name="workmate_number">2</string>
-    <string name="last_parenthesis">)</string>
-    <string name="place_photo">place_photo</string>
     <string name="need_location_permissions_message">We need your location</string>
 
+    <!-- LISTVIEW FRAGMENT -->
+    <string name="item_list_view_first_parenthesis">(</string>
+    <string name="item_list_view_workmate_number">2</string>
+    <string name="item_list_view_last_parenthesis">)</string>
+    <string name="item_list_view_place_photo">place photo</string>
 
+    <!-- WORKMATES FRAGMENT ADAPTER-->
+    <string name="workmates_fragment_adapter_no_restaurant_selected">" hasn\'t decided yet"</string>
+    <string name="listview_adapter_restaurant_opened">Is Open</string>
+    <string name="listview_adapter_restaurant_closed">Closed</string>
+    <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
 
 
 </resources>

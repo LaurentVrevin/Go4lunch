@@ -8,15 +8,53 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.models.Restaurant;
+import com.example.go4lunch.models.User;
+import com.example.go4lunch.viewmodels.RestaurantViewModel;
+import com.example.go4lunch.viewmodels.UserViewModel;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Objects;
 
 public class MyFirebaseMessagingServices extends FirebaseMessagingService {
+
     private static final String CANAL = "MyNotifCanal";
+
+    private RestaurantViewModel restaurantViewModel;
+    private UserViewModel userViewModel;
+    private User user;
+    private Restaurant restaurant;
+    private String userName;
+    private String restaurantName;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        restaurantViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(RestaurantViewModel.class);
+        userViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(UserViewModel.class);
+
+        user = userViewModel.getUserLiveData().getValue();
+        restaurant = restaurantViewModel.getSelectedRestaurantLiveData().getValue();
+
+        if(user !=null){
+            userName = user.getName();
+        }
+        if (restaurant !=null){
+            restaurantName = restaurant.getName();
+        }
+
+        if(user !=null & restaurant!=null){
+            Log.d("NOTIF", user.getName() + " " + restaurant.getName());
+        }
+
+    }
+
 
 
     @Override
@@ -26,10 +64,13 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
         String myMessage = Objects.requireNonNull(message.getNotification()).getBody();
         Log.d("FirebaseMessage", "Vous avez reçu un message"+ myMessage);
 
+        // Créez le message de notification en incluant le nom de l'utilisateur et le nom du restaurant
+        String notificationMessage = userName + " a choisi le restaurant " + restaurantName + ". ";
+
         //Créer une notification
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CANAL);
         notificationBuilder.setContentTitle("My notif");
-        notificationBuilder.setContentText(myMessage);
+        notificationBuilder.setContentText(notificationMessage);
         notificationBuilder.setSmallIcon(R.drawable.ic_baseline_alarm_24);
 
         //envoyer la notification

@@ -18,7 +18,6 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -166,7 +165,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
             }
         } else {
             // Le restaurant n'a pas de numéro de téléphone
-            Toast.makeText(this, "Ce restaurant n'a pas de numéro de téléphone disponible.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.your_lunch_detail_no_phone_number, Toast.LENGTH_SHORT).show();
         }
     }
     @Override
@@ -178,7 +177,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 callRestaurantPhoneNumber();
             } else {
                 // La permission d'appel a été refusée
-                Toast.makeText(this, "La permission d'appel est nécessaire pour effectuer un appel.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.your_lunch_detail_call_permission_needed, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -219,7 +218,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         userViewModel.getUserLiveData().observe(this, user -> {
             if (user != null) {
                 selectedRestaurantId = user.getSelectedRestaurantId();
-                Log.d("USERAUTH", "YourLunchActivity, observeSelectedRestaurantByUser : " + user.getName() + " " + user.getSelectedRestaurantId());
                 if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
                     setSelectionRestaurantButtonColor(true);
                 } else {
@@ -244,8 +242,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                     placeAddressTextView.setText(restaurant.getAddress());
                     ratingBar.setRating(ratingCount);
                     loadRestaurantImage(restaurant);
-
-
                 }
             });
         }
@@ -273,14 +269,14 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
-                Toast.makeText(this, "Vous avez enlevé le like de ce restaurant", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.your_lunch_detail_you_disliked, Toast.LENGTH_SHORT).show();
 
             } else {
                 likedPlaces.add(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
-                Toast.makeText(this, "Vous avez liké ce restaurant", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.your_lunch_detail_you_liked, Toast.LENGTH_SHORT).show();
 
             }
         }

@@ -71,7 +71,6 @@ public class SettingsActivity extends AppCompatActivity {
             currentUser = user;
             etFirstName.setText(user.getName().split(" ")[0]); // affiche le prénom
             etLastName.setText(user.getName().split(" ")[1]); // affiche le nom
-            Log.d("SETTINGUSERID", "user id is : " + currentUser.getUserId());
         });
 
 
