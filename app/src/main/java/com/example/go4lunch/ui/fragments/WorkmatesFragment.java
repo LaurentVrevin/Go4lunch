@@ -50,7 +50,6 @@ public class WorkmatesFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_workmates_fragment_rv);
         swipeRefreshLayout.setOnRefreshListener(this::refreshWorkmatesList);
 
-
         return view;
     }
 
@@ -63,9 +62,8 @@ public class WorkmatesFragment extends Fragment {
             setAllUsersListForLike(userList);
             workmatesFragmentAdapter.setAllUsersList(userList);
 
-
             if (userList != null && currentUser != null) {
-                // Exclure l'utilisateur connecté de la liste des workmates
+                // Exclude the logged-in user from the list of workmates
                 List<User> filteredList = new ArrayList<>();
 
                 for (User user : userList) {
@@ -74,23 +72,22 @@ public class WorkmatesFragment extends Fragment {
                     }
                 }
                 workmatesFragmentAdapter.setfilteredUsersList(filteredList);
-
             }
         });
+
         restaurantViewModel.getListRestaurantLiveData().observe(getViewLifecycleOwner(), restaurantList -> {
             if (restaurantList != null) {
                 workmatesFragmentAdapter.setRestaurantList(restaurantList);
                 setRestaurantsListforLikes(restaurantList);
             }
         });
-
     }
 
-    private void setAllUsersListForLike(List<User>allUsersListForLike){
+    private void setAllUsersListForLike(List<User> allUsersListForLike) {
         usersList = allUsersListForLike;
     }
 
-    private void setRestaurantsListforLikes(List<Restaurant>allRestaurantsList){
+    private void setRestaurantsListforLikes(List<Restaurant> allRestaurantsList) {
         restaurantList = allRestaurantsList;
     }
 
@@ -98,14 +95,14 @@ public class WorkmatesFragment extends Fragment {
         workmatesFragmentAdapter = new WorkmatesFragmentAdapter(new ArrayList<>(), new ArrayList<>());
         workmatesRecyclerView.setAdapter(workmatesFragmentAdapter);
 
-        // Création d'un DividerItemDecoration
+        // Create a DividerItemDecoration
         workmatesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         workmatesRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
-    // Méthode de rafraîchissement de la liste des workmates
+    // Method to refresh the list of workmates
     private void refreshWorkmatesList() {
-        //Rafraichit la liste des workmates
+        // Refresh the list of workmates
         userViewModel.getWorkmatesListFromFirestore(true);
         LikesCounter.updateLikesCount(restaurantList, usersList);
         swipeRefreshLayout.setRefreshing(false);
@@ -125,6 +122,4 @@ public class WorkmatesFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
-
 }
-

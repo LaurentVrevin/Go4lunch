@@ -20,7 +20,7 @@
     <string name="menu_bottom_mapview">Map View</string>
     <string name="menu_bottom_listview">List View</string>
     <string name="menu_bottom_workmates">Workmates</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="toolbar_title">toolbar title</string>
     <string name="nav_header_profilename">Firstname Name</string>
@@ -58,7 +58,7 @@
     <string name="facebook_login_protocol_scheme" translatable="false">fb927722528466481</string>
 
 
-    <!-- YOUR LUNCH ACTIVITY -->
+    <!-- YOUR LUNCH DETAIL ACTIVITY -->
     <string name="your_lunch_detail_place_image">Place image</string>
     <string name="your_lunch_detail_call_button">call</string>
     <string name="your_lunch_detail_like_button">like</string>
@@ -68,6 +68,9 @@
     <string name="your_lunch_detail_you_liked">You liked this restaurant</string>
     <string name="your_lunch_detail_call_permission_needed">Call permission is required to make a call.</string>
     <string name="your_lunch_detail_no_phone_number">This restaurant does not have a telephone number available.</string>
+
+    <!-- YOUR LUNCH DETAIL ADAPTER -->
+    <string name="your_lunch_detail_workmate_is_joining">" is joining!"</string>
 
     <!-- SETTINGS -->
     <string name="delete_title">Delete account</string>
@@ -98,11 +101,17 @@
     <string name="item_list_view_last_parenthesis">)</string>
     <string name="item_list_view_place_photo">place photo</string>
 
-    <!-- WORKMATES FRAGMENT ADAPTER-->
-    <string name="workmates_fragment_adapter_no_restaurant_selected">" hasn\'t decided yet"</string>
+    <!-- LISTVIEW ADAPTER -->
     <string name="listview_adapter_restaurant_opened">Is Open</string>
     <string name="listview_adapter_restaurant_closed">Closed</string>
-    <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
 
+    <!-- WORKMATES FRAGMENT ADAPTER-->
+    <string name="workmates_fragment_adapter_no_restaurant_selected">" hasn\'t decided yet"</string>
+    <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
+    <string name="settings_delete_account">DELETE ACCOUNT</string>
+    <string name="notification_message_1">"Hello "</string>
+    <string name="notification_message_2">", the restaurant you selected is "</string>
+    <string name="notification_message_3">" and the workmates want to go in this restaurant are "</string>
+    <string name="notification_message_title">Go4Lunch</string>
 
 </resources>

@@ -28,8 +28,6 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
     private List<User> workmatesList;
     private List<Restaurant> restaurantList;
     private String profilePictureUrl;
-
-
     List<User> usersWithRestaurantId = new ArrayList<>();
     List<User> usersWithoutRestaurantId = new ArrayList<>();
 
@@ -39,7 +37,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         updateUsersLists();
     }
 
-    // Met à jour les listes des utilisateurs ayant un restaurant sélectionné ou non
+    // Update the lists of users with a selected restaurant or without
     private void updateUsersLists() {
         usersWithRestaurantId.clear();
         usersWithoutRestaurantId.clear();
@@ -63,7 +61,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull WorkmatesFragmentViewHolder holder, int position) {
-        // Affiche les utilisateurs avec restaurant sélectionné en premier
+        // Display users with a selected restaurant first
         if (!usersWithRestaurantId.isEmpty() && position < usersWithRestaurantId.size()) {
             User user = usersWithRestaurantId.get(position);
             String selectedRestaurantId = user.getSelectedRestaurantId();
@@ -71,10 +69,10 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
 
             if (isRestaurantInList(selectedRestaurantId)) {
                 String selectedRestaurantName = getSelectedRestaurantName(user);
-                holder.userNameTextView.setText(user.getName() +  holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_is_eating_at) + "(" +  selectedRestaurantName + ")");
+                holder.userNameTextView.setText(user.getName().split(" ")[0] + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_is_eating_at) + "(" + selectedRestaurantName + ")");
                 setClickListener(holder.itemView, user);
             } else {
-                holder.userNameTextView.setText(user.getName() + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
+                holder.userNameTextView.setText(user.getName().split(" ")[0] + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
                 setClickListener(holder.itemView, null);
             }
 
@@ -85,10 +83,10 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
                         .into(holder.workmatesAvatar);
             }
         } else {
-            // Affiche les utilisateurs sans restaurant sélectionné ensuite
+            // Display users without a selected restaurant next
             int adjustedPosition = position - usersWithRestaurantId.size();
             User user = usersWithoutRestaurantId.get(adjustedPosition);
-            holder.userNameTextView.setText(user.getName() + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
+            holder.userNameTextView.setText(user.getName().split(" ")[0] + holder.itemView.getContext().getString(R.string.workmates_fragment_adapter_no_restaurant_selected));
             setClickListener(holder.itemView, null);
             profilePictureUrl = user.getPictureUrl();
 
@@ -100,7 +98,8 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
             }
         }
     }
-    // Vérifie si le restaurant choisi par le workmate existe dans la liste de restaurants
+
+    // Check if the restaurant chosen by the workmate exists in the list of restaurants
     private boolean isRestaurantInList(String restaurantId) {
         for (Restaurant restaurant : restaurantList) {
             if (restaurant.getPlaceId().equals(restaurantId)) {
@@ -110,7 +109,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         return false;
     }
 
-    // Récupère le nom du restaurant sélectionné par un utilisateur
+    // Get the name of the restaurant selected by a user
     private String getSelectedRestaurantName(User user) {
         String selectedRestaurantId = user.getSelectedRestaurantId();
         for (Restaurant restaurant : restaurantList) {
@@ -121,7 +120,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         return "";
     }
 
-    // Définit le click listener pour un utilisateur
+    // Set the click listener for a user
     private void setClickListener(View itemView, User user) {
         itemView.setOnClickListener(view -> {
             if (user != null) {
@@ -132,7 +131,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         });
     }
 
-    // Récupère le restaurant sélectionné par un utilisateur
+    // Get the restaurant selected by a user
     private Restaurant getSelectedRestaurant(User user) {
         String selectedRestaurantId = user.getSelectedRestaurantId();
         for (Restaurant restaurant : restaurantList) {
@@ -173,6 +172,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
         updateUsersLists();
         notifyDataSetChanged();
     }
+
     @SuppressLint("NotifyDataSetChanged")
     public void setAllUsersList(List<User> allUsersList) {
         LikesCounter.updateLikesCount(restaurantList, allUsersList);

@@ -39,8 +39,6 @@ public class LocationRepository implements LocationInterface {
         return 500;
     }
 
-    //je lui passe en paramètre la position du device, pour le moment je la prédéfinis.
-    // Je verrais ensuite pour récupérer directement celle du device
     @Override
     public Location getCurrentLocation() {
         Location deviceLocation = new Location((USER_POSITION));
@@ -49,38 +47,38 @@ public class LocationRepository implements LocationInterface {
         return deviceLocation;
     }
 
-    // Renvoie la localisation courante sous forme d'un objet LiveData
+    // Returns the current location as a LiveData object
     public LiveData<Location> getLiveDataCurrentLocation() {
         return locationMutableLiveData;
     }
 
     @SuppressLint("MissingPermission")
-    // Démarre la récupération de la localisation en utilisant les services de localisation de Google Play
+    // Start location retrieval using Google Play location services
     public void startLocationRequest(Context context, Activity activity) {
-        // Instantiation du client FusedLocationProviderClient
+        // Instantiate the FusedLocationProviderClient
         instantiateFusedLocationProviderClient(context);
 
-        // Configuration de la demande de localisation
+        // Configure the location request
         setupLocationRequest();
 
-        // Création du rappel pour recevoir les mises à jour de localisation
+        // Create a callback to receive location updates
         createLocationCallback();
 
-        // Démarre la mise à jour de la localisation
+        // Start location updates
         startLocationUpdates(activity);
     }
 
-    // Arrête la mise à jour de la localisation
+    // Stop location updates
     public void stopLocationUpdates() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    // Instantiation de FusedLocationProviderClient
+    // Instantiate FusedLocationProviderClient
     private void instantiateFusedLocationProviderClient(Context context) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
     }
 
-    // Configuration de la demande de localisation
+    // Configure the location request
     private void setupLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(LOCATION_REQUEST_PROVIDER_IN_MS);
@@ -88,7 +86,7 @@ public class LocationRepository implements LocationInterface {
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    // Création du rappel pour recevoir les mises à jour de localisation
+    // Create a callback to receive location updates
     public void createLocationCallback() {
         locationCallback = new LocationCallback() {
             @Override
@@ -99,7 +97,7 @@ public class LocationRepository implements LocationInterface {
                     return;
                 }
 
-                // Parcours les emplacements reçus et met à jour la valeur de locationMutableLiveData avec la dernière localisation
+                // Iterate through the received locations and update the value of locationMutableLiveData with the latest location
                 for (Location location : locationResult.getLocations()) {
                     locationMutableLiveData.setValue(location);
                 }
@@ -107,25 +105,11 @@ public class LocationRepository implements LocationInterface {
         };
     }
 
-    // Démarre la mise à jour de la localisation
+    // Start location updates
     @SuppressLint("MissingPermission")
     private void startLocationUpdates(Activity activity) {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest,
                 locationCallback,
                 Looper.getMainLooper());
     }
-
-
-    //ANCIEN CODE
-    /*
-    private MutableLiveData<LatLng>userLocation = new MutableLiveData<>();
-    @Override
-    public void updateUserLocation(LatLng location) {
-        userLocation.setValue(location);
-    }
-
-    @Override
-    public MutableLiveData<LatLng> getUserLocation() {
-        return userLocation;
-    }*/
 }

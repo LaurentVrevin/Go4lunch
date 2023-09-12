@@ -24,6 +24,4 @@ public class MyApplication extends Application {
         return firestoreInstance;
     }
 
-    //pour rappel je pourrais récupérer cette instance avec :
-    // "FirebaseFirestore firestore = ((MyApplication) getApplication()).getFirestoreInstance();"
 }

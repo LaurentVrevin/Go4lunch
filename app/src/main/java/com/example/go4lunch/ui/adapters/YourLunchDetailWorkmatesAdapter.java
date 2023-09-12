@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +36,11 @@ public class YourLunchDetailWorkmatesAdapter extends RecyclerView.Adapter<YourLu
         return new YourLunchDetailWorkmatesViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull YourLunchDetailWorkmatesViewHolder holder, int position) {
         User user = workmatesList.get(position);
-        holder.userNameTextView.setText(user.getName() + " is joigning");
+        holder.userNameTextView.setText(user.getName().split(" ")[0] + holder.itemView.getContext().getString(R.string.your_lunch_detail_workmate_is_joining));
         String profilePictureUrl = user.getPictureUrl();
         if (profilePictureUrl != null) {
             Glide.with(holder.itemView.getContext())

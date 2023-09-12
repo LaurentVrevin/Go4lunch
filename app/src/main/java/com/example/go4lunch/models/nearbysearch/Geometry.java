@@ -3,8 +3,6 @@ package com.example.go4lunch.models.nearbysearch;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-/* "Geometry" sera utilisée pour représenter les informations de géométrie dans la réponse de la recherche à proximité */
-
 public class Geometry {
     @SerializedName("location")
     @Expose

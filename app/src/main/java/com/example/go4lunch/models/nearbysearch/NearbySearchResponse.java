@@ -6,8 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-// "NearbySearchResponse" sera utilisée pour représenter la réponse de la recherche à proximité dans l'API Google Places
-// Elle comprend toutes les infos retrounées par l'api via la requête
+
 public class NearbySearchResponse {
     @SerializedName("html_attributions")
     @Expose

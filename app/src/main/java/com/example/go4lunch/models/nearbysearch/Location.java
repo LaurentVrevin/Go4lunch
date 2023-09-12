@@ -3,7 +3,6 @@ package com.example.go4lunch.models.nearbysearch;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// "Location" sera utilisée pour représenter les coordonnées de localisation dans la réponse de la recherche à proximité
 public class Location {
     @SerializedName("lat")
     @Expose

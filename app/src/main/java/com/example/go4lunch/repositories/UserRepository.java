@@ -105,7 +105,7 @@ public class UserRepository implements UserInterface {
         FirebaseUser firebaseUser = getCurrentFirebaseUser();
 
         if (firebaseUser != null) {
-            userCollection.document(userId).get().addOnCompleteListener(task -> {
+            userCollection.document(firebaseUser.getUid()).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null) {
                     User user = task.getResult().toObject(User.class);
                     if (user != null) {

@@ -11,7 +11,7 @@ import com.example.go4lunch.repositories.PermissionRepository;
 @InstallIn(ViewModelComponent.class)
 @Module
 public abstract class PermissionModule {
-    //Je lie PermissionRepository à PermissionInterface, ça me permettra de faciliter l'injection
+    // I bind PermissionRepository to PermissionInterface, which will make injection easier for me.
     @Binds
     public abstract PermissionInterface bindPermissionInterface(PermissionRepository permissionRepository);
 }

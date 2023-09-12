@@ -55,7 +55,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MyFirebaseMessagingServices"
+        <service android:name=".notificationmanager.MyFirebaseMessagingServices"
             android:exported="true"
             tools:ignore="MissingClass">
             <intent-filter>

@@ -20,7 +20,6 @@ import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
 import com.example.go4lunch.models.User;
 import com.example.go4lunch.viewmodels.UserViewModel;
 
@@ -42,7 +41,6 @@ public class SettingsActivity extends AppCompatActivity {
     private int radius;
     private int currentRadius;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +50,8 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        // Initialisation des vues
+
+        // Initialize views
         etFirstName = findViewById(R.id.editTextFirstName);
         etLastName = findViewById(R.id.editTextLastName);
         btnDelete = findViewById(R.id.buttonDeleteAccount);
@@ -60,22 +59,21 @@ public class SettingsActivity extends AppCompatActivity {
         txtviewRadius = findViewById(R.id.txtviewRadius);
         btnOk = findViewById(R.id.buttonOk);
 
-        // Récupération de l'utilisateur actuellement connecté
+        // Get the currently logged-in user
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
+        // Configure ViewModels
         configureViewModels();
-        // Initialisation du ViewModel
 
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
-            etFirstName.setText(user.getName().split(" ")[0]); // affiche le prénom
-            etLastName.setText(user.getName().split(" ")[1]); // affiche le nom
+            etFirstName.setText(user.getName().split(" ")[0]); // Display the first name
+            etLastName.setText(user.getName().split(" ")[1]); // Display the last name
         });
 
-
         btnOk.setOnClickListener(view -> {
-
+            // Add your action here when the "Ok" button is clicked
         });
 
         btnDelete.setOnClickListener(view -> {
@@ -86,19 +84,17 @@ public class SettingsActivity extends AppCompatActivity {
     private void configureViewModels() {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         userViewModel.getCurrentUserFromFirestore(mAuth.getCurrentUser().getUid());
-
-
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        // Retour à l'activité précédente quand on clique sur le bouton de retour de la Toolbar
+        // Return to the previous activity when the Toolbar's back button is clicked
         onBackPressed();
         return true;
     }
 
     public void deleteUser(String userId) {
-        // Supprimer l'utilisateur de Firebase Authentication
+        // Delete the user from Firebase Authentication
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.delete_title)
                 .setMessage(R.string.delete_message)
@@ -113,5 +109,4 @@ public class SettingsActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.logout_negative_button, null)
                 .show();
     }
-
 }

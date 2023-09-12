@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-//Photo est utilisée pour représenter une photo associée à un résultat de recherche à proximité.
 public class Photo implements Parcelable {
     @SerializedName("height")
     @Expose

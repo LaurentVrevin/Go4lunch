@@ -10,7 +10,7 @@ import com.example.go4lunch.repositories.LocationRepository;
 @InstallIn(SingletonComponent.class)
 @Module
 public abstract class LocationModule {
-    //Je lie LocationRepository à LocationInterface
+
     @Binds
     public abstract LocationInterface bindLocationInterface(LocationRepository locationRepository);
 }

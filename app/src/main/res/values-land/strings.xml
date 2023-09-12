@@ -1,9 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="nav_header_profilename">Prénom NOM</string>
-    <string name="text_setting">page de settings</string>
-    <string name="avatarsize_header_width">100</string>
-    <string name="avatarsize_header_height">50</string>
+    <string name="app_name">Go4lunch</string>
+
+    <!-- MAIN ACTIVITY-->
+    <string name="main_activity_no_restaurant_selected">You have not chosen a restaurant</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Go4Lunch</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_your_lunch">YOUR LUNCH</string>
+    <string name="menu_settings">SETTINGS</string>
+    <string name="menu_logout">LOGOUT</string>
+    <string name="menu_mapview">MAPVIEW</string>
+    <string name="menu_listview">LISTVIEW</string>
+    <string name="menu_workmates">WORKMATES</string>
+    <!-- BOTTOM MENU STRING-->
+    <string name="menu_bottom_mapview">Map View</string>
+    <string name="menu_bottom_listview">List View</string>
+    <string name="menu_bottom_workmates">Workmates</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="toolbar_title">toolbar title</string>
+    <string name="nav_header_profilename">Firstname Name</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="text_setting">Settings page</string>
     <string name="facebook_login_btn_txt">SIGN IN WITH FACEBOOK</string>
     <string name="google_login_btn_txt">SIGN IN WITH GOOGLE</string>
     <string name="connection_succeed">Connection succeed !!!</string>
@@ -14,18 +52,41 @@
     <string name="logout_message">Are you sure you want to logout ?</string>
     <string name="logout_positive_button">Yes</string>
     <string name="logout_negative_button">No</string>
+
+    <string name="facebook_application_id" translatable="false">927722528466481</string>
+    <string name="facebook_client_token">10baba866d9c65dcc89fc173ef8e9636</string>
+    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb927722528466481</string>
+
+
+    <!-- YOUR LUNCH DETAIL ACTIVITY -->
     <string name="your_lunch_detail_place_image">Place image</string>
     <string name="your_lunch_detail_call_button">call</string>
     <string name="your_lunch_detail_like_button">like</string>
+    <string name="your_lunch_detail_website_button">website</string>
     <string name="your_lunch_detail_select_restaurant_button">Button to save place choice</string>
-    <string name="delete_title">delete_title</string>
-    <string name="delete_message">"Are you sure to want delete your account ? "</string>
+    <string name="your_lunch_detail_you_disliked">You removed your like for this restaurant</string>
+    <string name="your_lunch_detail_you_liked">You liked this restaurant</string>
+    <string name="your_lunch_detail_call_permission_needed">Call permission is required to make a call.</string>
+    <string name="your_lunch_detail_no_phone_number">This restaurant does not have a telephone number available.</string>
+
+    <!-- YOUR LUNCH DETAIL ADAPTER -->
+    <string name="your_lunch_detail_workmate_is_joining">" is joining!"</string>
+
+    <!-- SETTINGS -->
+    <string name="delete_title">Delete account</string>
+    <string name="delete_message">"Are you sure you want delete your account ? "</string>
+
+    <!-- NOTIFICATION -->
     <string name="notification_channel_id">myCanal</string>
     <string name="notification_channel_title">myTitle</string>
     <string name="notification_channel_description">This is the good channel</string>
+
     <string name="user_avatar">User avatar</string>
     <string name="Search_Description">Search</string>
     <string name="search_title">Search</string>
+
+    <!-- LOCATION PERMISSION -->
     <string name="location_permission_denied">Permission denied !</string>
     <string name="permission_required_toast">Permission required</string>
     <string name="permission_rationale_location">Need permission location</string>
@@ -33,18 +94,25 @@
     <string name="permission_denied_message">To use the app, we need your location. Do you want to enable location now? Otherwise you will be disconnected.</string>
     <string name="permission_denied_positive_button">yes</string>
     <string name="permission_denied_negative_button">no</string>
+    <string name="need_location_permissions_message">We need your location</string>
+
+    <!-- LISTVIEW FRAGMENT -->
     <string name="item_list_view_first_parenthesis">(</string>
     <string name="item_list_view_workmate_number">2</string>
     <string name="item_list_view_last_parenthesis">)</string>
-    <string name="item_list_view_place_photo">place_photo</string>
-    <string name="need_location_permissions_message">We need your location</string>
-    <string name="workmates_fragment_adapter_no_restaurant_selected">- (no restaurant selected)</string>
-    <string name="your_lunch_detail_you_disliked">You removed your like for this restaurant</string>
-    <string name="your_lunch_detail_you_liked">You liked this restaurant</string>
-    <string name="your_lunch_detail_call_permission_needed">Call permission is required to make a call.</string>
-    <string name="your_lunch_detail_no_phone_number">This restaurant does not have a telephone number available.</string>
-    <string name="main_activity_no_restaurant_selected">You have not chosen a restaurant</string>
-    <string name="listview_adapter_restaurant_opened">Open</string>
+    <string name="item_list_view_place_photo">place photo</string>
+
+    <!-- LISTVIEW ADAPTER -->
+    <string name="listview_adapter_restaurant_opened">Is Open</string>
     <string name="listview_adapter_restaurant_closed">Closed</string>
+
+    <!-- WORKMATES FRAGMENT ADAPTER-->
+    <string name="workmates_fragment_adapter_no_restaurant_selected">" hasn\'t decided yet"</string>
     <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
+    <string name="settings_delete_account">DELETE ACCOUNT</string>
+    <string name="notification_message_1">"Hello "</string>
+    <string name="notification_message_2">", the restaurant you selected is "</string>
+    <string name="notification_message_3">" and the workmates want to go in this restaurant are "</string>
+    <string name="notification_message_title">Go4Lunch</string>
+
 </resources>

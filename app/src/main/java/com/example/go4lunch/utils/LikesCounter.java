@@ -11,14 +11,19 @@ import java.util.Map;
 
 public class LikesCounter {
     public static void updateLikesCount(List<Restaurant> restaurantList, List<User> userList) {
+
+        if (restaurantList == null || userList == null) {
+            // One of the lists is null, do not perform the update
+            return;
+        }
         Map<String, Integer> likesCountMap = new HashMap<>();
 
-        // Initialiser la map avec des compteurs de likes à zéro pour chaque restaurant
+        // Initialize the map with like counters set to zero for each restaurant
         for (Restaurant restaurant : restaurantList) {
             likesCountMap.put(restaurant.getPlaceId(), 0);
         }
 
-        // Parcourir la liste des utilisateurs
+        // Iterate through the list of users
         for (User user : userList) {
             List<String> likedPlaces = user.getLikedPlaces();
 
@@ -38,17 +43,17 @@ public class LikesCounter {
 
         }
 
-        // Mettre à jour les compteurs de likes des restaurants dans la liste
+        // Update the like counters of the restaurants in the list
         for (Restaurant restaurant : restaurantList) {
             String restaurantId = restaurant.getPlaceId();
             if (likesCountMap.containsKey(restaurantId)) {
                 int likesCount = likesCountMap.get(restaurantId);
                 restaurant.setLikesCount(likesCount);
 
-                // Calculer la note en étoiles en fonction des likes
+                // Calculate star rating based on likes
                 float rating = calculateRatingFromLikesPercentage(likesCount, userList.size());
                 restaurant.setRating(rating);
-                Log.d("LIKES_COUNTER", "Restaurant: " + restaurant.getName() + " " + restaurant.getPlaceId() + " " + " - Likes: " + likesCount + " étoiles :" + restaurant.getRating());
+                Log.d("LIKES_COUNTER", "Restaurant: " + restaurant.getName() + " " + restaurant.getPlaceId() + " " + " - Likes: " + likesCount + " Stars:" + restaurant.getRating());
             } else {
                 restaurant.setLikesCount(0);
                 restaurant.setLikesCount(0);
@@ -62,14 +67,13 @@ public class LikesCounter {
         float likesPercentage = (float) totalLikes / totalUsers * 100;
 
         if (likesPercentage >= 66) {
-            return 3.0f; // 3 étoiles
+            return 3.0f; // 3 stars
         } else if (likesPercentage >= 33) {
-            return 2.0f; // 2 étoiles
+            return 2.0f; // 2 stars
         } else if (likesPercentage >= 1) {
-            return 1.0f; // 1 étoile
+            return 1.0f; // 1 star
         } else {
-            return 0.0f; // 0 étoile
+            return 0.0f; // 0 star
         }
     }
 }
-

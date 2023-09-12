@@ -1,12 +1,11 @@
 package com.example.go4lunch.ui.activities;
 
-
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,10 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -30,10 +27,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-
-
 import com.bumptech.glide.Glide;
-
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.models.Restaurant;
@@ -45,20 +39,20 @@ import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.List;
-
 import dagger.hilt.android.AndroidEntryPoint;
 import pub.devrel.easypermissions.EasyPermissions;
 
-
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
-
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private DrawerLayout drawer;
     private NavigationView navigationView;
@@ -77,14 +71,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Restaurant restaurant;
     private Location currentLocation;
     private String userId;
+    private String restaurantName;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
     private ImageView imvProfilePhoto;
-
     private String restaurantSelectedIdByUser;
     private List<User> workmateslist;
     private List<Restaurant> restaurantslisteLike;
-
+    private String restaurantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,19 +101,38 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupNavigationListener();
         observePermission();
         observeRestaurantsData();
-
+        //getToken();
 
     }
 
+    private void getToken(){
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("TOKEN", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+                        // Log and toast
+                        String msg = "le token est : " + token;
+                        Log.d("TOKEN", msg);
+                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
     private void checkAuth() {
         firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null) {
-            // Utilisateur connecté, récupérer l'ID de l'utilisateur
+            // User is logged in, retrieve the user ID
             userId = firebaseUser.getUid();
-
         } else {
-            // Utilisateur non connecté, rediriger vers LoginActivity
+            // User is not logged in, redirect to LoginActivity
             redirectToLogin();
         }
     }
@@ -128,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         locationPermissionViewModel = new ViewModelProvider(this).get(LocationPermissionViewModel.class);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-
     }
 
     private void observeUserData() {
@@ -144,14 +156,23 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
+
     private void observeRestaurantSelectedByUser() {
         if (restaurantSelectedIdByUser != null) {
-
-            // Récupérez le restaurant sélectionné en utilisant restaurantSelectedIdByUser
+            // Get the selected restaurant using restaurantSelectedIdByUser
             restaurantViewModel.getRestaurantById(restaurantSelectedIdByUser);
             restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurantSelected -> {
                 if (restaurantSelected != null) {
                     restaurant = restaurantSelected;
+                    restaurantName = restaurant.getName();
+                    restaurantId = restaurant.getPlaceId();
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                    editor.putString("restaurant_name", restaurantName);
+                    editor.putString("restaurant_Id", restaurantId);
+                    editor.putString("user_id", userId);
+                    editor.apply();
                 }
             });
         } else {
@@ -162,9 +183,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private void openYourLunchActivityWithSelectedRestaurant() {
         if (restaurant != null) {
             observeRestaurantSelectedByUser();
-            // Vérifier si l'ID du restaurant sélectionné correspond à restaurantSelectedIdByUser
+            // Check if the selected restaurant's ID matches restaurantSelectedIdByUser
             if (restaurantSelectedIdByUser != null && restaurantSelectedIdByUser.equals(restaurant.getPlaceId())) {
-                // Ouvrir YourLunchDetailActivity avec le restaurant sélectionné
+                // Open YourLunchDetailActivity with the selected restaurant
                 Intent intent = new Intent(MainActivity.this, YourLunchDetailActivity.class);
                 intent.putExtra("restaurant", restaurant);
                 startActivity(intent);
@@ -172,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Toast.makeText(this, R.string.main_activity_no_restaurant_selected, Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(this,  R.string.main_activity_no_restaurant_selected, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.main_activity_no_restaurant_selected, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -243,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         });
     }
 
-    // Configuration des éléments de la barre de navigation inférieure
+    // Configuration of bottom navigation bar items
     @SuppressLint("NonConstantResourceId")
     private void configureBottomNavItem() {
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
@@ -253,14 +274,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     fragment = mapViewFragment;
                     break;
                 case R.id.nav_listview:
-                    // Lorsque l'utilisateur clique sur l'élément "List view", on affiche le fragment ListViewFragment
+                    // When the user clicks on "List view", display the ListViewFragment
                     if (listViewFragment == null) {
                         listViewFragment = new ListViewFragment();
                     }
                     fragment = listViewFragment;
                     break;
                 case R.id.nav_workmates:
-                    // Lorsque l'utilisateur clique sur l'élément "Workmates", on affiche le fragment WorkmatesFragment
+                    // When the user clicks on "Workmates", display the WorkmatesFragment
                     if (workmatesFragment == null) {
                         workmatesFragment = new WorkmatesFragment();
                     }
@@ -278,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @SuppressLint("SetTextI18n")
     private void displayUserInfo(User user) {
-        // Si les données de l'utilisateur ne sont pas nulles, les affiche dans les TextView correspondants
+        // If user data is not null, display it in the corresponding TextViews
         if (user != null) {
             tvUserName.setText(user.getName());
             tvUserEmail.setText(user.getEmail());
@@ -298,14 +319,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
-
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration) || super.onSupportNavigateUp();
     }
-
-
-
 
     private void showLogoutConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -315,7 +332,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .setNegativeButton(R.string.logout_negative_button, null)
                 .show();
     }
-    //PERMISSION
+
+    // PERMISSION
 
     private void checkPermission(Boolean hasPermission) {
         if (hasPermission) {
@@ -328,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     public void requestPermission() {
-
         EasyPermissions.requestPermissions(
                 this,
                 getString(R.string.permission_rationale_location),
@@ -356,7 +373,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void logOutAndRedirect() {
         userViewModel.logOut();
         redirectToLogin();
-
     }
 
     @Override
@@ -365,7 +381,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
-    //LOCATION
+    // LOCATION
 
     private void observeLocation() {
         locationPermissionViewModel.startUpdateLocation(this, this);
@@ -390,7 +406,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void redirectToLogin() {
-
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -400,13 +415,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search_right);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Ne rien faire ici, car nous voulons gérer la recherche en temps réel
+                // Do nothing here as we want to handle real-time search
                 return false;
             }
 
@@ -421,7 +435,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 return true;
             }
         });
-
         return true;
     }
 
@@ -429,13 +442,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onResume() {
         super.onResume();
         observeUserData();
+        Log.d("CYCLEDEVIE", "on Resume");
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
+        Log.d("CYCLEDEVIE", "on Pause");
     }
 
 
@@ -443,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     public void onStop() {
         super.onStop();
         locationPermissionViewModel.stopUpdateLocation();
-
+        Log.d("CYCLEDEVIE", "on Stope");
     }
 
     @Override
@@ -451,9 +465,5 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onDestroy();
         userViewModel.logOut();
         userViewModel.getUserLiveData().removeObservers(this);
-
-
     }
-
-
 }

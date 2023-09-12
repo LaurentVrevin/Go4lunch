@@ -3,7 +3,7 @@ package com.example.go4lunch.models.nearbysearch;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// "Northeast" sera utilisée pour représenter les coordonnées géographiques nord-est d'une région
+
 public class Northeast {
     @SerializedName("lat")
     @Expose

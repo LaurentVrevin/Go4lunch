@@ -1,7 +1,5 @@
 package com.example.go4lunch.ui.fragments;
 
-
-
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -41,17 +40,16 @@ public class ListViewFragment extends Fragment {
     private List<User> usersList;
     private Location location;
     private User currentUser;
-    private RecyclerView recyclerView;
+    private RecyclerView listviewRecyclerView;
     private ListViewAdapter listViewAdapter;
     private UserViewModel userViewModel;
     private SwipeRefreshLayout swipeRefreshLayout;
-
 
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_listview, container, false);
-        recyclerView = view.findViewById(R.id.rv_list_view);
+        listviewRecyclerView = view.findViewById(R.id.rv_list_view);
         configureViewModels();
         configureRecyclerView();
 
@@ -62,8 +60,11 @@ public class ListViewFragment extends Fragment {
 
     private void configureRecyclerView() {
         listViewAdapter = new ListViewAdapter(restaurantListData, location, workmatesListData);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(listViewAdapter);
+        listviewRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        listviewRecyclerView.setAdapter(listViewAdapter);
+        // Create a DividerItemDecoration
+        listviewRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        listviewRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -79,7 +80,6 @@ public class ListViewFragment extends Fragment {
         userViewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
             currentUser = user;
         });
-
     }
 
     private void observePermission() {
@@ -93,18 +93,16 @@ public class ListViewFragment extends Fragment {
 
             userViewModel.getUserListLiveData().observe(getViewLifecycleOwner(), userList -> {
                 if (userList != null && currentUser != null) {
-                        // Exclure l'utilisateur connecté de la liste des workmates
-                        List<User> filteredWorkmatesList = new ArrayList<>();
+                    // Exclude the logged-in user from the list of workmates
+                    List<User> filteredWorkmatesList = new ArrayList<>();
 
-                        for (User user : userList) {
-                            if (!user.getUserId().equals(currentUser.getUserId())) {
-                                filteredWorkmatesList.add(user);
-                            }
+                    for (User user : userList) {
+                        if (!user.getUserId().equals(currentUser.getUserId())) {
+                            filteredWorkmatesList.add(user);
                         }
+                    }
                     listViewAdapter.setAllUsersList(userList);
                     updateWorkmatesList(filteredWorkmatesList, userList);
-
-
                 }
             });
         }
@@ -119,13 +117,12 @@ public class ListViewFragment extends Fragment {
         }
     }
 
-    private void updateWorkmatesList(List<User> filteredWorkmatesList, List<User>allUsersList){
+    private void updateWorkmatesList(List<User> filteredWorkmatesList, List<User> allUsersList) {
         workmatesListData = filteredWorkmatesList;
         usersList = allUsersList;
-        if(listViewAdapter != null){
+        if (listViewAdapter != null) {
             listViewAdapter.setWorkmatesList(workmatesListData);
             listViewAdapter.setAllUsersList(usersList);
-
             listViewAdapter.notifyDataSetChanged();
         }
     }
@@ -136,7 +133,7 @@ public class ListViewFragment extends Fragment {
         }
     }
 
-    //SEARCH
+    // SEARCH
     public void filterRestaurantList(String query) {
         List<Restaurant> filteredList = new ArrayList<>();
 
@@ -149,12 +146,12 @@ public class ListViewFragment extends Fragment {
         listViewAdapter.setRestaurantList(filteredList);
         listViewAdapter.notifyDataSetChanged();
     }
+
     private void refreshListView() {
-        //Rafraichit la liste des workmates
+        // Refresh the list of workmates
         userViewModel.getWorkmatesListFromFirestore(true);
         LikesCounter.updateLikesCount(restaurantListData, usersList);
-        // Stop l'animation
+        // Stop the animation
         swipeRefreshLayout.setRefreshing(false);
     }
-
 }

@@ -14,10 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -74,6 +76,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;
     private String selectedRestaurantId;
 
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +95,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
 
     }
 
-
-    // Initialisation
+    // Initialization
     private void initializeViews() {
         placeImageView = findViewById(R.id.im_detail_place);
         placeNameTextView = findViewById(R.id.tv_detail_restaurant_name);
@@ -110,7 +112,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private void setupFirebaseAuth() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
-
     }
 
     // ViewModels
@@ -124,7 +125,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         });
     }
 
-    // Barre d'outils
+    // Toolbar
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.tb_toolbar);
         setSupportActionBar(toolbar);
@@ -135,7 +136,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Actions des boutons
+    // Button Actions
     private void setupButtonActions() {
         fabDetailChoice.setOnClickListener(view -> updateUserSelectedRestaurant());
         buttonRestaurantLike.setOnClickListener(view -> updateUserLikedPlace());
@@ -144,39 +145,41 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     }
 
     private void openRestaurantWebsite() {
-        // Ouvrir le site web du restaurant dans le navigateur par défaut
+        // Open the restaurant's website in the default browser
         String websiteUrl = Objects.requireNonNull(restaurantViewModel.getSelectedRestaurantLiveData().getValue()).getWebsiteUrl();
         Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteUrl));
         startActivity(webIntent);
     }
+
     private void callRestaurantPhoneNumber() {
         String phoneNumber = restaurant.getPhone();
         if (phoneNumber != null && !phoneNumber.isEmpty()) {
-            // Créer une intention pour l'action d'appel
+            // Create an intent for the call action
             Intent callIntent = new Intent(Intent.ACTION_CALL);
             callIntent.setData(Uri.parse("tel:" + phoneNumber));
 
-            // Vérifier si l'application a la permission CALL_PHONE
+            // Check if the app has CALL_PHONE permission
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                 startActivity(callIntent);
             } else {
-                // Demander la permission d'appel si elle n'est pas accordée
+                // Request call permission if not granted
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, CALL_PERMISSION_REQUEST_CODE);
             }
         } else {
-            // Le restaurant n'a pas de numéro de téléphone
+            // The restaurant doesn't have a phone number
             Toast.makeText(this, R.string.your_lunch_detail_no_phone_number, Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CALL_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // La permission d'appel a été accordée
+                // Call permission granted
                 callRestaurantPhoneNumber();
             } else {
-                // La permission d'appel a été refusée
+                // Call permission denied
                 Toast.makeText(this, R.string.your_lunch_detail_call_permission_needed, Toast.LENGTH_SHORT).show();
             }
         }
@@ -199,20 +202,36 @@ public class YourLunchDetailActivity extends AppCompatActivity {
         userViewModel.getUserListLiveData().observe(this, userList -> {
             if (userList != null) {
                 this.workmatesList = userList;
-                // Filtrer et obtenir la liste des collègues ayant choisi le même restaurant
+                // Filter and get the list of workmates who selected the same restaurant
                 List<User> filteredList = new ArrayList<>();
                 for (User user : workmatesList) {
-                        if (!user.getUserId().equals(currentUser.getUserId())
-                                && user.getSelectedRestaurantId() != null
-                                && user.getSelectedRestaurantId().equals(restaurantId)) {
+                    if (!user.getUserId().equals(currentUser.getUserId())
+                            && user.getSelectedRestaurantId() != null
+                            && user.getSelectedRestaurantId().equals(restaurantId)) {
                         filteredList.add(user);
                     }
                 }
                 workmatesListViewAdapter.setWorkmatesList(filteredList);
-
+                // Sauvegardez la liste filtrée dans SharedPreferences
+                List<String> workmateNamesList = new ArrayList<>();
+                for (User user : filteredList) {
+                    workmateNamesList.add(user.getName());
+                }
+                // Convert the list of names to a single string with a separator
+                String workmateNames = TextUtils.join(", ", workmateNamesList);
+                // Save the string to SharedPreferences
+                saveWorkmateNames(workmateNames);
             }
         });
     }
+    // Save the workmate names to SharedPreferences
+    private void saveWorkmateNames(String workmateNames) {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("workmate_names", workmateNames);
+        editor.apply();
+    }
+
 
     private void observeSelectedRestaurantByUser() {
         userViewModel.getUserLiveData().observe(this, user -> {
@@ -230,22 +249,54 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     // Intent
     private void getIntentData() {
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("restaurant")) {
-            restaurant = intent.getParcelableExtra("restaurant");
-            restaurantId = restaurant.getPlaceId();
-            restaurantViewModel.getRestaurantById(restaurantId);
-            float ratingCount = restaurant.getRating();
+        if (intent != null) {
+            if (intent.hasExtra("restaurant")) {
+                restaurant = intent.getParcelableExtra("restaurant");
+                restaurantId = restaurant.getPlaceId();
+                restaurantViewModel.getRestaurantById(restaurantId);
+                float ratingCount = restaurant.getRating();
 
-            restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
-                if (observeRestaurant != null) {
-                    placeNameTextView.setText(restaurant.getName());
-                    placeAddressTextView.setText(restaurant.getAddress());
-                    ratingBar.setRating(ratingCount);
-                    loadRestaurantImage(restaurant);
-                }
-            });
+                restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
+                    if (observeRestaurant != null) {
+                        placeNameTextView.setText(restaurant.getName());
+                        placeAddressTextView.setText(restaurant.getAddress());
+                        ratingBar.setRating(ratingCount);
+                        loadRestaurantImage(restaurant);
+                    }
+                });
+            }/*
+            else if (intent.hasExtra("restaurantId")) {
+                // Cas où la clé est "restaurantId"
+                restaurantId = intent.getStringExtra("restaurantId");
+                // Utilisez restaurantId pour obtenir les données du restaurant depuis votre ViewModel
+                restaurantViewModel.getRestaurantById(restaurantId);
+                restaurant = restaurantViewModel.getSelectedRestaurantLiveData().getValue();
+                //float ratingCount = restaurant.getRating();
+
+                restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
+                    if (observeRestaurant != null) {
+                        placeNameTextView.setText(observeRestaurant.getName());
+                        placeAddressTextView.setText(observeRestaurant.getAddress());
+                        //ratingBar.setRating(ratingCount);
+                        loadRestaurantImage(observeRestaurant);
+                    }
+                });
+            }*/
+
         }
     }
+
+    /** pour charger
+     * SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+     * SharedPreferences.Editor editor = sharedPreferences.edit();
+     * editor.putString("restaurant_name", restaurantName);
+     * editor.apply();
+     */
+
+    /** pour récupérer
+     * SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+     * String restaurantName = sharedPreferences.getString("restaurant_name", "");
+     */
 
     // Updates
     private void updateUserSelectedRestaurant() {
@@ -260,7 +311,6 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     }
 
     private void updateUserLikedPlace() {
-
         if (currentUser != null && restaurantId != null) {
             List<String> likedPlaces = currentUser.getLikedPlaces();
 
@@ -270,14 +320,12 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
                 Toast.makeText(this, R.string.your_lunch_detail_you_disliked, Toast.LENGTH_SHORT).show();
-
             } else {
                 likedPlaces.add(restaurantId);
                 currentUser.setLikedPlaces(likedPlaces);
                 userViewModel.updateUserLikedPlaces(currentUser.getUserId(), likedPlaces);
 
                 Toast.makeText(this, R.string.your_lunch_detail_you_liked, Toast.LENGTH_SHORT).show();
-
             }
         }
     }
