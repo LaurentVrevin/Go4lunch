@@ -32,7 +32,7 @@ public class Restaurant implements Parcelable {
     private int likesCount;
 
     public Restaurant() {
-        // constructeur sans argument requis pour Firestore
+
     }
 
     public Restaurant(Result result) {

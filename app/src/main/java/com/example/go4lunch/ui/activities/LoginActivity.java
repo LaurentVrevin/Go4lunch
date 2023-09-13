@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setTheme(R.style.LoginTheme)
+                        .setTheme(R.style.Go4LunchLogin)
                         .setAvailableProviders(providers)
                         .setIsSmartLockEnabled(false, true)
                         .setLogo(R.drawable.logo_go4lunch_launcher)

@@ -212,7 +212,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                     }
                 }
                 workmatesListViewAdapter.setWorkmatesList(filteredList);
-                // Sauvegardez la liste filtrée dans SharedPreferences
+                // Save the list of workmates in SharedPreferences
                 List<String> workmateNamesList = new ArrayList<>();
                 for (User user : filteredList) {
                     workmateNamesList.add(user.getName());
@@ -239,6 +239,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                 selectedRestaurantId = user.getSelectedRestaurantId();
                 if (selectedRestaurantId != null && selectedRestaurantId.equals(restaurantId)) {
                     setSelectionRestaurantButtonColor(true);
+
                 } else {
                     setSelectionRestaurantButtonColor(false);
                 }
@@ -264,39 +265,10 @@ public class YourLunchDetailActivity extends AppCompatActivity {
                         loadRestaurantImage(restaurant);
                     }
                 });
-            }/*
-            else if (intent.hasExtra("restaurantId")) {
-                // Cas où la clé est "restaurantId"
-                restaurantId = intent.getStringExtra("restaurantId");
-                // Utilisez restaurantId pour obtenir les données du restaurant depuis votre ViewModel
-                restaurantViewModel.getRestaurantById(restaurantId);
-                restaurant = restaurantViewModel.getSelectedRestaurantLiveData().getValue();
-                //float ratingCount = restaurant.getRating();
-
-                restaurantViewModel.getSelectedRestaurantLiveData().observe(this, observeRestaurant -> {
-                    if (observeRestaurant != null) {
-                        placeNameTextView.setText(observeRestaurant.getName());
-                        placeAddressTextView.setText(observeRestaurant.getAddress());
-                        //ratingBar.setRating(ratingCount);
-                        loadRestaurantImage(observeRestaurant);
-                    }
-                });
-            }*/
+            }
 
         }
     }
-
-    /** pour charger
-     * SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-     * SharedPreferences.Editor editor = sharedPreferences.edit();
-     * editor.putString("restaurant_name", restaurantName);
-     * editor.apply();
-     */
-
-    /** pour récupérer
-     * SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-     * String restaurantName = sharedPreferences.getString("restaurant_name", "");
-     */
 
     // Updates
     private void updateUserSelectedRestaurant() {

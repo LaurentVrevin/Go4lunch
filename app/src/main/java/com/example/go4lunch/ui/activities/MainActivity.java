@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -101,31 +102,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setupNavigationListener();
         observePermission();
         observeRestaurantsData();
-        //getToken();
+
 
     }
-
-    private void getToken(){
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w("TOKEN", "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // Log and toast
-                        String msg = "le token est : " + token;
-                        Log.d("TOKEN", msg);
-                        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
     private void checkAuth() {
         firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null) {
@@ -162,15 +141,22 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             // Get the selected restaurant using restaurantSelectedIdByUser
             restaurantViewModel.getRestaurantById(restaurantSelectedIdByUser);
             restaurantViewModel.getSelectedRestaurantLiveData().observe(this, restaurantSelected -> {
+                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
                 if (restaurantSelected != null) {
                     restaurant = restaurantSelected;
                     restaurantName = restaurant.getName();
                     restaurantId = restaurant.getPlaceId();
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
 
                     editor.putString("restaurant_name", restaurantName);
                     editor.putString("restaurant_Id", restaurantId);
+                    editor.putString("user_id", userId);
+                    editor.apply();
+                }
+                else{
+                    editor.putString("restaurant_name", "");
+                    editor.putString("restaurant_Id", "");
                     editor.putString("user_id", userId);
                     editor.apply();
                 }
@@ -367,7 +353,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+            // User dedied permission = logout
         logOutAndRedirect();
+
     }
 
     public void logOutAndRedirect() {
@@ -400,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             restaurantViewModel.getRestaurants(currentLocation);
             restaurantViewModel.getListRestaurantLiveData().observe(this, restaurantListData -> {
                 restaurantslisteLike = restaurantListData;
-                LikesCounter.updateLikesCount(restaurantslisteLike, workmateslist);
+               LikesCounter.updateLikesCount(restaurantslisteLike, workmateslist);
             });
         }
     }
@@ -456,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public void onStop() {
         super.onStop();
-        locationPermissionViewModel.stopUpdateLocation();
+
         Log.d("CYCLEDEVIE", "on Stope");
     }
 
@@ -465,5 +453,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         super.onDestroy();
         userViewModel.logOut();
         userViewModel.getUserLiveData().removeObservers(this);
+        locationPermissionViewModel.getCurrentLocation().removeObservers(this);
+        //locationPermissionViewModel.stopUpdateLocation();
     }
 }

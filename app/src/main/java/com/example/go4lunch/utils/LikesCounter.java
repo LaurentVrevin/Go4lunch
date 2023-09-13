@@ -12,52 +12,57 @@ import java.util.Map;
 public class LikesCounter {
     public static void updateLikesCount(List<Restaurant> restaurantList, List<User> userList) {
 
-        if (restaurantList == null || userList == null) {
-            // One of the lists is null, do not perform the update
-            return;
-        }
+
         Map<String, Integer> likesCountMap = new HashMap<>();
 
         // Initialize the map with like counters set to zero for each restaurant
-        for (Restaurant restaurant : restaurantList) {
-            likesCountMap.put(restaurant.getPlaceId(), 0);
-        }
+        if(restaurantList != null) {
 
-        // Iterate through the list of users
-        for (User user : userList) {
-            List<String> likedPlaces = user.getLikedPlaces();
 
-            Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liked places: " + likedPlaces.toString());
-            if (likedPlaces != null) {
-                for (String restaurantId : likedPlaces) {
-                    Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liking restaurant: " + restaurantId);
-
-                    if (likesCountMap.containsKey(restaurantId)) {
-                        int currentLikesCount = likesCountMap.get(restaurantId);
-                        likesCountMap.put(restaurantId, currentLikesCount + 1);
-                    } else {
-                        likesCountMap.put(restaurantId, 1);
-                    }
+            for (Restaurant restaurant : restaurantList) {
+                if (restaurant != null && restaurant.getPlaceId() != null) {
+                    likesCountMap.put(restaurant.getPlaceId(), 0);
                 }
             }
 
-        }
+            // Iterate through the list of users
+            for (User user : userList) {
+                List<String> likedPlaces = user.getLikedPlaces();
 
-        // Update the like counters of the restaurants in the list
-        for (Restaurant restaurant : restaurantList) {
-            String restaurantId = restaurant.getPlaceId();
-            if (likesCountMap.containsKey(restaurantId)) {
-                int likesCount = likesCountMap.get(restaurantId);
-                restaurant.setLikesCount(likesCount);
+                Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liked places: " + likedPlaces.toString());
+                if (likedPlaces != null) {
+                    for (String restaurantId : likedPlaces) {
+                        Log.d("LIKES_COUNTER", "User: " + user.getName() + " - Liking restaurant: " + restaurantId);
 
-                // Calculate star rating based on likes
-                float rating = calculateRatingFromLikesPercentage(likesCount, userList.size());
-                restaurant.setRating(rating);
-                Log.d("LIKES_COUNTER", "Restaurant: " + restaurant.getName() + " " + restaurant.getPlaceId() + " " + " - Likes: " + likesCount + " Stars:" + restaurant.getRating());
-            } else {
-                restaurant.setLikesCount(0);
-                restaurant.setLikesCount(0);
-                restaurant.setRating(0.0f);
+                        if (likesCountMap.containsKey(restaurantId)) {
+                            int currentLikesCount = likesCountMap.get(restaurantId);
+                            likesCountMap.put(restaurantId, currentLikesCount + 1);
+                        } else {
+                            likesCountMap.put(restaurantId, 1);
+                        }
+                    }
+                }
+
+            }
+
+            // Update the like counters of the restaurants in the list
+            for (Restaurant restaurant : restaurantList) {
+                if (restaurant != null && restaurant.getPlaceId() != null) {
+                    String restaurantId = restaurant.getPlaceId();
+                    if (likesCountMap.containsKey(restaurantId)) {
+                        int likesCount = likesCountMap.get(restaurantId);
+                        restaurant.setLikesCount(likesCount);
+
+                        // Calculate star rating based on likes
+                        float rating = calculateRatingFromLikesPercentage(likesCount, userList.size());
+                        restaurant.setRating(rating);
+                        Log.d("LIKES_COUNTER", "Restaurant: " + restaurant.getName() + " " + restaurant.getPlaceId() + " " + " - Likes: " + likesCount + " Stars:" + restaurant.getRating());
+                    } else {
+                        restaurant.setLikesCount(0);
+                        restaurant.setLikesCount(0);
+                        restaurant.setRating(0.0f);
+                    }
+                }
             }
         }
     }

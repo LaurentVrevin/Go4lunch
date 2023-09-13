@@ -102,7 +102,7 @@ public class WorkmatesFragmentAdapter extends RecyclerView.Adapter<WorkmatesFrag
     // Check if the restaurant chosen by the workmate exists in the list of restaurants
     private boolean isRestaurantInList(String restaurantId) {
         for (Restaurant restaurant : restaurantList) {
-            if (restaurant.getPlaceId().equals(restaurantId)) {
+            if (restaurant.getPlaceId() !=null && restaurant.getPlaceId().equals(restaurantId)) {
                 return true;
             }
         }

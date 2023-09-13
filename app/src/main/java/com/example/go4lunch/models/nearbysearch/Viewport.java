@@ -3,7 +3,6 @@ package com.example.go4lunch.models.nearbysearch;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-//Délimite la zone via Northeast et Southwest
 public class Viewport {
     @SerializedName("northeast")
     @Expose

@@ -4,10 +4,15 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@android:color/holo_red_dark</item>
-        <item name="colorAccent">@color/orange</item>
+        <item name="colorAccent">@color/black</item>
 
-        <!-- Customize your theme here. -->
+        <!-- Text Color -->
+        <item name="android:textColorPrimary">@color/orange</item>
+        <item name="android:textColorSecondary">@color/black</item>
+
     </style>
+    <!-- Base application theme. -->
+
 
     <style name="Theme.Go4lunch.NoActionBar">
         <item name="windowActionBar">false</item>

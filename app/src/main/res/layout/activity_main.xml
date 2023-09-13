@@ -24,7 +24,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/orange"
+            android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,10 +61,10 @@
     <!-- Menu de navigation latéral (NavigationView) -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view_drawer"
+        android:background="?attr/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/orange"
         android:fitsSystemWindows="true"
         app:itemTextColor="@color/white"
         app:itemIconTint="@color/white"

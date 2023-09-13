@@ -12,7 +12,6 @@ public interface LocationInterface {
 
     void startLocationRequest(Context context, Activity activity);
 
-    int getRadius();
 
     Location getCurrentLocation();
 

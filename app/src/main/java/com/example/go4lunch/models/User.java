@@ -14,7 +14,7 @@ public class User {
     private String pictureUrl;
     private List<String> likedPlaces;
     @Nullable
-    private String selectedRestaurantId; // Nouvelle variable pour stocker l'ID du restaurant sélectionné
+    private String selectedRestaurantId;
 
     //CONSTRUCTOR
     public User(String userId, String name, String email, @Nullable String pictureUrl, List<String> likedPlaces, @Nullable String selectedRestaurantId) {
@@ -26,7 +26,7 @@ public class User {
         this.selectedRestaurantId = selectedRestaurantId;
     }
     public User() {
-        // constructeur sans argument requis pour Firestore
+
     }
 
     //GETTERS & SETTERS

@@ -5,41 +5,34 @@
     android:id="@+id/item_list_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="2dp">
+    android:paddingVertical="@dimen/margin_ultrasmall">
 
-    <TextView
+    <TextView style="@style/TextViewPlaceName"
         android:id="@+id/tv_place_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:textStyle="bold"
+        android:layout_marginStart="@dimen/margin_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/im_place"
         tools:text="@string/app_name" />
 
-    <TextView
+    <TextView style="@style/TextViewPlaceDistance"
         android:id="@+id/tv_place_range"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/dark_grey"
-        android:textSize="14sp"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_small"
         app:layout_constraintEnd_toStartOf="@id/im_place"
         app:layout_constraintTop_toTopOf="@id/im_place"
         tools:text="@string/app_name" />
 
-    <TextView
+    <TextView style="@style/TextViewPlaceAddress"
         android:id="@+id/tv_place_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/margin_medium"
         android:maxWidth="200dp"
         android:maxLines="1"
-        android:textColor="@color/black"
-        android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/tv_place_open"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_place_name"
@@ -55,51 +48,42 @@
         app:layout_constraintTop_toBottomOf="@id/tv_place_name"
         app:tint="@color/black" />
 
-    <TextView
+    <TextView style="@style/TextViewWorkmateParentheses"
         android:id="@+id/tv_workmate_first_parenthesis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="@dimen/margin_ultrasmall"
         android:text="@string/item_list_view_first_parenthesis"
-        android:textColor="@color/black"
-        android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/tv_place_open"
         app:layout_constraintEnd_toStartOf="@id/tv_workmate_number"
         app:layout_constraintTop_toBottomOf="@id/tv_place_name" />
 
-    <TextView
+    <TextView style="@style/TextViewWorkmateNumber"
         android:id="@+id/tv_workmate_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:textColor="@color/black"
-        android:textSize="13sp"
+        android:layout_marginLeft="@dimen/margin_ultrasmall"
         app:layout_constraintBottom_toTopOf="@id/tv_place_open"
         app:layout_constraintEnd_toStartOf="@id/tv_workmate_last_parenthesis"
         app:layout_constraintTop_toBottomOf="@id/tv_place_name"
         tools:text="@string/item_list_view_workmate_number" />
 
-    <TextView
+    <TextView style="@style/TextViewWorkmateParentheses"
         android:id="@+id/tv_workmate_last_parenthesis"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="@dimen/margin_ultrasmall"
+        android:layout_marginEnd="@dimen/margin_small"
         android:text="@string/item_list_view_last_parenthesis"
-        android:textColor="@color/black"
-        android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/tv_place_open"
         app:layout_constraintEnd_toStartOf="@id/im_place"
         app:layout_constraintTop_toBottomOf="@id/tv_place_name" />
 
-    <TextView
+    <TextView style="@style/TextViewPlaceOpen"
         android:id="@+id/tv_place_open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        android:textStyle="italic"
+        android:layout_marginStart="@dimen/margin_medium"
         app:layout_constraintBottom_toBottomOf="@id/im_place"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="@string/app_name" />
@@ -109,8 +93,8 @@
         style="?android:attr/ratingBarStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_small"
         android:isIndicator="true"
         android:numStars="3"
         android:rating="0"
@@ -124,10 +108,10 @@
         android:id="@+id/im_place"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
         android:contentDescription="@string/item_list_view_place_photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

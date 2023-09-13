@@ -162,4 +162,5 @@ public class RestaurantRepository implements RestaurantInterface {
     public void updateRadius(int selectedRadius) {
         radius = selectedRadius;
     }
+
 }

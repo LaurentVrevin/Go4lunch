@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,7 +46,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     private LocationPermissionViewModel locationPermissionViewModel;
     private RestaurantViewModel restaurantViewModel;
     private UserViewModel userViewModel;
-    private Location location;
+    private Location userLocation;
 
     private static HashMap<String, Integer> workmatesCountMap = new HashMap<>();
 
@@ -98,7 +97,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
         locationPermissionViewModel.observePermission().observe(requireActivity(), this::setCamera);
-        if (location !=null) {
+        if (userLocation !=null) {
             getCurrentLocation(googleMap);
             googleMap.setMyLocationEnabled(true);
             setMarkers(restaurantListData); // Display restaurant markers on the map
@@ -126,7 +125,7 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     private void updateLocation(Location location) {
         if (this.isAdded()) {
-            this.location = location;
+            this.userLocation = location;
             enableMyLocation(googleMap);
             getCurrentLocation(googleMap);
         }
@@ -139,8 +138,8 @@ public class MapViewFragment extends Fragment implements OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     public void getCurrentLocation(GoogleMap googleMap) {
-        if (location != null) {
-            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+        if (userLocation != null) {
+            LatLng current = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, MAX_ZOOM));
         }
     }

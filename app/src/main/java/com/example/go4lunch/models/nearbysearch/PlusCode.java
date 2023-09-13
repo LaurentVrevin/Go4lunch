@@ -7,11 +7,11 @@ import com.google.gson.annotations.SerializedName;
 
 public class PlusCode {
 
-    //Identification précise du lieu, région et pays
+
     @SerializedName("compound_code")
     @Expose
     private String compoundCode;
-    //Référence unique à la loc dans le monde
+
     @SerializedName("global_code")
     @Expose
     private String globalCode;

@@ -15,4 +15,21 @@
     <dimen name="imagesize_iv_logo_height">140dp</dimen>
     <dimen name="avatarsize_header_width">70dp</dimen>
     <dimen name="avatarsize_header_height">70dp</dimen>
+
+    <!-- Marges -->
+    <dimen name="margin_ultrasmall">8dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+
+    <!--  LISTVIEW -->
+    <dimen name="listview_text_size_medium">14sp</dimen>
+    <dimen name="listview_text_size_small">13sp</dimen>
+
+    <!-- DRAWER -->
+    <dimen name="drawer_text_size_small">12sp</dimen>
+    <dimen name="drawer_text_size_medium">16sp</dimen>
+    <dimen name="drawer_text_size_large">20sp</dimen>
+
+
 </resources>

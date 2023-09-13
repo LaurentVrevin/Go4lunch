@@ -34,10 +34,7 @@ public class LocationRepository implements LocationInterface {
     public LocationRepository() {
     }
 
-    @Override
-    public int getRadius() {
-        return 500;
-    }
+
 
     @Override
     public Location getCurrentLocation() {

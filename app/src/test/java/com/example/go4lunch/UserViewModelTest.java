@@ -44,33 +44,33 @@ public class UserViewModelTest {
 
     @Test
     public void testGetUserLiveData() {
-        // Simuler la LiveData que votre userInterface retournerait
+        // Simulate the LiveData that userInterface would return
         LiveData<User> mockLiveData = Mockito.mock(LiveData.class);
         when(userInterface.getUserLiveData()).thenReturn(mockLiveData);
 
-        // Obtenir la LiveData du ViewModel
+        // Get the ViewModel's LiveData
         LiveData<User> viewModelLiveData = userViewModel.getUserLiveData();
 
-        // Vérifier que la LiveData n'est pas nulle
+        // Verify that the LiveData is not null
         assertNotNull(viewModelLiveData);
 
-        // Vérifier que la LiveData du ViewModel est la même que celle du userInterface
+        // Verify that the ViewModel's LiveData is the same as userInterface's
         assertEquals(mockLiveData, viewModelLiveData);
     }
 
     @Test
     public void testGetUserListLiveData() {
-        // Simuler la LiveData que votre userInterface retournerait
+        // Simulate the LiveData that userInterface would return
         LiveData<List<User>> mockLiveData = Mockito.mock(LiveData.class);
         when(userInterface.getUserListLiveData()).thenReturn(mockLiveData);
 
-        // Obtenir la LiveData du ViewModel
+        // Get the ViewModel's LiveData
         LiveData<List<User>> viewModelLiveData = userViewModel.getUserListLiveData();
 
-        // Vérifier que la LiveData n'est pas nulle
+        // Verify that the LiveData is not null
         assertNotNull(viewModelLiveData);
 
-        // Vérifier que la LiveData du ViewModel est la même que celle du userInterface
+        // Verify that the ViewModel's LiveData is the same as userInterface's
         assertEquals(mockLiveData, viewModelLiveData);
     }
 
@@ -78,83 +78,81 @@ public class UserViewModelTest {
     public void testGetCurrentUserFromFirestore() {
         String userId = "yourUserId";
 
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.getCurrentUserFromFirestore(userId);
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée avec le bon argument
+        // Verify that the corresponding method in UserInterface was called with the correct argument
         Mockito.verify(userInterface).getCurrentUserFromFirestore(userId);
     }
 
     @Test
     public void testCreateUserInFirestore() {
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.createUserInFirestore();
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée
+        // Verify that the corresponding method in UserInterface was called
         Mockito.verify(userInterface).createUserInFirestore();
     }
 
     @Test
     public void testGetUserId() {
-        // Créez une instance simulée de Task<DocumentSnapshot>
+        // Create a simulated instance of Task<DocumentSnapshot>
         Task<DocumentSnapshot> mockTask = Mockito.mock(Task.class);
 
-        // Configurez le mock pour qu'il renvoie cette instance simulée
+        // Configure the mock to return this simulated instance
         Mockito.when(userInterface.getUserId()).thenReturn(mockTask);
 
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         Task<DocumentSnapshot> resultTask = userViewModel.getUserId();
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée
+        // Verify that the corresponding method in UserInterface was called
         Mockito.verify(userInterface).getUserId();
 
-        // Vérification que la tâche renvoyée est la même que celle du UserInterface
+        // Verify that the returned task is the same as the one from UserInterface
         Assert.assertEquals(mockTask, resultTask);
     }
 
     @Test
     public void testUpdateUserSelectedRestaurant() {
-        String userId = "yourUserId";
-        User user = new User(); // Créez un objet User approprié
+        String userId = "123456789";
+        User user = new User(); // Create an appropriate User object
 
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.updateUserSelectedRestaurant(userId, user);
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée avec les bons arguments
+        // Verify that the corresponding method in UserInterface was called with the correct arguments
         Mockito.verify(userInterface).updateUserSelectedRestaurant(userId, user);
     }
 
     @Test
     public void testUpdateUserLikedPlaces() {
-        String userId = "yourUserId";
-        List<String> likedPlaces = Arrays.asList("Place1", "Place2", "Place3"); // Remplacez par votre liste
+        String userId = "123456789";
+        List<String> likedPlaces = Arrays.asList("Place1", "Place2", "Place3"); // Replace with your list
 
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.updateUserLikedPlaces(userId, likedPlaces);
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée avec les bons arguments
+        // Verify that the corresponding method in UserInterface was called with the correct arguments
         Mockito.verify(userInterface).updateUserLikedPlace(userId, likedPlaces);
     }
 
     @Test
     public void testLogOut() {
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.logOut();
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée
+        // Verify that the corresponding method in UserInterface was called
         Mockito.verify(userInterface).logOut();
     }
+
     @Test
     public void testDeleteAccount() {
-        Context context = Mockito.mock(Context.class); // Créez un mock de Context
+        Context context = Mockito.mock(Context.class); // Create a mock Context
 
-        // Appel de la méthode du ViewModel
+        // Call the ViewModel's method
         userViewModel.deleteAccount(context);
 
-        // Vérification que la méthode correspondante du UserInterface a été appelée avec le bon contexte
+        // Verify that the corresponding method in UserInterface was called with the correct context
         Mockito.verify(userInterface).deleteAccount(context);
     }
-
-
-
 }

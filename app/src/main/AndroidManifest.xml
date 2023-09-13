@@ -4,6 +4,10 @@
     package="com.example.go4lunch">
 
 
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -56,8 +60,9 @@
         </activity>
 
         <service android:name=".notificationmanager.MyFirebaseMessagingServices"
-            android:exported="true"
-            tools:ignore="MissingClass">
+            android:exported="false"
+            tools:ignore="MissingClass"
+            android:permission="TODO">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-//représente les informations d'un lieu obtenu à partir de la recherche à proximité (Nearby Search) de l'API Google Places
+
 public class Result {
     @SerializedName("address_components")
     @Expose

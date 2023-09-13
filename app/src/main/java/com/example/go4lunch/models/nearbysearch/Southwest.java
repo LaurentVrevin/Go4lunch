@@ -3,7 +3,7 @@ package com.example.go4lunch.models.nearbysearch;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-//représente les coordonnées géographiques du coin sud-ouest
+
 public class Southwest {
 
     @SerializedName("lat")
