@@ -1,5 +1,7 @@
 
 # <p align="center">GO4LUNCH</p>
+
+Application developed for the P7 of my Android developer formation with OpenClassrooms
   
 Go4Lunch is a application designed for workplace teams. It simplifies the process of finding a nearby restaurant, selecting one's choice, and coordinating lunch plans with colleagues. Just before lunchtime, the app sends notifications to remind users to join their coworkers for a lunch break.
     
