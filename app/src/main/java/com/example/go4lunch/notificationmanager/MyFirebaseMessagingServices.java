@@ -29,6 +29,7 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
     private String restaurantIdFromKey;
     private String workmateNamesFromKey;
     private String userIdFromKey;
+    private String restaurantAddress;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
@@ -41,6 +42,7 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         restaurantNameFromKey = sharedPreferences.getString("restaurant_name", "");
         restaurantIdFromKey = sharedPreferences.getString("restaurant_Id", "");
+        restaurantAddress = sharedPreferences.getString("restaurant_address", "");
         userIdFromKey = sharedPreferences.getString("user_id", "");
         workmateNamesFromKey = sharedPreferences.getString("workmate_names", "");
         if (!restaurantIdFromKey.isEmpty()) {
@@ -52,8 +54,8 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
                 userName = currentUser.getDisplayName();
 
                 // Step 3: Display the notification with the selected restaurant
-                String myMessage = Objects.requireNonNull(message.getNotification()).getBody();
-                Log.d("FirebaseMessage", "You received a message: " + myMessage);
+                String myNotif = Objects.requireNonNull(message.getNotification()).getBody();
+                Log.d("FirebaseMessage", "You received a message: " + myNotif);
 
                 // Optional Step 4: Handle notification click to open restaurant details activity
                 // Create an intent to open MainActivity with the restaurant ID
@@ -63,12 +65,17 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
 
                 // Create a BigTextStyle notification
                 NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-                bigTextStyle.bigText(myMessage + getString(R.string.notification_message_1) + userName + getString(R.string.notification_message_2) + restaurantNameFromKey + getString(R.string.notification_message_3) + workmateNamesFromKey);
+                bigTextStyle.bigText(myNotif +
+                        getString(R.string.notification_message_1) + userName +
+                        getString(R.string.notification_message_2) + restaurantNameFromKey + ", " + restaurantAddress +
+                        getString(R.string.notification_message_3) + workmateNamesFromKey);
+
+
 
                 // Create the notification builder and set the expandable style
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CANAL);
                 notificationBuilder.setContentTitle(getString(R.string.notification_message_title));
-                notificationBuilder.setContentText(myMessage); // Text when notification is not expanded
+                notificationBuilder.setContentText(myNotif); // Text when notification is not expanded
                 notificationBuilder.setStyle(bigTextStyle); // Set the expandable style
                 notificationBuilder.setSmallIcon(R.drawable.ic_baseline_alarm_24);
                 notificationBuilder.setContentIntent(pendingIntent); // Set the intent when notification is clicked

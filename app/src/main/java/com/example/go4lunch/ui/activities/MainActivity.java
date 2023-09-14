@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private List<User> workmateslist;
     private List<Restaurant> restaurantslisteLike;
     private String restaurantId;
+    private String restaurantAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,10 +146,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     restaurant = restaurantSelected;
                     restaurantName = restaurant.getName();
                     restaurantId = restaurant.getPlaceId();
-
+                    restaurantAddress = restaurant.getAddress();
 
                     editor.putString("restaurant_name", restaurantName);
                     editor.putString("restaurant_Id", restaurantId);
+                    editor.putString("restaurant_address", restaurantAddress);
                     editor.putString("user_id", userId);
                     editor.apply();
                 }
@@ -156,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     editor.putString("restaurant_name", "");
                     editor.putString("restaurant_Id", "");
                     editor.putString("user_id", userId);
+                    editor.putString("restaurant_address", restaurantAddress);
                     editor.apply();
                 }
             });
@@ -452,6 +455,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         userViewModel.logOut();
         userViewModel.getUserLiveData().removeObservers(this);
         locationPermissionViewModel.getCurrentLocation().removeObservers(this);
-        //locationPermissionViewModel.stopUpdateLocation();
+
     }
 }

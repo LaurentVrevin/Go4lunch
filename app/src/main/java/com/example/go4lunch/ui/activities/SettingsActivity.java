@@ -22,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SettingsActivity extends AppCompatActivity {
 
-    private TextView firstname, lastname;
+    private TextView firstname;
     private Button btnDelete;
 
 
@@ -41,6 +41,7 @@ public class SettingsActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.settings_activity_title);
         }
 
         // Initialize views

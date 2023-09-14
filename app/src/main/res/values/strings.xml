@@ -77,11 +77,18 @@
     <string name="delete_message">"Are you sure you want delete your account ? "</string>
     <string name="settings_activity_description">Hello, once you confirm your account deletion request, you will be automatically logged out.</string>
     <string name="settings_activity_your_name">You are logged in as : </string>
+    <string name="settings_activity_title">Settings</string>
 
     <!-- NOTIFICATION -->
     <string name="notification_channel_id">myCanal</string>
     <string name="notification_channel_title">myTitle</string>
     <string name="notification_channel_description">This is the good channel</string>
+    <string name="notification_message_1">"Hello "</string>
+    <string name="notification_message_2">", it's time to go eat at "</string>
+    <string name="notification_message_3">" with "</string>
+    <string name="notification_message_title">Go4Lunch</string>
+
+    <!-- *** -->
 
     <string name="user_avatar">User avatar</string>
     <string name="Search_Description">Search</string>
@@ -111,10 +118,8 @@
     <string name="workmates_fragment_adapter_no_restaurant_selected">" hasn\'t decided yet"</string>
     <string name="workmates_fragment_adapter_is_eating_at">" is eating at "</string>
     <string name="settings_delete_account">DELETE ACCOUNT</string>
-    <string name="notification_message_1">"Hello "</string>
-    <string name="notification_message_2">", the restaurant you selected is "</string>
-    <string name="notification_message_3">" and the workmates want to go in this restaurant are "</string>
-    <string name="notification_message_title">Go4Lunch</string>
+
+
 
 
 </resources>

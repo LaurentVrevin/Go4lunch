@@ -78,11 +78,17 @@
     <string name="settings_delete_account">SUPPRIMEZ VOTRE COMPTE</string>
     <string name="settings_activity_description">"Bonjour, une fois que vous confirmez votre demande de suppression de compte, vous serez automatiquement déconnecté(e)"</string>
     <string name="settings_activity_your_name">"Vous êtes connecté(e) en tant que "</string>
+    <string name="settings_activity_title">Paramètres</string>
 
     <!-- NOTIFICATION -->
     <string name="notification_channel_id">monCanal</string>
     <string name="notification_channel_title">monTitre</string>
     <string name="notification_channel_description">C\'est le bon canal</string>
+
+    <string name="notification_message_1">"Salut "</string>
+    <string name="notification_message_2">", il est l'heure d'aller manger au "</string>
+    <string name="notification_message_3">" avec "</string>
+    <string name="notification_message_title">Go4Lunch</string>
 
     <string name="user_avatar">Avatar de l\'utilisateur</string>
     <string name="Search_Description">Rechercher</string>
@@ -112,11 +118,6 @@
     <string name="workmates_fragment_adapter_no_restaurant_selected">" n'a pas encore décidé"</string>
     <string name="workmates_fragment_adapter_is_eating_at">" mange chez "</string>
 
-
-    <string name="notification_message_1">"Hello "</string>
-    <string name="notification_message_2">", le restaurant que vous avez choisi est "</string>
-    <string name="notification_message_3">" et les collègues qui ont choisi ce restaurant sont "</string>
-    <string name="notification_message_title">Go4Lunch</string>
 
 
 

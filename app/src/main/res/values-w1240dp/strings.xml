@@ -115,6 +115,7 @@
     <string name="notification_message_2">", the restaurant you selected is "</string>
     <string name="notification_message_3">" and the workmates want to go in this restaurant are "</string>
     <string name="notification_message_title">Go4Lunch</string>
+    <string name="settings_activity_title">Settings</string>
 
 
 </resources>
