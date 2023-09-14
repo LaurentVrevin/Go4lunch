@@ -75,8 +75,8 @@
     <!-- SETTINGS -->
     <string name="delete_title">Delete account</string>
     <string name="delete_message">"Are you sure you want delete your account ? "</string>
-    <string name="settings_activity_description">My first name :</string>
-    <string name="settings_activity_lastname">"My last name : "</string>
+    <string name="settings_activity_description">Hello, once you confirm your account deletion request, you will be automatically logged out.</string>
+    <string name="settings_activity_your_name">You are logged in as : </string>
 
     <!-- NOTIFICATION -->
     <string name="notification_channel_id">myCanal</string>
