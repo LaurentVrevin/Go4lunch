@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Go4lunch</string>
 
@@ -76,6 +75,8 @@
     <!-- SETTINGS -->
     <string name="delete_title">Delete account</string>
     <string name="delete_message">"Are you sure you want delete your account ? "</string>
+    <string name="settings_activity_description">My first name :</string>
+    <string name="settings_activity_lastname">"My last name : "</string>
 
     <!-- NOTIFICATION -->
     <string name="notification_channel_id">myCanal</string>
@@ -114,5 +115,6 @@
     <string name="notification_message_2">", the restaurant you selected is "</string>
     <string name="notification_message_3">" and the workmates want to go in this restaurant are "</string>
     <string name="notification_message_title">Go4Lunch</string>
+
 
 </resources>

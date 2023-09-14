@@ -7,7 +7,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -28,6 +28,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityMainBinding;
@@ -40,15 +41,13 @@ import com.example.go4lunch.utils.LikesCounter;
 import com.example.go4lunch.viewmodels.LocationPermissionViewModel;
 import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.example.go4lunch.viewmodels.UserViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.List;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -135,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         }
     }
 
-
     private void observeRestaurantSelectedByUser() {
         if (restaurantSelectedIdByUser != null) {
             // Get the selected restaurant using restaurantSelectedIdByUser
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void observeWorkmatesData() {
-        userViewModel.getWorkmatesListFromFirestore(false);
+        userViewModel.getWorkmatesListFromFirestore(true);
         userViewModel.getUserListLiveData().observe(this, userList -> workmateslist = userList);
     }
 

@@ -63,10 +63,7 @@ public class MyFirebaseMessagingServices extends FirebaseMessagingService {
 
                 // Create a BigTextStyle notification
                 NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
-                bigTextStyle.bigText(myMessage +
-                        getString(R.string.notification_message_1) + userName +
-                        getString(R.string.notification_message_2) + restaurantNameFromKey +
-                        getString(R.string.notification_message_3) + workmateNamesFromKey);
+                bigTextStyle.bigText(myMessage + getString(R.string.notification_message_1) + userName + getString(R.string.notification_message_2) + restaurantNameFromKey + getString(R.string.notification_message_3) + workmateNamesFromKey);
 
                 // Create the notification builder and set the expandable style
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CANAL);

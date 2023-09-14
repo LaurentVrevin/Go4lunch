@@ -2,12 +2,8 @@ package com.example.go4lunch.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -15,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.repositories.RestaurantRepository;
-import com.example.go4lunch.viewmodels.RestaurantViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -28,18 +22,16 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SettingsActivity extends AppCompatActivity {
 
-    private EditText etFirstName, etLastName;
+    private TextView firstname, lastname;
     private Button btnDelete;
-    private Button btnOk;
-    private SeekBar seekBarRadius;
-    private TextView txtviewRadius;
+
+
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private UserViewModel userViewModel;
-    private RestaurantViewModel restaurantViewModel;
+
     private User currentUser;
-    private int radius;
-    private int currentRadius;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +44,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         // Initialize views
-        etFirstName = findViewById(R.id.editTextFirstName);
-        etLastName = findViewById(R.id.editTextLastName);
-        btnDelete = findViewById(R.id.buttonDeleteAccount);
-        seekBarRadius = findViewById(R.id.seekBarRadius);
-        txtviewRadius = findViewById(R.id.txtviewRadius);
-        btnOk = findViewById(R.id.buttonOk);
+        firstname = findViewById(R.id.txtviewFirstname);
 
-        // Get the currently logged-in user
+        btnDelete = findViewById(R.id.buttonDeleteAccount);
+                // Get the currently logged-in user
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -68,13 +56,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         userViewModel.getUserLiveData().observe(this, user -> {
             currentUser = user;
-            etFirstName.setText(user.getName().split(" ")[0]); // Display the first name
-            etLastName.setText(user.getName().split(" ")[1]); // Display the last name
+            firstname.setText(user.getName().split(" ")[0]); // Display the first name
+
         });
 
-        btnOk.setOnClickListener(view -> {
-            // Add your action here when the "Ok" button is clicked
-        });
 
         btnDelete.setOnClickListener(view -> {
             deleteUser(currentUser.getUserId());

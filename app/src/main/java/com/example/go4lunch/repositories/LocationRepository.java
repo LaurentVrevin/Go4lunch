@@ -34,8 +34,6 @@ public class LocationRepository implements LocationInterface {
     public LocationRepository() {
     }
 
-
-
     @Override
     public Location getCurrentLocation() {
         Location deviceLocation = new Location((USER_POSITION));

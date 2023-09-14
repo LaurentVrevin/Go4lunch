@@ -14,17 +14,17 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class PermissionRepository implements PermissionInterface {
 
-    // Crée un objet MutableLiveData<Boolean> pour stocker l'état des permissions
+    // Create a MutableLiveData<Boolean> object to store the state of permissions
     final MutableLiveData<Boolean> hasPermissions = new MutableLiveData<>();
 
     @Inject
     public PermissionRepository() {
-        // Constructeur de la classe PermissionRepository
+
     }
 
     @Override
     public boolean hasLocationPermissions(Context context) {
-        // Vérifie si les permissions de localisation sont accordées
+        // Check if location permissions are granted
         return EasyPermissions.hasPermissions(
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -34,11 +34,11 @@ public class PermissionRepository implements PermissionInterface {
 
     @Override
     public LiveData<Boolean> liveDataHasLocationPermission(Context context) {
-        // Vérifie les permissions de localisation et met à jour l'objet MutableLiveData
+        // Check location permissions and update the MutableLiveData object
         hasPermissions.setValue(EasyPermissions.hasPermissions(
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 ACCESS_FINE_LOCATION));
-        return hasPermissions; // Renvoie l'objet MutableLiveData pour observer les changements
+        return hasPermissions; // Return the MutableLiveData object for observing changes
     }
 }

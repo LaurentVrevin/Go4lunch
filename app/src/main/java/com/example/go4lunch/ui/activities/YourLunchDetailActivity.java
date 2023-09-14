@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LiveData;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,12 +48,12 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class YourLunchDetailActivity extends AppCompatActivity {
 
-    private static final int CALL_PERMISSION_REQUEST_CODE = 0631;
+    private static final int CALL_PERMISSION_REQUEST_CODE = 409;
 
     private ImageView placeImageView;
     private TextView placeNameTextView;
     private TextView placeAddressTextView;
-    private TextView numberofNote;
+
 
     private FloatingActionButton fabDetailChoice;
     private RatingBar ratingBar;
@@ -70,7 +70,7 @@ public class YourLunchDetailActivity extends AppCompatActivity {
     private UserViewModel userViewModel;
     private RestaurantViewModel restaurantViewModel;
 
-    private LiveData<User> userLiveData;
+
     private List<User> workmatesList;
     private RecyclerView workmatesRecyclerView;
     private YourLunchDetailWorkmatesAdapter workmatesListViewAdapter;

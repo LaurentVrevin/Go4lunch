@@ -6,67 +6,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/editTextFirstName"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/txtview_settings_desciption"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="First name"
+        android:textAlignment="center"
+        android:layout_margin="@dimen/margin_small"
+        android:text="@string/settings_activity_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/your_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_small"
+        android:text="@string/settings_activity_your_name"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/txtview_settings_desciption" />
 
-    <EditText
-        android:id="@+id/editTextLastName"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/txtviewFirstname"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Last name"
+        android:layout_margin="@dimen/margin_small"
+        android:hint="first name"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextFirstName"/>
+        app:layout_constraintTop_toBottomOf="@+id/your_name" />
 
 
     <Button
         android:id="@+id/buttonDeleteAccount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/nav_header_vertical_spacing"
         android:layout_margin="@dimen/nav_header_vertical_spacing"
+        android:background="@drawable/custom_orange_button"
+        android:padding="@dimen/nav_header_vertical_spacing"
         android:text="@string/settings_delete_account"
         android:textColor="@color/white"
-        android:background="@drawable/custom_orange_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextLastName"/>
-
-    <TextView
-        android:id="@+id/txtviewRadius"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Choisissez la distance "
-        app:layout_constraintBottom_toTopOf="@+id/seekBarRadius"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-
-    <SeekBar
-        android:id="@+id/seekBarRadius"
-        android:layout_width="336dp"
-        android:layout_height="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
+
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonDeleteAccount" />
-
-    <Button
-        android:id="@+id/buttonOk"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/nav_header_vertical_spacing"
-        android:layout_margin="@dimen/nav_header_vertical_spacing"
-        android:text="OK"
-        android:textColor="@color/white"
-        android:background="@drawable/custom_orange_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarRadius"/>
-
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

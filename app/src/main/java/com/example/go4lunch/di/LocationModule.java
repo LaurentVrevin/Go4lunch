@@ -4,6 +4,7 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
+
 import com.example.go4lunch.repositories.LocationInterface;
 import com.example.go4lunch.repositories.LocationRepository;
 

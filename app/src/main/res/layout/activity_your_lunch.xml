@@ -5,6 +5,7 @@
     android:id="@+id/place_details_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".ui.activities.YourLunchDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -35,7 +36,8 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:navigationIcon="@drawable/ic_baseline_arrow_back_24" />
+                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
+                />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -68,9 +70,9 @@
             android:id="@+id/tv_detail_restaurant_address"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginStart="@dimen/margin_small_L"
+            android:layout_marginEnd="@dimen/margin_medium_L"
+            android:layout_marginBottom="@dimen/margin_ultrasmall_xs"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/white"
@@ -84,7 +86,7 @@
             style="?android:attr/ratingBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="@dimen/margin_large"
             android:isIndicator="true"
             android:numStars="3"
             android:rating="0"
@@ -102,7 +104,7 @@
         android:id="@+id/bt_detail_restaurant_call"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@color/white"
         android:drawableTop="@drawable/ic_baseline_call_24"
         android:drawableTint="@color/orange"
@@ -118,7 +120,7 @@
         android:id="@+id/bt_detail_restaurant_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@color/white"
         android:drawableTop="@drawable/ic_baseline_star_rate_24"
         android:drawableTint="@color/orange"
@@ -134,7 +136,7 @@
         android:id="@+id/bt_detail_restaurant_website"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_small"
         android:background="@color/white"
         android:drawableTop="@drawable/ic_baseline_language_24"
         android:drawableTint="@color/orange"
@@ -150,8 +152,8 @@
         android:id="@+id/rv_detail_restaurant_workmates"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="12dp"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:layout_marginVertical="@dimen/margin_middle"
         app:layoutManager="LinearLayoutManager"
         android:backgroundTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -165,7 +167,7 @@
         android:id="@+id/fab_detail_choice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="@dimen/margin_large"
         android:contentDescription="@string/your_lunch_detail_select_restaurant_button"
         app:backgroundTint="@color/white"
         app:layout_constraintBottom_toTopOf="@id/cl_detail_middle"

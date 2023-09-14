@@ -1,11 +1,9 @@
 package com.example.go4lunch.di;
 
 
-
 import com.example.go4lunch.repositories.UserInterface;
 import com.example.go4lunch.repositories.UserRepository;
 
-import java.util.List;
 
 import dagger.Binds;
 import dagger.Module;

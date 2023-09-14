@@ -16,5 +16,4 @@ public interface RestaurantInterface {
     MutableLiveData<Restaurant> getRestaurantById(String placeId);
 
 
-    void updateRadius(int selectedRadius);
 }

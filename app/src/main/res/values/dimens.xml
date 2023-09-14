@@ -1,5 +1,5 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!-- HEADER -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
@@ -16,10 +16,14 @@
     <dimen name="avatarsize_header_width">70dp</dimen>
     <dimen name="avatarsize_header_height">70dp</dimen>
 
-    <!-- Marges -->
+    <!-- MARGINS -->
+    <dimen name="margin_ultrasmall_xs">5dp</dimen>
     <dimen name="margin_ultrasmall">8dp</dimen>
     <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_small_L">10dp</dimen>
+    <dimen name="margin_middle">12dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_medium_L">20dp</dimen>
     <dimen name="margin_large">24dp</dimen>
 
     <!--  LISTVIEW -->

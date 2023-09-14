@@ -76,6 +76,8 @@
     <string name="delete_title">Supprimer le compte</string>
     <string name="delete_message">"Êtes-vous sûr de vouloir supprimer votre compte ?"</string>
     <string name="settings_delete_account">SUPPRIMEZ VOTRE COMPTE</string>
+    <string name="settings_activity_description">"Bonjour, une fois que vous confirmez votre demande de suppression de compte, vous serez automatiquement déconnecté(e)"</string>
+    <string name="settings_activity_your_name">"Vous êtes connecté(e) en tant que "</string>
 
     <!-- NOTIFICATION -->
     <string name="notification_channel_id">monCanal</string>
@@ -115,6 +117,7 @@
     <string name="notification_message_2">", le restaurant que vous avez choisi est "</string>
     <string name="notification_message_3">" et les collègues qui ont choisi ce restaurant sont "</string>
     <string name="notification_message_title">Go4Lunch</string>
+
 
 
 </resources>

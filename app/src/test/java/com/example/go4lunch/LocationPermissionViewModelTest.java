@@ -1,6 +1,5 @@
 package com.example.go4lunch;
 
-import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 

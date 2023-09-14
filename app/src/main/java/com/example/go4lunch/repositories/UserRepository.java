@@ -39,7 +39,7 @@ public class UserRepository implements UserInterface {
     private CollectionReference userCollection;
     private MutableLiveData<User> userLiveData;
     private MutableLiveData<List<User>> userListLiveData;
-    private List<Restaurant>restaurantList;
+
 
     @Inject
     public UserRepository() {
@@ -49,10 +49,12 @@ public class UserRepository implements UserInterface {
         userLiveData = new MutableLiveData<>();
         userListLiveData = new MutableLiveData<>();
     }
+
     private FirebaseUser getCurrentFirebaseUser() {
         return firebaseAuth.getCurrentUser();
     }
-      @Override
+
+    @Override
     public LiveData<User> getUserLiveData() {
         return userLiveData;
     }
@@ -71,22 +73,22 @@ public class UserRepository implements UserInterface {
 
             userDocument.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                    // L'utilisateur existe déjà dans Firestore, ne rien faire
+                    // The user already exists in Firestore, do nothing
                 } else {
-                    // L'utilisateur n'existe pas encore dans Firestore, créer un nouveau document
+                    // The user does not exist in Firestore yet, create a new document
                     String displayName = firebaseUser.getDisplayName();
                     String email = firebaseUser.getEmail();
                     String photoUrl = firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null;
 
-                    // Vérifiez si photoUrl est nul, si oui, définissez l'image par défaut
+                    // Check if photoUrl is null, if yes, set the default image
                     if (photoUrl == null) {
-                        // Mettez l'image de base depuis les ressources locales (drawable)
+                        // Set the default image from local resources (drawable)
                         photoUrl = "https://i.pravatar.cc/300";
                     }
 
                     User newUser = new User(userId, displayName, email, photoUrl, new ArrayList<>(), null);
 
-                    // Utilisez la méthode "set" avec l'option "merge" pour mettre à jour uniquement les champs spécifiques
+                    // Use the "set" method with "merge" option to update only specific fields
                     userDocument.set(newUser, SetOptions.merge())
                             .addOnCompleteListener(createUserTask -> {
                                 if (createUserTask.isSuccessful()) {
@@ -139,7 +141,7 @@ public class UserRepository implements UserInterface {
 
                     userListLiveData.postValue(userList);
                     Log.d(TAG, "Retrieved user list from Firestore. User count: " + userList.size());
-                    // Log des lieux appréciés de tous les utilisateurs
+                    // Log the liked places of all users
                     for (User user : userList) {
                         Log.d(TAG, user.getName() + user.getLikedPlaces());
                     }
@@ -148,7 +150,6 @@ public class UserRepository implements UserInterface {
                 }
             });
         }
-
     }
 
     @Override
@@ -231,11 +232,9 @@ public class UserRepository implements UserInterface {
             firebaseAuth.signOut();
         }
     }
+
     @Override
     public void setUserList(List<User> userList) {
         userListLiveData.postValue(userList);
     }
-
-
-
 }

@@ -5,6 +5,7 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.hilt.InstallIn;
 import dagger.hilt.android.components.ViewModelComponent;
+
 import com.example.go4lunch.repositories.PermissionInterface;
 import com.example.go4lunch.repositories.PermissionRepository;
 

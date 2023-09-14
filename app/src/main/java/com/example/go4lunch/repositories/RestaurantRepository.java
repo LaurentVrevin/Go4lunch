@@ -32,7 +32,6 @@ public class RestaurantRepository implements RestaurantInterface {
 
     private final PlacesApi placesApi;
     private Map<String, Restaurant> cachedRestaurants;
-    private int radius;
 
     @Inject
     public RestaurantRepository() {
@@ -157,10 +156,6 @@ public class RestaurantRepository implements RestaurantInterface {
 
     private String generateCacheKey(double latitude, double longitude, int radius) {
         return String.format("%.6f_%.6f_%d", latitude, longitude, radius);
-    }
-
-    public void updateRadius(int selectedRadius) {
-        radius = selectedRadius;
     }
 
 }
