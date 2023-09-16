@@ -66,7 +66,9 @@ offers a French and English version of the application.
 
 ![translation](https://github.com/LaurentVrevin/Go4lunch/assets/94620399/d0de68e3-87e7-47f6-97d7-1a19e0cecb8e)
 
-        
+#### Architecture    
+MVVM : Repository / ViewModel / LiveData 
+
 ## 🛠️ Tech Stack
 - [Firebase Auth](https://firebase.google.com/docs/auth)
 - [Firebase Firestore](https://firebase.google.com/docs/firestore)
